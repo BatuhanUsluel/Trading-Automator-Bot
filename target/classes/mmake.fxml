@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="86.0" layoutY="76.0" prefHeight="42.0" prefWidth="115.0" text="Base Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="bPAr" layoutX="76.0" layoutY="111.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="90.0" layoutY="143.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="86.0" layoutY="169.0" prefHeight="42.0" prefWidth="94.0" text="Alt Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="aPAr" layoutX="76.0" layoutY="205.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="90.0" layoutY="237.0" prefHeight="9.0" prefWidth="38.0" />
+      <JFXButton fx:id="RunArbitrage" layoutX="660.0" layoutY="392.0" prefHeight="93.0" prefWidth="212.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
+         <font>
+            <Font size="33.0" />
+         </font>
+      </JFXButton>
+      <Separator layoutX="462.0" layoutY="10.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="9.0" />
+      <Label fx:id="ExLabelAv" layoutX="528.0" layoutY="276.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <JFXComboBox fx:id="ExAv" editable="true" focusColor="#8397d3" layoutX="533.0" layoutY="318.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <Label layoutX="83.0" layoutY="267.0" prefHeight="42.0" prefWidth="273.0" text="Min Spread(In Base):" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="mAAr" layoutX="78.0" layoutY="300.0" prefHeight="44.0" prefWidth="87.0" promptText="0.005" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="91.0" layoutY="332.0" prefHeight="9.0" prefWidth="76.0" />
+      <Label layoutX="526.0" layoutY="48.0" prefHeight="42.0" prefWidth="273.0" text="Max Alt Balance:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="mAAr1" layoutX="521.0" layoutY="81.0" prefHeight="44.0" prefWidth="76.0" promptText="500" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="534.0" layoutY="113.0" prefHeight="9.0" prefWidth="67.0" />
+      <Label layoutX="526.0" layoutY="143.0" prefHeight="42.0" prefWidth="273.0" text="Min Alt Balance:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="mAAr11" layoutX="521.0" layoutY="176.0" prefHeight="44.0" prefWidth="76.0" promptText="150" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="534.0" layoutY="208.0" prefHeight="9.0" prefWidth="67.0" />
+   </children>
+</AnchorPane>

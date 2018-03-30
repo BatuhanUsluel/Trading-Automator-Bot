@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="76.0" layoutY="66.0" prefHeight="42.0" prefWidth="115.0" text="Base Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="bPAr" layoutX="66.0" layoutY="101.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="80.0" layoutY="133.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="76.0" layoutY="159.0" prefHeight="42.0" prefWidth="94.0" text="Alt Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="aPAr" layoutX="66.0" layoutY="195.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="80.0" layoutY="227.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="73.0" layoutY="260.0" prefHeight="42.0" prefWidth="273.0" text="Minimum Arbitrage %:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="mAAr" layoutX="68.0" layoutY="291.0" prefHeight="44.0" prefWidth="38.0" promptText="1" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="81.0" layoutY="323.0" prefHeight="9.0" prefWidth="14.0" />
+      <JFXButton fx:id="RunArbitrage" layoutX="708.0" layoutY="492.0" prefHeight="54.0" prefWidth="162.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
+         <font>
+            <Font size="33.0" />
+         </font>
+      </JFXButton>
+      <Label layoutX="453.0" layoutY="59.0" prefHeight="42.0" prefWidth="115.0" text="Exchanges:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <JFXComboBox fx:id="Ex1Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="111.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <Separator fx:id="sepVertical" layoutX="426.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="0.0" style="-fx-opacity: 0.8;" />
+      <Label layoutX="456.0" layoutY="103.0" prefHeight="42.0" prefWidth="24.0" text="1:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <Label layoutX="456.0" layoutY="260.0" prefHeight="42.0" prefWidth="24.0" text="5:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <Label layoutX="456.0" layoutY="222.0" prefHeight="42.0" prefWidth="24.0" text="4:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <Label layoutX="456.0" layoutY="181.0" prefHeight="42.0" prefWidth="24.0" text="3:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <Label layoutX="456.0" layoutY="140.0" prefHeight="42.0" prefWidth="24.0" text="2:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <Label layoutX="456.0" layoutY="381.0" prefHeight="42.0" prefWidth="24.0" text="8:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <Label layoutX="456.0" layoutY="339.0" prefHeight="42.0" prefWidth="24.0" text="7:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <Label layoutX="456.0" layoutY="297.0" prefHeight="42.0" prefWidth="24.0" text="6:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <JFXComboBox fx:id="Ex2Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="149.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="Ex3Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="190.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="Ex4Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="231.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="Ex5Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="269.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="Ex6Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="306.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="Ex7Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="348.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="Ex8Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="390.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+   </children>
+</AnchorPane>

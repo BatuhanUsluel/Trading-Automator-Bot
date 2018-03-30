@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="456.0" prefWidth="953.0" style="-fx-border-color: #313235;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+   <children>
+      <AnchorPane prefHeight="456.0" prefWidth="436.0" style="-fx-background-color: #313235;">
+         <children>
+            <Label fx:id="name" layoutX="92.0" layoutY="136.0" text="Trading Bot" textFill="#3592dd">
+               <font>
+                  <Font size="50.0" />
+               </font>
+            </Label>
+            <Label fx:id="slogan" layoutX="108.0" layoutY="204.0" text="Insert Slogan Here" textFill="#3f72eb">
+               <font>
+                  <Font size="27.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="435.0" prefHeight="456.0" prefWidth="518.0" style="-fx-background-color: #3e4047;">
+         <children>
+            <PasswordField fx:id="Pass" layoutX="83.0" layoutY="232.0" prefHeight="27.0" prefWidth="258.0" promptText="•••••••••••••••••••" style="-fx-background-color: #3e4047; -fx-text-inner-color: #ffffff;">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </PasswordField>
+            <Label fx:id="EmailLabel" layoutX="90.0" layoutY="67.0" text="Email" textFill="#4769e4">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <TextField fx:id="Email" layoutX="80.0" layoutY="104.0" prefHeight="32.0" prefWidth="258.0" promptText="Email" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: #ffffff;">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </TextField>
+            <Separator layoutX="92.0" layoutY="139.0" prefHeight="17.0" prefWidth="258.0" />
+            <Label fx:id="PassLabel" layoutX="92.0" layoutY="195.0" text="Passsword" textFill="#4769e4">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Separator layoutX="92.0" layoutY="260.0" prefHeight="17.0" prefWidth="258.0" />
+            <JFXButton fx:id="LoggedIn" layoutX="91.0" layoutY="351.0" onAction="#LogIn" prefHeight="44.0" prefWidth="258.0" style="-fx-background-color: #2986d3;" text="Log In" textFill="WHITE">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </JFXButton>
+            <JFXCheckBox fx:id="RememberMe" checkedColor="#bf81f8" layoutX="91.0" layoutY="303.0" prefHeight="20.0" prefWidth="135.0" text="Remember Me" textFill="WHITE" unCheckedColor="WHITE">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </JFXCheckBox>
+            <Label fx:id="First" layoutX="370.0" layoutY="17.0" text="First time?" textFill="#ababab">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <JFXButton fx:id="SignUp" layoutX="444.0" layoutY="14.0" style="-fx-background-color: #2d2d3c;" text="Sign Up" textFill="#cdcdcd" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

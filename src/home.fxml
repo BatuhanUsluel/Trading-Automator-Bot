@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXTreeTableView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+   <children>
+      <JFXCheckBox fx:id="RememberMe" checkedColor="#9e6dcd" layoutX="55.0" layoutY="65.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Market Making" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXCheckBox>
+      <Label layoutX="43.0" layoutY="8.0" text="Filters:" textFill="#c996bc">
+         <font>
+            <Font size="35.0" />
+         </font>
+      </Label>
+      <Separator layoutY="157.0" prefHeight="0.0" prefWidth="920.0" />
+      <JFXCheckBox fx:id="RememberMe1" checkedColor="#9e6dcd" layoutX="55.0" layoutY="103.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Arbitrage" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox fx:id="RememberMe2" checkedColor="#9e6dcd" layoutX="208.0" layoutY="65.0" prefHeight="25.0" prefWidth="149.0" selected="true" text="Average Trading" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox fx:id="RememberMe3" checkedColor="#9e6dcd" layoutX="208.0" layoutY="104.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Quick Buy" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox fx:id="RememberMe31" checkedColor="#9e6dcd" layoutX="368.0" layoutY="65.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Pending Order" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox fx:id="RememberMe311" checkedColor="#9e6dcd" layoutX="368.0" layoutY="103.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Trailing Stop" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox fx:id="RememberMe3111" checkedColor="#9e6dcd" layoutX="519.0" layoutY="65.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Fill Order Book" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox fx:id="RememberMe31111" checkedColor="#9e6dcd" layoutX="519.0" layoutY="103.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Live Strategy" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox fx:id="RememberMe311111" checkedColor="#9e6dcd" layoutX="667.0" layoutY="65.0" prefHeight="18.0" prefWidth="99.0" selected="true" text="Backtest" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox fx:id="RememberMe311112" checkedColor="#e14f32" layoutX="771.0" layoutY="59.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Stopped" textFill="#fca9a9" unCheckedColor="WHITE">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox fx:id="RememberMe311113" checkedColor="#35c96e" layoutX="771.0" layoutY="97.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Running" textFill="#76dd80" unCheckedColor="WHITE">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXTreeTableView fx:id="table" layoutX="55.0" layoutY="179.0" prefHeight="390.0" prefWidth="821.0" stylesheets="@main.css" />
+      <JFXButton fx:id="tablee" layoutX="667.0" layoutY="96.0" onAction="#tableEnable" prefHeight="38.0" prefWidth="89.0" style="-fx-background-color: #2fcc6e;" text="refresh" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="19.0" />
+         </font>
+      </JFXButton>
+   </children>
+</AnchorPane>

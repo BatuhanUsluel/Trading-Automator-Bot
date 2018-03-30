@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="76.0" layoutY="66.0" prefHeight="42.0" prefWidth="115.0" text="Base Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="Email" layoutX="66.0" layoutY="101.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="80.0" layoutY="133.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="76.0" layoutY="159.0" prefHeight="42.0" prefWidth="94.0" text="Alt Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="Email1" layoutX="66.0" layoutY="195.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="80.0" layoutY="227.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="71.0" layoutY="260.0" prefHeight="42.0" prefWidth="201.0" text="Volume (In base):" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <Label layoutX="465.0" layoutY="84.0" prefHeight="42.0" prefWidth="94.0" text="Trail By:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="Email11" layoutX="66.0" layoutY="291.0" prefHeight="44.0" prefWidth="134.0" promptText="0.0001" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="80.0" layoutY="323.0" prefHeight="9.0" prefWidth="115.0" />
+      <TextField fx:id="Email111" layoutX="460.0" layoutY="118.0" prefHeight="44.0" prefWidth="134.0" promptText="0.05" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="474.0" layoutY="150.0" prefHeight="9.0" prefWidth="115.0" />
+      <JFXButton fx:id="RunFOBook" layoutX="678.0" layoutY="224.0" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
+         <font>
+            <Font size="33.0" />
+         </font>
+      </JFXButton>
+      <Label layoutX="465.0" layoutY="217.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <JFXComboBox editable="true" focusColor="#8397d3" layoutX="470.0" layoutY="259.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <Separator fx:id="sepVertical" layoutX="426.0" layoutY="10.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="0.0" style="-fx-opacity: 0.8;" />
+   </children>
+</AnchorPane>

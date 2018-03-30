@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="81.0" layoutY="43.0" prefHeight="42.0" prefWidth="115.0" text="Base Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="qBase" layoutX="71.0" layoutY="78.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="85.0" layoutY="110.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="76.0" layoutY="159.0" prefHeight="42.0" prefWidth="94.0" text="Alt Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="qAlt" layoutX="66.0" layoutY="195.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="80.0" layoutY="227.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="71.0" layoutY="265.0" prefHeight="42.0" prefWidth="168.0" text="Volume(Base):" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="qVolume" layoutX="66.0" layoutY="297.0" prefHeight="44.0" prefWidth="87.0" promptText="0.52" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="80.0" layoutY="329.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="72.0" layoutY="364.0" prefHeight="42.0" prefWidth="188.0" text="Buy Above Ask %:" textFill="#3592dd">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <TextField fx:id="qBAA" layoutX="64.0" layoutY="394.0" prefHeight="44.0" prefWidth="51.0" promptText="10" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="78.0" layoutY="426.0" prefHeight="9.0" prefWidth="23.0" />
+      <Label layoutX="101.0" layoutY="403.0" text="\%" textFill="WHITE">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Separator layoutY="139.0" prefHeight="9.0" prefWidth="300.0" />
+      <Separator layoutY="253.0" prefHeight="9.0" prefWidth="300.0" />
+      <Separator layoutY="350.0" prefHeight="9.0" prefWidth="300.0" />
+      <Separator layoutX="294.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="6.0" />
+      <AnchorPane layoutX="297.0" prefHeight="606.0" prefWidth="623.0" style="-fx-background-color: #5c6368;">
+         <children>
+            <JFXButton fx:id="RunQBuy" layoutX="29.0" layoutY="98.0" onAction="#quickPrice" prefHeight="391.0" prefWidth="565.0" style="-fx-background-color: #2fcc6e;" text="Buy" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="180.0" />
+               </font>
+            </JFXButton>
+         </children>
+      </AnchorPane>
+      <Separator layoutY="447.0" prefHeight="9.0" prefWidth="294.0" />
+      <Label layoutX="72.0" layoutY="458.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#3592dd">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <JFXComboBox fx:id="qEx" editable="true" layoutX="77.0" layoutY="500.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" />
+   </children>
+</AnchorPane>

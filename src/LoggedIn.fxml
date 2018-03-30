@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="1091.0" style="-fx-background-color: #4e5a6d;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+   <children>
+      <AnchorPane layoutX="-2.0" prefHeight="606.0" prefWidth="173.0" style="-fx-background-color: #414c5a;">
+         <children>
+            <JFXButton fx:id="arbitrage" layoutY="61.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Arbitrage" textFill="#92d38b">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="mmake" layoutY="107.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Market Making" textFill="#92d38b">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <Separator layoutY="106.0" prefHeight="2.0" prefWidth="173.0" />
+            <Separator layoutY="60.0" prefHeight="2.0" prefWidth="173.0" />
+            <Separator layoutY="151.0" prefHeight="2.0" prefWidth="173.0" />
+            <JFXButton fx:id="backtest" layoutY="154.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Backtesting" textFill="#92d38b">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="lives" layoutY="200.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Live Strategy" textFill="#92d38b">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <Separator layoutY="199.0" prefHeight="2.0" prefWidth="173.0" />
+            <JFXButton fx:id="avtrad" layoutY="319.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Average Trading" textFill="#9dbdc6">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="qbuy" layoutY="365.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Quick Buy" textFill="#9dbdc6">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <Separator layoutY="364.0" prefHeight="2.0" prefWidth="173.0" />
+            <JFXButton fx:id="porder" layoutY="410.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Pending Order" textFill="#9dbdc6">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="tstop" layoutY="456.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Trailing Stop" textFill="#9dbdc6">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <Separator layoutY="455.0" prefHeight="2.0" prefWidth="173.0" />
+            <Separator layoutY="409.0" prefHeight="2.0" prefWidth="173.0" />
+            <JFXButton fx:id="fobook" layoutY="503.0" onAction="#handleChangeView" prefHeight="44.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Fill Order Book" textFill="#9dbdc6">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <Separator layoutY="500.0" prefHeight="2.0" prefWidth="173.0" />
+            <Separator layoutY="318.0" prefHeight="2.0" prefWidth="173.0" />
+            <JFXButton fx:id="home" layoutY="246.0" onAction="#DashBoard" prefHeight="72.0" prefWidth="173.0" style="-fx-background-color: #60646b; -fx-border-color: #60646b;" text="Dashboard" textFill="#19f8b5">
+               <font>
+                  <Font size="26.0" />
+               </font>
+            </JFXButton>
+            <Separator layoutY="243.0" prefHeight="2.0" prefWidth="173.0" />
+            <JFXButton fx:id="settings" layoutY="545.0" onAction="#handleChangeView" prefHeight="61.0" prefWidth="173.0" style="-fx-background-color: #60646b; -fx-border-color: #60646b;" text="Settings" textFill="#c9c9c9">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </JFXButton>
+            <Separator layoutY="546.0" prefHeight="2.0" prefWidth="173.0" />
+         </children>
+      </AnchorPane>
+      <BorderPane fx:id="mainView" layoutX="171.0" prefHeight="606.0" prefWidth="920.0">
+     	 <center>
+         	<fx:include source="home.fxml" />
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>
