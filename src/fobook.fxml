@@ -17,7 +17,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="Email" layoutX="56.0" layoutY="91.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="FOBase" layoutX="56.0" layoutY="91.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
@@ -28,7 +28,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="Email1" layoutX="56.0" layoutY="185.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="FOAlt" layoutX="56.0" layoutY="185.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
@@ -55,25 +55,25 @@
          </font>
       </Label>
       <Separator fx:id="sepVertical" layoutX="416.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="0.0" style="-fx-opacity: 0.8;" />
-      <TextField fx:id="Email11" layoutX="54.0" layoutY="336.0" prefHeight="44.0" prefWidth="134.0" promptText="0.0001" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="FOStartP" layoutX="54.0" layoutY="336.0" prefHeight="44.0" prefWidth="134.0" promptText="0.0001" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
       <Separator layoutX="68.0" layoutY="368.0" prefHeight="9.0" prefWidth="115.0" />
-      <TextField fx:id="Email111" layoutX="54.0" layoutY="424.0" prefHeight="44.0" prefWidth="134.0" promptText="0.000155" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="FOEndP" layoutX="54.0" layoutY="424.0" prefHeight="44.0" prefWidth="134.0" promptText="0.000155" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
       <Separator layoutX="68.0" layoutY="456.0" prefHeight="9.0" prefWidth="115.0" />
-      <TextField fx:id="Email1111" layoutX="447.0" layoutY="80.0" prefHeight="44.0" prefWidth="87.0" promptText="0.4825" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="FOBalanceUsed" layoutX="447.0" layoutY="80.0" prefHeight="44.0" prefWidth="87.0" promptText="0.4825" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
       <Separator layoutX="461.0" layoutY="112.0" prefHeight="9.0" prefWidth="67.0" />
-      <TextField fx:id="Email11111" layoutX="448.0" layoutY="179.0" prefHeight="42.0" prefWidth="67.0" promptText="30" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="FONumberOrders" layoutX="448.0" layoutY="179.0" prefHeight="42.0" prefWidth="67.0" promptText="30" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
@@ -84,15 +84,15 @@
             <Font size="34.0" />
          </font>
          <toggleGroup>
-            <ToggleGroup fx:id="toggleGroup" />
+            <ToggleGroup fx:id="FoBuySell" />
          </toggleGroup>
       </JFXRadioButton>
-      <JFXRadioButton fx:id="BuyFO" layoutX="458.0" layoutY="291.0" prefWidth="115.0" selected="true" style="-jfx-selected-color: #2acc76; -jfx-unselected-color: WHITE;" text="Buy" textFill="WHITE" toggleGroup="$toggleGroup">
+      <JFXRadioButton fx:id="BuyFO" layoutX="458.0" layoutY="291.0" prefWidth="115.0" selected="true" style="-jfx-selected-color: #2acc76; -jfx-unselected-color: WHITE;" text="Buy" textFill="WHITE" toggleGroup="$FoBuySell">
          <font>
             <Font size="34.0" />
          </font>
       </JFXRadioButton>
-      <JFXButton fx:id="RunFOBook" layoutX="691.0" layoutY="424.0" prefHeight="83.0" prefWidth="179.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
+      <JFXButton fx:id="RunFOBook" layoutX="691.0" layoutY="424.0" onAction="#fillOrderBook" prefHeight="83.0" prefWidth="179.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
          <font>
             <Font size="39.0" />
          </font>
@@ -102,7 +102,7 @@
             <Font size="23.0" />
          </font>
       </Label>
-      <JFXComboBox editable="true" focusColor="#8397d3" layoutX="472.0" layoutY="470.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="FOEx" editable="true" focusColor="#8397d3" layoutX="472.0" layoutY="470.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
       <Separator layoutX="417.0" layoutY="252.0" prefHeight="0.0" prefWidth="503.0" />
    </children>
 </AnchorPane>

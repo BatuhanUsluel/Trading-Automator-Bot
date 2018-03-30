@@ -76,11 +76,11 @@ public class Controller {
 	 @FXML private JFXButton tstop;
 	 @FXML private JFXButton fobook;
 	 @FXML private JFXButton settings;
-	 @FXML private JFXRadioButton BuyFO;
-	 @FXML private JFXRadioButton SellFO;
 	 @FXML private Separator sepVertical;
 	 @FXML private ToggleGroup toggleGroupFO;
 	 
+	
+	    
 	 //Average Trading
 	 	@FXML private Label BPAv;
 	    @FXML private TextField BPAvU;
@@ -120,7 +120,7 @@ public class Controller {
 	    @FXML private JFXRadioButton BuyPO;
 	    @FXML private ToggleGroup toggleGroupPO;
 	    	    
-	//QUICK BUY
+	//QuickBuy
 	    @FXML private TextField qBase;
 	    @FXML private TextField qAlt;
 	    @FXML private TextField qVolume;
@@ -128,10 +128,22 @@ public class Controller {
 	    @FXML private JFXButton RunQBuy;
 	    @FXML private JFXComboBox<?> qEx;	
 	    
-	    @FXML private JFXTreeTableView<Person> table;
 	    
+	    @FXML private JFXTreeTableView<Person> table;
 	    @FXML private JFXButton tablee;
 	    
+	//Fill Order Book
+	    @FXML private TextField FOBase;
+	    @FXML private TextField FOAlt;
+	    @FXML private TextField FOStartP;
+	    @FXML  private TextField FOEndP;
+	    @FXML private TextField FOBalanceUsed;
+	    @FXML private TextField FONumberOrders;
+	    @FXML private JFXRadioButton SellFO;
+	    @FXML private ToggleGroup FoBuySell;
+	    @FXML private JFXRadioButton BuyFO;
+	    @FXML private JFXButton RunFOBook;
+	    @FXML  private JFXComboBox<?> FOEx;
 	@FXML
     private void handleChangeView(ActionEvent event) {
     	System.out.println("Changing");
@@ -305,6 +317,23 @@ public class Controller {
       	AverageTrading.runOrder(averageTrading);
     	}
     
+    public void fillOrderBook(ActionEvent event) {
+    	String base = FOBase.getText();
+    	String alt = FOAlt.getText();
+    	String startprice = FOStartP.getText();
+    	String endprice = FOEndP.getText();
+    	String balanceused = FOBalanceUsed.getText();
+    	String nooforders = FONumberOrders.getText();
+    	String BuySell = ((RadioButton) FoBuySell.getSelectedToggle()).getText();
+    	//String exchange = FOEx.getValue().toString();
+    	String exchange = "bittrex";
+    	//Add check for valid inputs!!
+    	try {
+			FillOrderBook.fillOrderBook(base, alt, startprice,endprice, balanceused, nooforders, BuySell, exchange);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
     public void setPrimaryStage(Stage stage) {
     	  this.primaryStage = stage;
     	}

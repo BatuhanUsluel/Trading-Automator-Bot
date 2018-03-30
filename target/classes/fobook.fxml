@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXCheckBox?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXRadioButton?>
 <?import javafx.scene.control.Label?>
@@ -18,7 +17,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="Email" layoutX="56.0" layoutY="91.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="FOBase" layoutX="56.0" layoutY="91.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
@@ -29,137 +28,81 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="Email1" layoutX="56.0" layoutY="185.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="FOAlt" layoutX="56.0" layoutY="185.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
       <Separator layoutX="70.0" layoutY="217.0" prefHeight="9.0" prefWidth="38.0" />
-      <Label layoutX="61.0" layoutY="250.0" prefHeight="42.0" prefWidth="134.0" text="Start Price:" textFill="#3592dd">
+      <Label layoutX="59.0" layoutY="305.0" prefHeight="42.0" prefWidth="134.0" text="Start Price:" textFill="#3592dd">
          <font>
             <Font size="26.0" />
          </font>
       </Label>
-      <Label layoutX="61.0" layoutY="333.0" prefHeight="42.0" prefWidth="134.0" text="End Price:" textFill="#3592dd">
+      <Label layoutX="59.0" layoutY="390.0" prefHeight="42.0" prefWidth="134.0" text="End Price:" textFill="#3592dd">
          <font>
             <Font size="26.0" />
          </font>
       </Label>
-      <Label layoutX="61.0" layoutY="410.0" prefHeight="42.0" prefWidth="308.0" text="Total Balance Used(base):" textFill="#3592dd">
+      <Label layoutX="452.0" layoutY="48.0" prefHeight="42.0" prefWidth="308.0" text="Total Balance Used(base):" textFill="#3592dd">
          <font>
             <Font size="26.0" />
          </font>
       </Label>
-      <Label layoutX="61.0" layoutY="486.0" prefHeight="42.0" prefWidth="232.0" text="Number Of Orders:" textFill="#3592dd">
+      <Label layoutX="453.0" layoutY="148.0" prefHeight="42.0" prefWidth="232.0" text="Number Of Orders:" textFill="#3592dd">
          <font>
             <Font size="26.0" />
          </font>
       </Label>
       <Separator fx:id="sepVertical" layoutX="416.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="0.0" style="-fx-opacity: 0.8;" />
-      <JFXCheckBox checkedColor="#45cda6" layoutX="451.0" layoutY="306.0" text="Random Interval(between orders)" textFill="WHITE" unCheckedColor="WHITE">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </JFXCheckBox>
-      <JFXCheckBox checkedColor="#45cda6" layoutX="449.0" layoutY="139.0" text="Random Balance (per order, base currency)" textFill="WHITE" unCheckedColor="WHITE">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </JFXCheckBox>
-      <TextField fx:id="Email11" layoutX="56.0" layoutY="281.0" prefHeight="44.0" prefWidth="134.0" promptText="0.0001" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="FOStartP" layoutX="54.0" layoutY="336.0" prefHeight="44.0" prefWidth="134.0" promptText="0.0001" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
-      <Separator layoutX="70.0" layoutY="313.0" prefHeight="9.0" prefWidth="115.0" />
-      <TextField fx:id="Email111" layoutX="56.0" layoutY="367.0" prefHeight="44.0" prefWidth="134.0" promptText="0.000155" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <Separator layoutX="68.0" layoutY="368.0" prefHeight="9.0" prefWidth="115.0" />
+      <TextField fx:id="FOEndP" layoutX="54.0" layoutY="424.0" prefHeight="44.0" prefWidth="134.0" promptText="0.000155" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
-      <Separator layoutX="70.0" layoutY="399.0" prefHeight="9.0" prefWidth="115.0" />
-      <TextField fx:id="Email1111" layoutX="56.0" layoutY="442.0" prefHeight="44.0" prefWidth="87.0" promptText="0.4825" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <Separator layoutX="68.0" layoutY="456.0" prefHeight="9.0" prefWidth="115.0" />
+      <TextField fx:id="FOBalanceUsed" layoutX="447.0" layoutY="80.0" prefHeight="44.0" prefWidth="87.0" promptText="0.4825" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
-      <Separator layoutX="70.0" layoutY="474.0" prefHeight="9.0" prefWidth="67.0" />
-      <TextField fx:id="Email11111" layoutX="56.0" layoutY="517.0" prefHeight="42.0" prefWidth="67.0" promptText="30" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <Separator layoutX="461.0" layoutY="112.0" prefHeight="9.0" prefWidth="67.0" />
+      <TextField fx:id="FONumberOrders" layoutX="448.0" layoutY="179.0" prefHeight="42.0" prefWidth="67.0" promptText="30" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
-      <Separator layoutX="70.0" layoutY="549.0" prefHeight="9.0" prefWidth="38.0" />
-      <JFXRadioButton fx:id="SellFO" layoutX="435.0" layoutY="70.0" style="-jfx-selected-color: #ee9494; -jfx-unselected-color: WHITE;" text="Sell" textFill="WHITE">
+      <Separator layoutX="462.0" layoutY="211.0" prefHeight="9.0" prefWidth="38.0" />
+      <JFXRadioButton fx:id="SellFO" layoutX="458.0" layoutY="353.0" style="-jfx-selected-color: #ee9494; -jfx-unselected-color: WHITE;" text="Sell" textFill="WHITE">
          <font>
-            <Font size="25.0" />
+            <Font size="34.0" />
          </font>
          <toggleGroup>
-            <ToggleGroup fx:id="toggleGroup" />
+            <ToggleGroup fx:id="FoBuySell" />
          </toggleGroup>
       </JFXRadioButton>
-      <JFXRadioButton fx:id="BuyFO" layoutX="434.0" layoutY="32.0" selected="true" style="-jfx-selected-color: #2acc76; -jfx-unselected-color: WHITE;" text="Buy" textFill="WHITE" toggleGroup="$toggleGroup">
+      <JFXRadioButton fx:id="BuyFO" layoutX="458.0" layoutY="291.0" prefWidth="115.0" selected="true" style="-jfx-selected-color: #2acc76; -jfx-unselected-color: WHITE;" text="Buy" textFill="WHITE" toggleGroup="$FoBuySell">
          <font>
-            <Font size="25.0" />
+            <Font size="34.0" />
          </font>
       </JFXRadioButton>
-      <Separator layoutX="419.0" layoutY="125.0" prefHeight="9.0" prefWidth="502.0" />
-      <Separator layoutX="419.0" layoutY="293.0" prefHeight="9.0" prefWidth="502.0" />
-      <TextField fx:id="MinBalT" layoutX="582.0" layoutY="164.0" prefHeight="44.0" prefWidth="134.0" promptText="0.00005" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <JFXButton fx:id="RunFOBook" layoutX="691.0" layoutY="424.0" onAction="#fillOrderBook" prefHeight="83.0" prefWidth="179.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
          <font>
-            <Font size="19.0" />
-         </font>
-      </TextField>
-      <Separator layoutX="596.0" layoutY="196.0" prefHeight="9.0" prefWidth="115.0" />
-      <TextField fx:id="MaxBalT" layoutX="582.0" layoutY="216.0" prefHeight="44.0" prefWidth="134.0" promptText="0.0001" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </TextField>
-      <Separator layoutX="596.0" layoutY="248.0" prefHeight="9.0" prefWidth="115.0" />
-      <Label fx:id="MinBal" layoutX="461.0" layoutY="165.0" prefHeight="42.0" prefWidth="134.0" text="Minimum:" textFill="#3bc5dd">
-         <font>
-            <Font size="26.0" />
-         </font>
-      </Label>
-      <Label fx:id="MaxBal" layoutX="461.0" layoutY="217.0" prefHeight="42.0" prefWidth="134.0" text="Maximum:" textFill="#3bc5dd">
-         <font>
-            <Font size="26.0" />
-         </font>
-      </Label>
-      <Label fx:id="MinInt" layoutX="461.0" layoutY="347.0" prefHeight="42.0" prefWidth="134.0" text="Minimum:" textFill="#3bc5dd">
-         <font>
-            <Font size="26.0" />
-         </font>
-      </Label>
-      <Label fx:id="MaxInt" layoutX="461.0" layoutY="399.0" prefHeight="42.0" prefWidth="134.0" text="Maximum:" textFill="#3bc5dd">
-         <font>
-            <Font size="26.0" />
-         </font>
-      </Label>
-      <TextField fx:id="MinIntT" layoutX="582.0" layoutY="346.0" prefHeight="44.0" prefWidth="134.0" promptText="0.001" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </TextField>
-      <Separator layoutX="596.0" layoutY="378.0" prefHeight="9.0" prefWidth="115.0" />
-      <TextField fx:id="MaxIntT" layoutX="582.0" layoutY="398.0" prefHeight="44.0" prefWidth="134.0" promptText="0.0025" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </TextField>
-      <Separator layoutX="596.0" layoutY="430.0" prefHeight="9.0" prefWidth="115.0" />
-      <Separator layoutX="419.0" layoutY="448.0" prefHeight="9.0" prefWidth="502.0" />
-      <JFXButton fx:id="RunFOBook" layoutX="698.0" layoutY="482.0" prefHeight="54.0" prefWidth="162.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
-         <font>
-            <Font size="33.0" />
+            <Font size="39.0" />
          </font>
       </JFXButton>
-      <Label layoutX="457.0" layoutY="474.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#4adeff">
+      <Label layoutX="467.0" layoutY="428.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#4adeff">
          <font>
             <Font size="23.0" />
          </font>
       </Label>
-      <JFXComboBox editable="true" focusColor="#8397d3" layoutX="462.0" layoutY="516.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="FOEx" editable="true" focusColor="#8397d3" layoutX="472.0" layoutY="470.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <Separator layoutX="417.0" layoutY="252.0" prefHeight="0.0" prefWidth="503.0" />
    </children>
 </AnchorPane>
