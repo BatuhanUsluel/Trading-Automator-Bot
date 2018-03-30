@@ -38,7 +38,7 @@ public class Main extends Application {
 	        primaryStage.setOpacity(0.99);
 	        primaryStage.show();
 	        primaryStage.setResizable(false);
-	        SocketCommunication.setup();
+
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

@@ -137,18 +137,19 @@ public class AverageTrading {
 					double ordersize = Double.parseDouble(message.getString("volumeperorder"));
 		            while (run==true) {
 		            	if (Orders1.contains(message)) {
-		            		System.out.println("Orders contains: " + message.toString());
+		            		System.out.println("Orders contains");
 		            		if (coinstotrade>total+ordersize) {
 		            			priceRequest(message);
 		            			total = total+ordersize;
 		            		} else {
 		            			double newordersize = coinstotrade-total;
-		            			message.put("volume", newordersize);
+		            			message.put("volumeperorder", String.valueOf(newordersize));
 		            			priceRequest(message);
 		            			total = total+ordersize;
 		            			run=false;
 		            		}
 		            	} else {
+		            		System.out.println("Removing Order");
 		            		run=false;
 		            	}
 		            	TimeUnit.SECONDS.sleep(loop);
@@ -171,7 +172,7 @@ public class AverageTrading {
     }
     
 	public static void recievedAverageTrade(JSONObject message) throws JSONException, NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
-		System.out.println("Recieved quickbuy");
+		System.out.println("Recieved AVERAGEE");
 		System.out.println(Orders.toString());
 		for (int i = 0; i < Orders.size(); i++) {
 			JSONObject listitem = Orders.get(i);

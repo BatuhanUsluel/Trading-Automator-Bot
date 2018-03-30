@@ -274,13 +274,13 @@ public class Controller {
         Scene scene = new Scene(rootLayout);
         primaryStage.setScene(scene);
         primaryStage.show();
-        //Exchanges ex = new Exchanges();
+        SocketCommunication.setup();
     }
     
     public void quickPrice(ActionEvent event) {
    	 System.out.println("running quickPrice");
-   	 quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),qEx.getValue().toString(), Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
-   	
+   	 //quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),qEx.getValue().toString(), Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
+   	quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),"bittrex", Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
  	}
     
     public void averageTrading(ActionEvent event) throws JSONException {
@@ -303,7 +303,6 @@ public class Controller {
      	System.out.println("--------------");
      	System.out.println(averageTrading);
       	AverageTrading.runOrder(averageTrading);
-      	
     	}
     
     public void setPrimaryStage(Stage stage) {

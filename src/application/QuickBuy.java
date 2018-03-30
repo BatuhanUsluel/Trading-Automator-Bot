@@ -73,10 +73,11 @@ public class QuickBuy {
 				double buypercent =  Double.parseDouble(listitem.get("buypercent").toString());
 				Exchange exchange = Exchanges.exchangemap.get(listitem.getString("Exchanges"));
 				double ask = message.getDouble("Ask");
-				String coin = listitem.getString("Coin");
-				CurrencyPair pair = new CurrencyPair(coin,"BTC");
+				String coin = listitem.getString("Basecoin");
+				CurrencyPair pair = new CurrencyPair(listitem.getString("Altcoin"),listitem.getString("Basecoin"));
 				System.out.println(ask);
-				double buyprice = ask*buypercent;
+				double buyprice = ask*((buypercent/100)+1);
+				System.out.println(buyprice);
 				double altvolume = btcvolume/buyprice;
 				LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN));
 				System.out.println(BuyingOrder.toString());
