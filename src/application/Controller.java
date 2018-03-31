@@ -144,6 +144,19 @@ public class Controller {
 	    @FXML private JFXRadioButton BuyFO;
 	    @FXML private JFXButton RunFOBook;
 	    @FXML  private JFXComboBox<?> FOEx;
+	    
+	//Trailing Stop
+	    @FXML private TextField TStopBase;
+	    @FXML private TextField TStopAlt;
+	    @FXML private TextField TStopVolume;
+	    @FXML private TextField TStopTrail;
+	    @FXML private JFXButton RunTStop;
+	    @FXML private JFXComboBox<?> TStopExchange;
+	    @FXML private JFXRadioButton TStopSell;
+	    @FXML private ToggleGroup TStopToggleBS;
+	    @FXML private JFXRadioButton TStopBuy;
+	    
+	    
 	@FXML
     private void handleChangeView(ActionEvent event) {
     	System.out.println("Changing");
@@ -294,7 +307,25 @@ public class Controller {
    	 //quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),qEx.getValue().toString(), Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
    	quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),"bittrex", Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
  	}
-    
+    public void trailingStop(ActionEvent event) throws JSONException {
+    	JSONObject trailingStop = new JSONObject();
+    	String base = TStopBase.getText();
+    	String alt = TStopAlt.getText();
+    	String volume = TStopVolume.getText();
+    	String trail = TStopTrail.getText();
+    	String buysell = ((RadioButton) TStopToggleBS.getSelectedToggle()).getText();
+    	//String exchange =TStopExchange.getValue().toString());
+    	String exchange = "bittrex";
+    	trailingStop.put("base", base);
+    	trailingStop.put("alt", alt);
+    	trailingStop.put("volume", volume);
+    	trailingStop.put("trail", trail);
+    	trailingStop.put("buysell", buysell);
+    	trailingStop.put("exchange",exchange);
+    	trailingStop.put("licenceKey", SocketCommunication.licencekey);
+    	trailingStop.put("millis", System.currentTimeMillis());
+    	TrailingStop.runOrder(trailingStop);
+    }
     public void averageTrading(ActionEvent event) throws JSONException {
       	 System.out.println("running averageTrading");
      	JSONObject averageTrading = new JSONObject();
