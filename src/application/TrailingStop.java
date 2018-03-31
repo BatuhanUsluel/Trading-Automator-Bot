@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.CurrencyPair;
+import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.StopOrder;
@@ -18,43 +19,37 @@ import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
 public class TrailingStop {
-	public static ArrayList<JSONObject> OrdersTrailing = new ArrayList<JSONObject>();
-	public static ArrayList<JSONObject> OrdersTrailing1 = new ArrayList<JSONObject>();
-	
-	public static void runOrder(JSONObject message) {
-		class OneShotTask implements Runnable {
-			JSONObject message;
-			OneShotTask(JSONObject message2) {message= message2; }
-	        public void run() {
+	ArrayList<JSONObject> OrdersTrailing = new ArrayList<JSONObject>();
+	boolean run = true;
+	boolean firstrun = true;
+	String lastorder;
+	double prevprice;
+	LimitOrder LastOrder;
+	public void runOrder(JSONObject message) {
+			final JSONObject messagefinal = message;
+			Thread thread = new Thread(new Runnable() {
+				public void run() {
 	            boolean run=true;
 	            try {
-	            	OrdersTrailing1.add(message);
 					//int loop = Integer.parseInt(message.getString("loop"));
-					
 		            while (run==true) {
-		            	if (OrdersTrailing1.contains(message)) {
 		            		System.out.println("Orders contains");
-		                	OrdersTrailing.add(message);
-		                	System.out.println(message);
-		                	SocketCommunication.out.print(message.toString());
+		            		messagefinal.put("millis", System.currentTimeMillis());
+		                	OrdersTrailing.add(messagefinal);
+		                	System.out.println(messagefinal);
+		                	SocketCommunication.out.print(messagefinal.toString());
 		                	SocketCommunication.out.flush();
-		            	} else {
-		            		System.out.println("Removing Order");
-		            		run=false;
-		            	}
 		            	TimeUnit.SECONDS.sleep(60);
 		            }
-				} catch (InterruptedException e) {
+				} catch (InterruptedException | JSONException e) {
 					e.printStackTrace();
 				}
 	        }
-		}
-		
-	    Thread t = new Thread(new OneShotTask(message));
-	    t.start();
+		});
+	    thread.start();
 	}
 	
-	public static void recievedTrailingStop(JSONObject message) throws JSONException, NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
+	public void recievedTrailingStop(JSONObject message) throws JSONException, NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
 		System.out.println("Recieved TrailingStop!");
 		System.out.println(OrdersTrailing.toString());
 		for (int i = 0; i < OrdersTrailing.size(); i++) {
@@ -63,11 +58,13 @@ public class TrailingStop {
 			
 			if ((listitem.getString("base").equals(message.getString("base")))
 			&& (listitem.getString("alt").equals(message.getString("alt")))
+			&& (listitem.getString("request").equals(message.getString("request")))
 			&& (listitem.getString("volume").equals(message.getString("volume")))
 			&& (listitem.getString("trail").equals(message.getString("trail")))
 			&& (listitem.getString("buysell").equals(message.getString("buysell")))
 			&& (listitem.getString("exchange").equals(message.getString("exchange")))
 			&& (listitem.getString("licenceKey").equals(message.getString("licenceKey")))
+			&& listitem.getLong("millisstart") == (message.getLong("millisstart"))
 			&& listitem.getLong("millis") == (message.getLong("millis"))) {
 				
 				OrdersTrailing.remove(listitem);
@@ -84,22 +81,57 @@ public class TrailingStop {
 				} else {
 					System.out.println("error!");
 				}
-				System.out.println("Buystring:" + buystring);
 				double volume = Double.parseDouble(listitem.getString("volume"));
 				double trail = Double.parseDouble(listitem.getString("trail"));
 				double price = Double.parseDouble(message.getString("price"));
 				CurrencyPair pair = new CurrencyPair(altcoin,basecoin);
 				
-				//Buy order tracks above the price, sell order tracks below
-				if (buy==true) {
-					LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
-					System.out.println(BuyingOrder);
-					//String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+				if (firstrun=true) {
+					
+					if (buy==true) {
+						System.out.println("---------------------------TRADING FIRST RUN BUY----------------------");
+						LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
+						System.out.println(LastOrder);
+						lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
+						prevprice = price;
+					} else {
+						System.out.println("---------------------------TRADING FIRST RUN SELL----------------------");
+						prevprice = price;
+					}
 				} else {
-					StopOrder SellingOrder = new StopOrder((OrderType.ASK), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price-trail).setScale(8, RoundingMode.HALF_DOWN));
-					System.out.println(SellingOrder);
-					//String limitOrderReturnValueSELL = exchange.getTradeService().placeLimitOrder(SellingOrder);
+					if (buy==true) {
+						if (LastOrder.getStatus()== Order.OrderStatus.PARTIALLY_FILLED ) {
+							System.out.println("Order is partially filled, not doing anything");
+						} else if(LastOrder.getStatus() == Order.OrderStatus.FILLED) {
+							run=false;
+						} else {
+							if (price<prevprice) {
+								System.out.println("---------------------------CHANGING BUY----------------------");
+								exchange.getTradeService().cancelOrder(lastorder);
+								LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
+								//lastorder = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+								prevprice = price;
+							} else {
+								System.out.println("---------------------------NOT TRADING BUY----------------------");
+								System.out.println("Price:" + price);
+								System.out.println("PrevPrice: " +prevprice);
+							}
+						}
+					} else {
+						if (price>prevprice) {
+							System.out.println("---------------------------CHANGING PREVPRICE SELL----------------------");
+							prevprice = price;
+						} else if (price<=prevprice-trail) {
+							System.out.println("---------------------------SELLING!!!----------------------");
+							LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
+							System.out.println(SellingOrder);
+							lastorder = exchange.getTradeService().placeLimitOrder(SellingOrder);
+							run=false;
+						}
+						
+					}
 				}
+				firstrun=false;
 			}
 		}		
 	}

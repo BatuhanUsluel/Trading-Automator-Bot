@@ -2,6 +2,7 @@ package application;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
@@ -47,6 +48,7 @@ import javafx.collections.ObservableList;
 public class Controller {
 	QuickBuy quickbuy = new QuickBuy();
 	AverageTrading averageTrading = new AverageTrading();
+	public HashMap<JSONObject, TrailingStop> TrailingStopMap = new HashMap<JSONObject, TrailingStop>();
     private Main application;
     private Scene scene;
     public Stage primaryStage;
@@ -102,17 +104,11 @@ public class Controller {
 	    @FXML private JFXTextField MABAv;
 	    
 	//Pending Order
-	    @FXML private Label POBP;
 	    @FXML private TextField POBPU;
-	    @FXML private Label APPO;
 	    @FXML private TextField APPOU;
-	    @FXML private Label PPO;
 	    @FXML private TextField PPOU;
-	    @FXML private Label BVPO;
 	    @FXML private TextField BVPOU;
-	    @FXML private Label ExPO;
 	    @FXML private JFXComboBox<?> ExPOU;
-	    @FXML private Label POWPO;
 	    @FXML private TextField POVPOU;
 	    @FXML private JFXButton RunPO;
 	    @FXML private JFXRadioButton SellPO;
@@ -307,6 +303,7 @@ public class Controller {
    	 //quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),qEx.getValue().toString(), Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
    	quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),"bittrex", Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
  	}
+    
     public void trailingStop(ActionEvent event) throws JSONException {
     	JSONObject trailingStop = new JSONObject();
     	String base = TStopBase.getText();
@@ -316,16 +313,21 @@ public class Controller {
     	String buysell = ((RadioButton) TStopToggleBS.getSelectedToggle()).getText();
     	//String exchange =TStopExchange.getValue().toString());
     	String exchange = "bittrex";
+    	
     	trailingStop.put("base", base);
     	trailingStop.put("alt", alt);
+    	trailingStop.put("request", "trailingStop");
     	trailingStop.put("volume", volume);
     	trailingStop.put("trail", trail);
     	trailingStop.put("buysell", buysell);
     	trailingStop.put("exchange",exchange);
     	trailingStop.put("licenceKey", SocketCommunication.licencekey);
     	trailingStop.put("millis", System.currentTimeMillis());
-    	TrailingStop.runOrder(trailingStop);
+    	TrailingStop trailingstopclass = new TrailingStop();
+    	trailingstopclass.runOrder(trailingStop);
+    	TrailingStopMap.put(trailingStop, trailingstopclass);
     }
+    
     public void averageTrading(ActionEvent event) throws JSONException {
       	 System.out.println("running averageTrading");
      	JSONObject averageTrading = new JSONObject();
@@ -337,7 +339,7 @@ public class Controller {
      	averageTrading.put("coinstotrade", MABAv.getText());
      	averageTrading.put("volumeperorder", VpOAV.getText());
      	averageTrading.put("licenceKey", SocketCommunication.licencekey);
-     	averageTrading.put("millis", System.currentTimeMillis());
+     	averageTrading.put("millisstart", System.currentTimeMillis());
      	String atbidtext = ((RadioButton) toggleBAAv.getSelectedToggle()).getText();
      	averageTrading.put("atbid", ((RadioButton) toggleBAAv.getSelectedToggle()).getText());
      	System.out.println(((RadioButton) toggleBSAv.getSelectedToggle()).getText());
