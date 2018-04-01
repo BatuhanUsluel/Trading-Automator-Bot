@@ -48,7 +48,7 @@ import javafx.collections.ObservableList;
 public class Controller {
 	QuickBuy quickbuy = new QuickBuy();
 	AverageTrading averageTrading = new AverageTrading();
-	public HashMap<JSONObject, TrailingStop> TrailingStopMap = new HashMap<JSONObject, TrailingStop>();
+	public static HashMap<JSONObject, TrailingStop> TrailingStopMap = new HashMap<JSONObject, TrailingStop>();
     private Main application;
     private Scene scene;
     public Stage primaryStage;
@@ -350,6 +350,10 @@ public class Controller {
       	AverageTrading.runOrder(averageTrading);
     	}
     
+    public void pendingOrder(ActionEvent event)  {
+    	
+    
+    }
     public void fillOrderBook(ActionEvent event) {
     	String base = FOBase.getText();
     	String alt = FOAlt.getText();

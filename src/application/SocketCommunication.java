@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.lang.Runnable;
 import javax.json.Json;
@@ -96,6 +98,26 @@ public class SocketCommunication {
 						case "averageTrading":
 							System.out.println("Recieved AVERAGE");
 							AverageTrading.recievedAverageTrade(jsonmessage);
+							break;
+						case "trailingStop":
+							HashMap<JSONObject, TrailingStop> hashmap = Controller.TrailingStopMap;
+							for (Entry<JSONObject, TrailingStop> entry : hashmap.entrySet()) {
+							    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+							    JSONObject key = entry.getKey();
+							    TrailingStop value = entry.getValue();
+								if ((key.getString("base").equals(jsonmessage.getString("base")))
+									&& (key.getString("alt").equals(jsonmessage.getString("alt")))
+									&& (key.getString("request").equals(jsonmessage.getString("request")))
+									&& (key.getString("volume").equals(jsonmessage.getString("volume")))
+									&& (key.getString("trail").equals(jsonmessage.getString("trail")))
+									&& (key.getString("buysell").equals(jsonmessage.getString("buysell")))
+									&& (key.getString("exchange").equals(jsonmessage.getString("exchange")))
+									&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
+									&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))
+									&& key.getLong("millis") == (jsonmessage.getLong("millis"))) {
+										value.recievedTrailingStop(jsonmessage);
+								}
+							}
 							break;
 						default:
 							System.out.println("Invalid");
