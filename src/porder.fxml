@@ -79,7 +79,7 @@
          </font>
       </Label>
       <Separator layoutX="450.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="13.0" />
-      <JFXButton fx:id="RunPO" layoutX="507.0" layoutY="297.0" prefHeight="127.0" prefWidth="310.0" style="-fx-background-color: #2fcc6e;" text="Place Order" textFill="WHITE">
+      <JFXButton fx:id="RunPO" layoutX="507.0" layoutY="297.0" onAction="#pendingOrder" prefHeight="127.0" prefWidth="310.0" style="-fx-background-color: #2fcc6e;" text="Place Order" textFill="WHITE">
          <font>
             <Font size="47.0" />
          </font>

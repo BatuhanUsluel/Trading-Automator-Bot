@@ -102,9 +102,7 @@ public class SocketCommunication {
 						case "trailingStop":
 							HashMap<JSONObject, TrailingStop> hashmap = Controller.TrailingStopMap;
 							for (Entry<JSONObject, TrailingStop> entry : hashmap.entrySet()) {
-							    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
 							    JSONObject key = entry.getKey();
-							    TrailingStop value = entry.getValue();
 								if ((key.getString("base").equals(jsonmessage.getString("base")))
 									&& (key.getString("alt").equals(jsonmessage.getString("alt")))
 									&& (key.getString("request").equals(jsonmessage.getString("request")))
@@ -115,7 +113,27 @@ public class SocketCommunication {
 									&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
 									&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))
 									&& key.getLong("millis") == (jsonmessage.getLong("millis"))) {
+										TrailingStop value = entry.getValue();
 										value.recievedTrailingStop(jsonmessage);
+								}
+							}
+							break;
+						case "pendingOrder":
+							HashMap<JSONObject, PendingOrder> hashmappending = Controller.PendingOrderMap;
+							for (Entry<JSONObject, PendingOrder> entry : hashmappending.entrySet()) {
+								JSONObject key = entry.getKey();
+								if ((key.getString("base").equals(jsonmessage.getString("base")))
+									&& (key.getString("alt").equals(jsonmessage.getString("alt")))
+									&& (key.getString("request").equals(jsonmessage.getString("request")))
+									&& (key.getString("priceorder").equals(jsonmessage.getString("priceorder")))
+									&& (key.getString("volume").equals(jsonmessage.getString("volume")))
+									&& (key.getString("percent").equals(jsonmessage.getString("percent")))
+									&& (key.getString("exchange").equals(jsonmessage.getString("exchange")))
+									&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
+									&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))
+									&& key.getLong("millis") == (jsonmessage.getLong("millis"))) {
+										PendingOrder value = entry.getValue();
+										value.recievedPendingOrder(jsonmessage);
 								}
 							}
 							break;

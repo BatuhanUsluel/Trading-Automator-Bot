@@ -32,6 +32,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
@@ -49,6 +50,8 @@ public class Controller {
 	QuickBuy quickbuy = new QuickBuy();
 	AverageTrading averageTrading = new AverageTrading();
 	public static HashMap<JSONObject, TrailingStop> TrailingStopMap = new HashMap<JSONObject, TrailingStop>();
+	public static HashMap<JSONObject, PendingOrder> PendingOrderMap = new HashMap<JSONObject, PendingOrder>();
+	
     private Main application;
     private Scene scene;
     public Stage primaryStage;
@@ -102,20 +105,7 @@ public class Controller {
 	    @FXML private Label MBAv;
 	    @FXML private TextField VpOAV;
 	    @FXML private JFXTextField MABAv;
-	    
-	//Pending Order
-	    @FXML private TextField POBPU;
-	    @FXML private TextField APPOU;
-	    @FXML private TextField PPOU;
-	    @FXML private TextField BVPOU;
-	    @FXML private JFXComboBox<?> ExPOU;
-	    @FXML private TextField POVPOU;
-	    @FXML private JFXButton RunPO;
-	    @FXML private JFXRadioButton SellPO;
-	    @FXML private ToggleGroup toggleGroup;
-	    @FXML private JFXRadioButton BuyPO;
-	    @FXML private ToggleGroup toggleGroupPO;
-	    	    
+
 	//QuickBuy
 	    @FXML private TextField qBase;
 	    @FXML private TextField qAlt;
@@ -322,7 +312,7 @@ public class Controller {
     	trailingStop.put("buysell", buysell);
     	trailingStop.put("exchange",exchange);
     	trailingStop.put("licenceKey", SocketCommunication.licencekey);
-    	trailingStop.put("millis", System.currentTimeMillis());
+    	trailingStop.put("millisstart", System.currentTimeMillis());
     	TrailingStop trailingstopclass = new TrailingStop();
     	trailingstopclass.runOrder(trailingStop);
     	TrailingStopMap.put(trailingStop, trailingstopclass);
@@ -340,9 +330,7 @@ public class Controller {
      	averageTrading.put("volumeperorder", VpOAV.getText());
      	averageTrading.put("licenceKey", SocketCommunication.licencekey);
      	averageTrading.put("millisstart", System.currentTimeMillis());
-     	String atbidtext = ((RadioButton) toggleBAAv.getSelectedToggle()).getText();
      	averageTrading.put("atbid", ((RadioButton) toggleBAAv.getSelectedToggle()).getText());
-     	System.out.println(((RadioButton) toggleBSAv.getSelectedToggle()).getText());
      	averageTrading.put("buy", ((RadioButton) toggleBSAv.getSelectedToggle()).getText());
      	averageTrading.put("loop", LPAvU.getText());
      	System.out.println("--------------");
@@ -350,9 +338,44 @@ public class Controller {
       	AverageTrading.runOrder(averageTrading);
     	}
     
-    public void pendingOrder(ActionEvent event)  {
+//Pending Order
+    @FXML private TextField POBPU;
+    @FXML private TextField APPOU;
+    @FXML private TextField PPOU;
+    @FXML private TextField BVPOU;
+    @FXML private JFXComboBox<?> ExPOU;
+    @FXML private TextField POVPOU;
+    @FXML private JFXButton RunPO;
+    @FXML private JFXRadioButton SellPO;
+    @FXML private JFXRadioButton BuyPO;
+    @FXML private ToggleGroup toggleGroupPO;
+    	    
+    public void pendingOrder(ActionEvent event) throws JSONException  {
+    	JSONObject pendingOrder = new JSONObject();
+    	String base = POBPU.getText();
+    	String alt = APPOU.getText();
+    	String price = PPOU.getText();
+    	String volume = BVPOU.getText();
+    	String percent = POVPOU.getText();
+    	String buysell = ((RadioButton) toggleGroupPO.getSelectedToggle()).getText();
+    	//String exchange = ExPOU.getValue().toString();
+    	String exchange = "bittrex";
     	
-    
+    	pendingOrder.put("base",base);
+    	pendingOrder.put("alt",alt);
+    	pendingOrder.put("request","pendingOrder");
+    	pendingOrder.put("priceorder",price);
+    	pendingOrder.put("volume",volume);
+    	pendingOrder.put("percent",percent);
+    	pendingOrder.put("licenceKey", SocketCommunication.licencekey);
+    	pendingOrder.put("millisstart", System.currentTimeMillis());
+    	pendingOrder.put("buysell",buysell);
+    	pendingOrder.put("exchange",exchange);
+    	//PendingOrder pendingorderclass = new PendingOrder(pendingOrder);
+    	PendingOrder pend = new PendingOrder(pendingOrder);
+    	PendingOrderMap.put(pendingOrder, pend);
+    	Thread t = new Thread(pend);
+    	t.start();
     }
     public void fillOrderBook(ActionEvent event) {
     	String base = FOBase.getText();

@@ -33,7 +33,7 @@ public class TrailingStop {
 	            try {
 					//int loop = Integer.parseInt(message.getString("loop"));
 		            while (run==true) {
-		            		System.out.println("Orders contains");
+		            		System.out.println("Sending Order Request");
 		            		messagefinal.put("millis", System.currentTimeMillis());
 		                	OrdersTrailing.add(messagefinal);
 		                	System.out.println(messagefinal);
@@ -50,12 +50,9 @@ public class TrailingStop {
 	}
 	
 	public void recievedTrailingStop(JSONObject message) throws JSONException, NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
-		System.out.println("Recieved TrailingStop!");
-		System.out.println(OrdersTrailing.toString());
+		System.out.println("Recieved TrailingStop Message!");
 		for (int i = 0; i < OrdersTrailing.size(); i++) {
 			JSONObject listitem = OrdersTrailing.get(i);
-			System.out.println("Looping");
-			
 			if ((listitem.getString("base").equals(message.getString("base")))
 			&& (listitem.getString("alt").equals(message.getString("alt")))
 			&& (listitem.getString("request").equals(message.getString("request")))
@@ -66,7 +63,6 @@ public class TrailingStop {
 			&& (listitem.getString("licenceKey").equals(message.getString("licenceKey")))
 			&& listitem.getLong("millisstart") == (message.getLong("millisstart"))
 			&& listitem.getLong("millis") == (message.getLong("millis"))) {
-				
 				OrdersTrailing.remove(listitem);
 				String basecoin = listitem.getString("base");
 				String altcoin = listitem.getString("alt");
@@ -86,18 +82,19 @@ public class TrailingStop {
 				double price = Double.parseDouble(message.getString("price"));
 				CurrencyPair pair = new CurrencyPair(altcoin,basecoin);
 				
-				if (firstrun=true) {
+				if (firstrun==true) {
 					
 					if (buy==true) {
 						System.out.println("---------------------------TRADING FIRST RUN BUY----------------------");
 						LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
 						System.out.println(LastOrder);
-						lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
+						//lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
 						prevprice = price;
 					} else {
 						System.out.println("---------------------------TRADING FIRST RUN SELL----------------------");
 						prevprice = price;
 					}
+					firstrun=false;
 				} else {
 					if (buy==true) {
 						if (LastOrder.getStatus()== Order.OrderStatus.PARTIALLY_FILLED ) {
@@ -107,9 +104,11 @@ public class TrailingStop {
 						} else {
 							if (price<prevprice) {
 								System.out.println("---------------------------CHANGING BUY----------------------");
-								exchange.getTradeService().cancelOrder(lastorder);
+								//exchange.getTradeService().cancelOrder(lastorder);
 								LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
 								//lastorder = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+								System.out.println("Price:" + price);
+								System.out.println("PrevPrice: " +prevprice);
 								prevprice = price;
 							} else {
 								System.out.println("---------------------------NOT TRADING BUY----------------------");
@@ -125,13 +124,13 @@ public class TrailingStop {
 							System.out.println("---------------------------SELLING!!!----------------------");
 							LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
 							System.out.println(SellingOrder);
-							lastorder = exchange.getTradeService().placeLimitOrder(SellingOrder);
+							//lastorder = exchange.getTradeService().placeLimitOrder(SellingOrder);
 							run=false;
 						}
 						
 					}
 				}
-				firstrun=false;
+				
 			}
 		}		
 	}
