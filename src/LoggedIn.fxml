@@ -1,84 +1,175 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.ColorAdjust?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.Shadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="1091.0" style="-fx-background-color: #4e5a6d;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="1158.0" style="-fx-background-color: #4e5a6d;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
    <children>
-      <AnchorPane layoutX="-2.0" prefHeight="606.0" prefWidth="173.0" style="-fx-background-color: #414c5a;">
+      <AnchorPane layoutX="-2.0" prefHeight="606.0" prefWidth="240.0" style="-fx-background-color: #414c5a;">
          <children>
-            <JFXButton fx:id="arbitrage" layoutY="61.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Arbitrage" textFill="#92d38b">
+            <JFXButton fx:id="arbitrage" alignment="BASELINE_CENTER" contentDisplay="CENTER" graphicTextGap="10.0" onAction="#handleChangeView" prefHeight="54.0" prefWidth="240.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="            Arbitrage" textFill="#92d38b">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="mmake" layoutY="107.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Market Making" textFill="#92d38b">
+            <JFXButton fx:id="mmake" layoutX="67.0" layoutY="54.0" onAction="#handleChangeView" prefHeight="61.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Market Making" textFill="#92d38b">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <Separator layoutY="106.0" prefHeight="2.0" prefWidth="173.0" />
-            <Separator layoutY="60.0" prefHeight="2.0" prefWidth="173.0" />
-            <Separator layoutY="151.0" prefHeight="2.0" prefWidth="173.0" />
-            <JFXButton fx:id="backtest" layoutY="154.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Backtesting" textFill="#92d38b">
+            <JFXButton fx:id="backtest" layoutX="67.0" layoutY="115.0" onAction="#handleChangeView" prefHeight="54.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Backtesting" textFill="#92d38b">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="lives" layoutY="200.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Live Strategy" textFill="#92d38b">
+            <JFXButton fx:id="lives" layoutX="67.0" layoutY="169.0" onAction="#handleChangeView" prefHeight="61.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Live Strategy" textFill="#92d38b">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <Separator layoutY="199.0" prefHeight="2.0" prefWidth="173.0" />
-            <JFXButton fx:id="avtrad" layoutY="319.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Average Trading" textFill="#9dbdc6">
+            <JFXButton fx:id="avtrad" layoutX="67.0" layoutY="304.0" onAction="#handleChangeView" prefHeight="54.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Average Trading" textFill="#9dbdc6">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="qbuy" layoutY="365.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Quick Buy" textFill="#9dbdc6">
+            <JFXButton fx:id="qbuy" layoutX="67.0" layoutY="358.0" onAction="#handleChangeView" prefHeight="41.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Quick Buy" textFill="#9dbdc6">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <Separator layoutY="364.0" prefHeight="2.0" prefWidth="173.0" />
-            <JFXButton fx:id="porder" layoutY="410.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Pending Order" textFill="#9dbdc6">
+            <JFXButton fx:id="porder" layoutX="67.0" layoutY="402.0" onAction="#handleChangeView" prefHeight="44.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Pending Order" textFill="#9dbdc6">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="tstop" layoutY="456.0" onAction="#handleChangeView" prefHeight="42.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Trailing Stop" textFill="#9dbdc6">
+            <JFXButton fx:id="tstop" layoutX="67.0" layoutY="446.0" onAction="#handleChangeView" prefHeight="44.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Trailing Stop" textFill="#9dbdc6">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <Separator layoutY="455.0" prefHeight="2.0" prefWidth="173.0" />
-            <Separator layoutY="409.0" prefHeight="2.0" prefWidth="173.0" />
-            <JFXButton fx:id="fobook" layoutY="503.0" onAction="#handleChangeView" prefHeight="44.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Fill Order Book" textFill="#9dbdc6">
+            <JFXButton fx:id="fobook" layoutX="67.0" layoutY="490.0" onAction="#handleChangeView" prefHeight="54.0" prefWidth="173.0" style="-fx-background-color: #474a50; -fx-border-color: #474a50;" text="Fill Order Book" textFill="#9dbdc6">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <Separator layoutY="500.0" prefHeight="2.0" prefWidth="173.0" />
-            <Separator layoutY="318.0" prefHeight="2.0" prefWidth="173.0" />
-            <JFXButton fx:id="home" layoutY="246.0" onAction="#DashBoard" prefHeight="72.0" prefWidth="173.0" style="-fx-background-color: #60646b; -fx-border-color: #60646b;" text="Dashboard" textFill="#19f8b5">
+            <JFXButton fx:id="home" layoutX="67.0" layoutY="229.0" onAction="#DashBoard" prefHeight="75.0" prefWidth="173.0" style="-fx-background-color: #60646b; -fx-border-color: #60646b;" text="Dashboard" textFill="#19f8b5">
                <font>
                   <Font size="26.0" />
                </font>
             </JFXButton>
-            <Separator layoutY="243.0" prefHeight="2.0" prefWidth="173.0" />
-            <JFXButton fx:id="settings" layoutY="545.0" onAction="#handleChangeView" prefHeight="61.0" prefWidth="173.0" style="-fx-background-color: #60646b; -fx-border-color: #60646b;" text="Settings" textFill="#c9c9c9">
+            <JFXButton fx:id="settings" layoutX="67.0" layoutY="541.0" onAction="#handleChangeView" prefHeight="67.0" prefWidth="173.0" style="-fx-background-color: #60646b; -fx-border-color: #60646b;" text="Settings" textFill="#c9c9c9">
                <font>
                   <Font size="19.0" />
                </font>
             </JFXButton>
-            <Separator layoutY="546.0" prefHeight="2.0" prefWidth="173.0" />
+            <AnchorPane layoutX="-1.0" prefHeight="608.0" prefWidth="68.0" style="-fx-background-color: #474a50;">
+               <children>
+                  <ImageView fitHeight="41.0" fitWidth="41.0" layoutX="14.0" layoutY="124.0">
+                     <image>
+                        <Image url="/icons8-time-machine-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="41.0" fitWidth="50.0" layoutX="10.0" layoutY="499.0">
+                     <image>
+                        <Image url="/icons8-paint-bucket-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="41.0" fitWidth="50.0" layoutX="10.0" layoutY="358.0">
+                     <image>
+                        <Image url="/icons8-quick-mode-on-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="41.0" fitWidth="41.0" layoutX="19.0" layoutY="450.0">
+                     <image>
+                        <Image url="/icons8-train-track-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="41.0" fitWidth="41.0" layoutX="15.0" layoutY="311.0">
+                     <image>
+                        <Image url="/icons8-average-filled-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="54.0" fitWidth="57.0" layoutX="7.0" layoutY="238.0">
+                     <image>
+                        <Image url="/icons8-speed-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="41.0" fitWidth="41.0" layoutX="15.0" layoutY="403.0">
+                     <image>
+                        <Image url="/icons8-wait-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="44.0" fitWidth="50.0" layoutX="11.0" layoutY="550.0">
+                     <image>
+                        <Image url="/icons8-settings-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="54.0" fitWidth="57.0" layoutX="6.0" layoutY="56.0">
+                     <image>
+                        <Image url="/icons8-meeting-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="54.0" fitWidth="57.0" layoutX="7.0" layoutY="172.0">
+                     <image>
+                        <Image url="/icons8-money-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="41.0" fitWidth="41.0" layoutX="15.0" layoutY="8.0">
+                     <image>
+                        <Image url="/icons8-double-tick-filled-100.png" />
+                     </image>
+                     <effect>
+                        <Shadow blurType="TWO_PASS_BOX" color="#92d38b" height="1.0" radius="0.0" width="0.0" />
+                     </effect>
+                  </ImageView>
+               </children>
+               <effect>
+                  <DropShadow height="0.0" radius="9.8775" spread="0.14" width="41.51" />
+               </effect>
+            </AnchorPane>
          </children>
+         <effect>
+            <ColorAdjust contrast="0.15" />
+         </effect>
       </AnchorPane>
-      <BorderPane fx:id="mainView" layoutX="171.0" prefHeight="606.0" prefWidth="920.0">
+      <BorderPane fx:id="mainView" layoutX="238.0" prefHeight="606.0" prefWidth="902.0">
      	 <center>
          	<fx:include source="home.fxml" />
          </center>
