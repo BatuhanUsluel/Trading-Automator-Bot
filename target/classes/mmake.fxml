@@ -15,7 +15,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="bPAr" layoutX="76.0" layoutY="111.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="BaseMM" layoutX="76.0" layoutY="111.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
@@ -26,13 +26,13 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="aPAr" layoutX="76.0" layoutY="205.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="AltMM" layoutX="76.0" layoutY="205.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
       <Separator layoutX="90.0" layoutY="237.0" prefHeight="9.0" prefWidth="38.0" />
-      <JFXButton fx:id="RunArbitrage" layoutX="660.0" layoutY="392.0" prefHeight="93.0" prefWidth="212.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
+      <JFXButton fx:id="RunMM" layoutX="655.0" layoutY="392.0" onAction="#marketMaking" prefHeight="93.0" prefWidth="212.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
          <font>
             <Font size="33.0" />
          </font>
@@ -43,13 +43,13 @@
             <Font size="23.0" />
          </font>
       </Label>
-      <JFXComboBox fx:id="ExAv" editable="true" focusColor="#8397d3" layoutX="533.0" layoutY="318.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="ExchangeMM" editable="true" focusColor="#8397d3" layoutX="533.0" layoutY="318.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
       <Label layoutX="83.0" layoutY="267.0" prefHeight="42.0" prefWidth="273.0" text="Min Spread(In Base):" textFill="#3592dd">
          <font>
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="mAAr" layoutX="78.0" layoutY="300.0" prefHeight="44.0" prefWidth="87.0" promptText="0.005" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="SpreadMM" layoutX="78.0" layoutY="300.0" prefHeight="44.0" prefWidth="87.0" promptText="0.005" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
@@ -60,7 +60,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="mAAr1" layoutX="521.0" layoutY="81.0" prefHeight="44.0" prefWidth="76.0" promptText="500" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="MaxBalMM" layoutX="521.0" layoutY="81.0" prefHeight="44.0" prefWidth="76.0" promptText="500" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
@@ -71,7 +71,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="mAAr11" layoutX="521.0" layoutY="176.0" prefHeight="44.0" prefWidth="76.0" promptText="150" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="MinBalMM" layoutX="521.0" layoutY="176.0" prefHeight="44.0" prefWidth="76.0" promptText="150" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>

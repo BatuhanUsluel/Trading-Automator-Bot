@@ -51,41 +51,40 @@ public class Controller {
 	AverageTrading averageTrading = new AverageTrading();
 	public static HashMap<JSONObject, TrailingStop> TrailingStopMap = new HashMap<JSONObject, TrailingStop>();
 	public static HashMap<JSONObject, PendingOrder> PendingOrderMap = new HashMap<JSONObject, PendingOrder>();
+	public static HashMap<JSONObject, MarketMaking> marketMakingMap = new HashMap<JSONObject, MarketMaking>();
 	
     private Main application;
     private Scene scene;
     public Stage primaryStage;
-     @FXML private Label name;
-	 @FXML private Label slogan;
-	 @FXML private PasswordField Pass;
-	 @FXML private Label EmailLabel;
-	 @FXML private TextField Email;
-	 @FXML private Label PassLabel;
-	 @FXML private JFXButton LoggedIn;
-	 @FXML private JFXCheckBox RememberMe;
-	 @FXML private Label First;
-	 @FXML private JFXButton SignUp;
-	 @FXML private BorderPane mainView;
-	 
-	 
-	 @FXML private JFXButton arbitrage;
-	 @FXML private JFXButton mmake;
-	 @FXML private JFXButton backtest;
-	 @FXML private JFXButton lives;
-	 
-	 @FXML private JFXButton home;
-	 
-	 @FXML private JFXButton avtrad;
-	 @FXML private JFXButton qbuy;
-	 @FXML private JFXButton porder;
-	 @FXML private JFXButton tstop;
-	 @FXML private JFXButton fobook;
-	 @FXML private JFXButton settings;
-	 @FXML private Separator sepVertical;
-	 @FXML private ToggleGroup toggleGroupFO;
-	 
-	
-	    
+    
+    //Main
+		 @FXML private Label name;
+		 @FXML private Label slogan;
+		 @FXML private PasswordField Pass;
+		 @FXML private Label EmailLabel;
+		 @FXML private TextField Email;
+		 @FXML private Label PassLabel;
+		 @FXML private JFXButton LoggedIn;
+		 @FXML private JFXCheckBox RememberMe;
+		 @FXML private Label First;
+		 @FXML private JFXButton SignUp;
+		 @FXML private BorderPane mainView;
+		 @FXML private JFXTreeTableView<Person> table;
+		 @FXML private JFXButton tablee;
+		 
+	 //Navigation
+		 @FXML private JFXButton arbitrage;
+		 @FXML private JFXButton mmake;
+		 @FXML private JFXButton backtest;
+		 @FXML private JFXButton lives;
+		 @FXML private JFXButton home;
+		 @FXML private JFXButton avtrad;
+		 @FXML private JFXButton qbuy;
+		 @FXML private JFXButton porder;
+		 @FXML private JFXButton tstop;
+		 @FXML private JFXButton fobook;
+		 @FXML private JFXButton settings;
+   
 	 //Average Trading
 	 	@FXML private Label BPAv;
 	    @FXML private TextField BPAvU;
@@ -112,11 +111,7 @@ public class Controller {
 	    @FXML private TextField qVolume;
 	    @FXML private TextField qBAA;
 	    @FXML private JFXButton RunQBuy;
-	    @FXML private JFXComboBox<?> qEx;	
-	    
-	    
-	    @FXML private JFXTreeTableView<Person> table;
-	    @FXML private JFXButton tablee;
+	    @FXML private JFXComboBox<?> qEx;		    
 	    
 	//Fill Order Book
 	    @FXML private TextField FOBase;
@@ -142,7 +137,27 @@ public class Controller {
 	    @FXML private ToggleGroup TStopToggleBS;
 	    @FXML private JFXRadioButton TStopBuy;
 	    
-	    
+	//Pending Order
+	    @FXML private TextField POBPU;
+	    @FXML private TextField APPOU;
+	    @FXML private TextField PPOU;
+	    @FXML private TextField BVPOU;
+	    @FXML private JFXComboBox<?> ExPOU;
+	    @FXML private TextField POVPOU;
+	    @FXML private JFXButton RunPO;
+	    @FXML private JFXRadioButton SellPO;
+	    @FXML private JFXRadioButton BuyPO;
+	    @FXML private ToggleGroup toggleGroupPO;
+	
+	//Market Making
+	    @FXML private TextField BaseMM;
+	    @FXML private TextField AltMM;
+	    @FXML private JFXButton RunMM;
+	    @FXML private JFXComboBox<?> ExchangeMM;
+	    @FXML private TextField SpreadMM;
+	    @FXML private TextField MaxBalMM;
+	    @FXML private TextField MinBalMM;
+	      
 	@FXML
     private void handleChangeView(ActionEvent event) {
     	System.out.println("Changing");
@@ -338,18 +353,7 @@ public class Controller {
       	AverageTrading.runOrder(averageTrading);
     	}
     
-//Pending Order
-    @FXML private TextField POBPU;
-    @FXML private TextField APPOU;
-    @FXML private TextField PPOU;
-    @FXML private TextField BVPOU;
-    @FXML private JFXComboBox<?> ExPOU;
-    @FXML private TextField POVPOU;
-    @FXML private JFXButton RunPO;
-    @FXML private JFXRadioButton SellPO;
-    @FXML private JFXRadioButton BuyPO;
-    @FXML private ToggleGroup toggleGroupPO;
-    	    
+
     public void pendingOrder(ActionEvent event) throws JSONException  {
     	JSONObject pendingOrder = new JSONObject();
     	String base = POBPU.getText();
@@ -377,6 +381,32 @@ public class Controller {
     	Thread t = new Thread(pend);
     	t.start();
     }
+  
+    public void marketMaking(ActionEvent event)  throws JSONException {
+    	JSONObject marketMaking = new JSONObject();
+    	String base = BaseMM.getText();
+    	String Alt = AltMM.getText();
+    	String Spread = SpreadMM.getText();
+    	String MaxBal = MaxBalMM.getText();
+    	String MinBal = MinBalMM.getText();
+    	//String exchange = ExchangeMM.getValue().toString();
+    	String exchange = "bittrex";
+
+		marketMaking.put("base", base);
+    	marketMaking.put("alt", Alt);
+    	marketMaking.put("spread", Spread);
+    	marketMaking.put("MaxBal", MaxBal);
+    	marketMaking.put("MinBal", MinBal);
+    	marketMaking.put("exchange", exchange);
+    	marketMaking.put("licencekey", SocketCommunication.licencekey);
+    	marketMaking.put("millisstart", System.currentTimeMillis());
+    	marketMaking.put("request","marketMaking");
+    	MarketMaking market = new MarketMaking(marketMaking);
+    	marketMakingMap.put(marketMaking, market);
+    	Thread t = new Thread(market);
+    	t.start();
+    }
+    
     public void fillOrderBook(ActionEvent event) {
     	String base = FOBase.getText();
     	String alt = FOAlt.getText();
