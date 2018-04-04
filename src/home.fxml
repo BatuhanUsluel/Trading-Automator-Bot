@@ -79,5 +79,10 @@
          </font>
       </JFXButton>
       <TableView fx:id="tableView" layoutX="108.0" layoutY="189.0" prefHeight="269.0" prefWidth="459.0" />
+      <JFXButton fx:id="tableUpdate" layoutX="654.0" layoutY="147.0" onAction="#tableUpdate" prefHeight="38.0" prefWidth="89.0" style="-fx-background-color: #2fcc6e;" text="refresh" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="19.0" />
+         </font>
+      </JFXButton>
    </children>
 </AnchorPane>

@@ -129,6 +129,7 @@ public class AverageTrading {
 			OneShotTask(JSONObject message2) {message= message2; }
 	        public void run() {
 	            boolean run=true;
+	            
 	            try {
 	            	Orders1.add(message);
 					int loop = Integer.parseInt(message.getString("loop"));
