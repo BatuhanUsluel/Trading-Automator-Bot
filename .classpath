@@ -96,5 +96,14 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/Batuhan/OneDrive/Downloads/Donut/jfoenix-9.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Batuhan/.m2/repository/io/netty/netty-common/4.1.16.Final/netty-common-4.1.16.Final.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+			<attribute name="maven.artifactId" value="netty-common"/>
+			<attribute name="maven.version" value="4.1.16.Final"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

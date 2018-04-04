@@ -5,6 +5,7 @@
 <?import com.jfoenix.controls.JFXTreeTableView?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -71,11 +72,12 @@
             <Font size="26.0" />
          </font>
       </JFXCheckBox>
-      <JFXTreeTableView fx:id="table" layoutX="55.0" layoutY="179.0" prefHeight="390.0" prefWidth="821.0" stylesheets="@main.css" />
+      <JFXTreeTableView fx:id="table" layoutX="826.0" layoutY="179.0" prefHeight="390.0" prefWidth="50.0" stylesheets="@main.css" />
       <JFXButton fx:id="tablee" layoutX="667.0" layoutY="96.0" onAction="#tableEnable" prefHeight="38.0" prefWidth="89.0" style="-fx-background-color: #2fcc6e;" text="refresh" textFill="WHITE">
          <font>
             <Font name="System Bold" size="19.0" />
          </font>
       </JFXButton>
+      <TableView fx:id="tableView" layoutX="108.0" layoutY="189.0" prefHeight="269.0" prefWidth="459.0" />
    </children>
 </AnchorPane>

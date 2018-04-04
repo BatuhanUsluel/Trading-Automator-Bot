@@ -5,19 +5,45 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
-
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
+import javafx.event.EventHandler;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
+
+import javafx.application.Application;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.event.Event;
 import javafx.scene.control.TreeItem;
 import javafx.beans.property.SimpleStringProperty;
@@ -37,6 +63,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeTableColumn;
@@ -57,6 +86,13 @@ public class Controller {
     private Scene scene;
     public Stage primaryStage;
     
+	
+	 
+	 /*private final ObservableList<Person> data =
+		        FXCollections.observableArrayList(
+		            new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running")
+		        );
+	 */
     //Main
 		 @FXML private Label name;
 		 @FXML private Label slogan;
@@ -69,7 +105,7 @@ public class Controller {
 		 @FXML private Label First;
 		 @FXML private JFXButton SignUp;
 		 @FXML private BorderPane mainView;
-		 @FXML private JFXTreeTableView<Person> table;
+		 //@FXML private JFXTreeTableView<Person> table;
 		 @FXML private JFXButton tablee;
 		 
 	 //Navigation
@@ -157,7 +193,16 @@ public class Controller {
 	    @FXML private TextField SpreadMM;
 	    @FXML private TextField MaxBalMM;
 	    @FXML private TextField MinBalMM;
-	      
+	    
+	    @FXML private TableView<Person> tableView = new TableView<Person>();
+	    
+	    private final ObservableList<Person> data =
+	            FXCollections.observableArrayList(
+	            new Person("Eliza", "Smith", "eliza.smith@javafxpro.com"),
+	            new Person("Isabella", "Johnson", "isabella.johnson@javafxpro.com"),
+	            new Person("Imran", "Williams", "imran.williams@javafxpro.com"),
+	            new Person("Emma", "Jones", "emma.jones@javafxpro.com"),
+	            new Person("Russel", "Peters", "russel.peters@javafxpro.com"));
 	@FXML
     private void handleChangeView(ActionEvent event) {
     	System.out.println("Changing");
@@ -187,105 +232,62 @@ public class Controller {
     }
 	
 	@FXML
+    @SuppressWarnings("unchecked")
     private void DashBoard(ActionEvent event) throws IOException
     {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/home.fxml"));
 		mainView.setCenter(loader.load());
+
 		System.out.println("HEREEE");
     }
 	
+
+	@SuppressWarnings("unchecked")
 	@FXML
-	private void tableEnable(ActionEvent event) {
-		JFXTreeTableColumn<Person,String> OrderType = new JFXTreeTableColumn<Person,String>("Order Type");
-		OrderType.setPrefWidth(100);
-	
-		OrderType.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Person, String>, ObservableValue<String>>() {
-	          
-			@Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Person, String> param) {
-                return param.getValue().getValue().OrderType;
+	 private void tableEnable(ActionEvent event) {
+		
+		tableView.setEditable(false);
+        
+        TableColumn<Person, String> firstName = new TableColumn<Person, String>("First Name");
+        TableColumn<Person, String> lastName = new TableColumn<Person, String>("Last Name");
+        TableColumn<Person, String> email = new TableColumn<Person, String>("Email");
+        
+        firstName.setCellValueFactory(new PropertyValueFactory<Person, String>("firstName"));
+        lastName.setCellValueFactory(new PropertyValueFactory<Person, String>("lastName"));
+        email.setCellValueFactory(new PropertyValueFactory<Person, String>("email"));
+        
+        tableView.getColumns().add(firstName);
+        tableView.getColumns().add(lastName);
+        tableView.getColumns().add(email);
+        
+        //Insert Button
+        TableColumn col_action = new TableColumn<>("Action");
+        tableView.getColumns().add(col_action);
+        
+        col_action.setCellValueFactory(
+                new Callback<TableColumn.CellDataFeatures<Person, Boolean>, 
+                ObservableValue<Boolean>>() {
+
+            @Override
+            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Person, Boolean> p) {
+                return new SimpleBooleanProperty(p.getValue() != null);
             }
         });
-		
-		JFXTreeTableColumn<Person,String> BasePair = new JFXTreeTableColumn<Person,String>("Base Pair");
-		BasePair.setPrefWidth(100);
-	
-		BasePair.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Person, String>, ObservableValue<String>>() {
-	          
-			@Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Person, String> param) {
-                return param.getValue().getValue().BasePair;
+
+        //Adding the Button to the cell
+        col_action.setCellFactory(
+                new Callback<TableColumn<Person, Boolean>, TableCell<Person, Boolean>>() {
+
+            @Override
+            public TableCell<Person, Boolean> call(TableColumn<Person, Boolean> p) {
+                return new ButtonCell();
             }
+        
         });
-		
-		JFXTreeTableColumn<Person,String> AltPair = new JFXTreeTableColumn<Person,String>("Alt Pair");
-		AltPair.setPrefWidth(100);
-	
-		AltPair.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Person, String>, ObservableValue<String>>() {
-	          
-			@Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Person, String> param) {
-                return param.getValue().getValue().AltPair;
-            }
-        });
-		
-		JFXTreeTableColumn<Person,String> Exchange = new JFXTreeTableColumn<Person,String>("Exchange");
-		Exchange.setPrefWidth(100);
-	
-		Exchange.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Person, String>, ObservableValue<String>>() {
-	          
-			@Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Person, String> param) {
-                return param.getValue().getValue().Exchanges;
-            }
-        });
-		
-		JFXTreeTableColumn<Person,String> StartTime = new JFXTreeTableColumn<Person,String>("Start Time");
-		StartTime.setPrefWidth(100);
-	
-		StartTime.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Person, String>, ObservableValue<String>>() {
-	          
-			@Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Person, String> param) {
-                return param.getValue().getValue().StartTime;
-            }
-        });
-		
-		JFXTreeTableColumn<Person,String> EndTime = new JFXTreeTableColumn<Person,String>("EndTime");
-		EndTime.setPrefWidth(100);
-	
-		EndTime.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Person, String>, ObservableValue<String>>() {
-	          
-			@Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Person, String> param) {
-                return param.getValue().getValue().EndTime;
-            }
-        });
-		
-		JFXTreeTableColumn<Person,String> Running = new JFXTreeTableColumn<Person,String>("Running");
-		Running.setPrefWidth(100);
-	
-		Running.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Person, String>, ObservableValue<String>>() {
-	          
-			@Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Person, String> param) {
-                return param.getValue().getValue().Running;
-            }
-        });
-		
-		ObservableList<Person> person = FXCollections.observableArrayList();
-		person.add(new Person("Market Making","BTC","ETH", "Bittrex", "28.2(5:30)", "NA", "Running"));
-		person.add(new Person("Arbitrage","BTC","DCR", "Poloniex & Bittrex", "28.2(5:30)", "NA", "Running"));
-		person.add(new Person("QuickBuy","BTC","XRP", "Binance", "28.2(5:30)", "28.2(5:30)", "Stopped"));
-		person.add(new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running"));
-		System.out.println("ADDED ITEMS!!!");
-		final TreeItem<Person> root = new RecursiveTreeItem<Person>(person, RecursiveTreeObject::getChildren);
-		System.out.println(table.getColumns());
-		table.getColumns().setAll(OrderType,BasePair,AltPair, Exchange, StartTime, EndTime, Running);
-		table.setRoot(root);
-		table.setShowRoot(false);
+
+        tableView.setItems(data);
+
 	}
-	
     @FXML
     private void LogIn(ActionEvent event) throws IOException
     {
@@ -302,13 +304,11 @@ public class Controller {
         primaryStage.show();
         SocketCommunication.setup();
     }
-    
     public void quickPrice(ActionEvent event) {
    	 System.out.println("running quickPrice");
    	 //quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),qEx.getValue().toString(), Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
    	quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),"bittrex", Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
- 	}
-    
+ 	}    
     public void trailingStop(ActionEvent event) throws JSONException {
     	JSONObject trailingStop = new JSONObject();
     	String base = TStopBase.getText();
@@ -331,8 +331,7 @@ public class Controller {
     	TrailingStop trailingstopclass = new TrailingStop();
     	trailingstopclass.runOrder(trailingStop);
     	TrailingStopMap.put(trailingStop, trailingstopclass);
-    }
-    
+    }  
     public void averageTrading(ActionEvent event) throws JSONException {
       	 System.out.println("running averageTrading");
      	JSONObject averageTrading = new JSONObject();
@@ -352,8 +351,6 @@ public class Controller {
      	System.out.println(averageTrading);
       	AverageTrading.runOrder(averageTrading);
     	}
-    
-
     public void pendingOrder(ActionEvent event) throws JSONException  {
     	JSONObject pendingOrder = new JSONObject();
     	String base = POBPU.getText();
@@ -380,8 +377,7 @@ public class Controller {
     	PendingOrderMap.put(pendingOrder, pend);
     	Thread t = new Thread(pend);
     	t.start();
-    }
-  
+    } 
     public void marketMaking(ActionEvent event)  throws JSONException {
     	JSONObject marketMaking = new JSONObject();
     	String base = BaseMM.getText();
@@ -405,8 +401,7 @@ public class Controller {
     	marketMakingMap.put(marketMaking, market);
     	Thread t = new Thread(market);
     	t.start();
-    }
-    
+    }    
     public void fillOrderBook(ActionEvent event) {
     	String base = FOBase.getText();
     	String alt = FOAlt.getText();
@@ -428,30 +423,70 @@ public class Controller {
     	  this.primaryStage = stage;
     	}
 
-    private static final class Person extends RecursiveTreeObject<Person>{
-		StringProperty OrderType;
-		StringProperty BasePair;
-		StringProperty AltPair;
-		StringProperty Exchanges;
-		StringProperty StartTime;
-		StringProperty EndTime;
-		StringProperty Running;
-		
-		
-		public Person(String OrderType,String BasePair,String AltPair, String Exchanges, String StartTime, String EndTime, String Running)
-		{
-			this.OrderType = new SimpleStringProperty(OrderType);
-			this.BasePair  = new SimpleStringProperty(BasePair);
-			this.AltPair = new SimpleStringProperty(AltPair);
-			this.Exchanges = new SimpleStringProperty(Exchanges);
-			this.StartTime = new SimpleStringProperty(StartTime);
-			this.EndTime = new SimpleStringProperty(EndTime);
-			this.Running = new SimpleStringProperty(Running);
-			
-		}
-		
-		
-	}
+    public static class Person {
+   	 
+        private final SimpleStringProperty firstName;
+        private final SimpleStringProperty lastName;
+        private final SimpleStringProperty email;
+ 
+        private Person(String fName, String lName, String email) {
+            this.firstName = new SimpleStringProperty(fName);
+            this.lastName = new SimpleStringProperty(lName);
+            this.email = new SimpleStringProperty(email);
+        }
+ 
+        public String getFirstName() {
+            return firstName.get();
+        }
+ 
+        public void setFirstName(String fName) {
+            firstName.set(fName);
+        }
+ 
+        public String getLastName() {
+            return lastName.get();
+        }
+ 
+        public void setLastName(String fName) {
+            lastName.set(fName);
+        }
+ 
+        public String getEmail() {
+            return email.get();
+        }
+ 
+        public void setEmail(String fName) {
+            email.set(fName);
+        }
+    }
+  //Define the button cell
+    private class ButtonCell extends TableCell<Person, Boolean> {
+        final Button cellButton = new Button("Delete");
+        
+        ButtonCell(){
+            
+        	//Action when the button is pressed
+            cellButton.setOnAction(new EventHandler<ActionEvent>(){
+
+                @Override
+                public void handle(ActionEvent t) {
+                    // get Selected Item
+                	Person currentPerson = (Person) ButtonCell.this.getTableView().getItems().get(ButtonCell.this.getIndex());
+                	//remove selected item from the table list
+                	data.remove(currentPerson);
+                }
+            });
+        }
+
+        //Display button if the row is not empty
+        @Override
+        protected void updateItem(Boolean t, boolean empty) {
+            super.updateItem(t, empty);
+            if(!empty){
+                setGraphic(cellButton);
+            }
+        }
+    }
 }
 
 
