@@ -2,6 +2,8 @@ package application;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,6 +13,7 @@ import com.jfoenix.controls.JFXComboBox;
 import javafx.event.EventHandler;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
+
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,21 +55,13 @@ public class Controller {
 		        );
 	 */
     //Main
-		 @FXML private Label name;
-		 @FXML private Label slogan;
 		 @FXML private PasswordField Pass;
-		 @FXML private Label EmailLabel;
 		 @FXML private TextField Email;
-		 @FXML private Label PassLabel;
 		 @FXML private JFXButton LoggedIn;
 		 @FXML private JFXCheckBox RememberMe;
-		 @FXML private Label First;
 		 @FXML private JFXButton SignUp;
 		 @FXML private BorderPane mainView;
-		 //@FXML private JFXTreeTableView<Person> table;
-		 @FXML private JFXButton tablee;
-		 @FXML private JFXButton tableUpdate;
-		 
+
 	 //Navigation
 		 @FXML private JFXButton arbitrage;
 		 @FXML private JFXButton mmake;
@@ -153,16 +148,7 @@ public class Controller {
 	    @FXML private TextField MaxBalMM;
 	    @FXML private TextField MinBalMM;
 	    
-	    @FXML private TableView<Person> tableView = new TableView<Person>();
-	    
-	    private final ObservableList<Person> data
-        = FXCollections.observableArrayList(
-                new Person("Jacob", "Smith"),
-                new Person("Isabella", "Johnson"),
-                new Person("Ethan", "Williams"),
-                new Person("Emma", "Jones"),
-                new Person("Michael", "Brown")
-        );
+
 	@FXML
     private void handleChangeView(ActionEvent event) {
     	System.out.println("Changing");
@@ -198,79 +184,11 @@ public class Controller {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/home.fxml"));
 		mainView.setCenter(loader.load());
 		System.out.println("TABLE1!");
-		System.out.println("HEREEE");
     }
 	
-
-	@FXML
-	private void tableUpdate() {
-		final ObservableList<Person> data2
-        = FXCollections.observableArrayList(
-                new Person("Jacob", "Smith"),
-                new Person("Isabella", "Smith"),
-                new Person("Ethan", "Smith"),
-                new Person("Michael", "BroSmithSmithwn")
-        );
-		tableView.setItems(data2);
-		tableView.refresh();
-	}
-	
-	@SuppressWarnings("unchecked")
-	@FXML
-	 private void tableEnable() {
-		TableColumn<Person, String> firstNameCol = new TableColumn<Person, String>("First Name");
-        firstNameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-
-        TableColumn<Person, String> lastNameCol = new TableColumn<Person, String>("Last Name");
-        lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-
-        TableColumn<Person, String> actionCol = new TableColumn<Person, String>("Action");
-        actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-
-        Callback<TableColumn<Person, String>, TableCell<Person, String>> cellFactory
-                = //
-                new Callback<TableColumn<Person, String>, TableCell<Person, String>>() {
-            @Override
-            public TableCell<Person, String> call(final TableColumn<Person, String> param) {
-                final TableCell<Person, String> cell = new TableCell<Person, String>() {
-
-                    final Button btn = new Button("Just Do It");
-
-                    @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                                Person person = getTableView().getItems().get(getIndex());
-                                System.out.println(person.getFirstName()
-                                        + "   " + person.getLastName());
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
-                    }
-                };
-                return cell;
-            }
-        };
-
-        actionCol.setCellFactory(cellFactory);
-
-        tableView.setItems(data);
-        tableView.getColumns().addAll(firstNameCol, lastNameCol, actionCol);
-	}
     @FXML
     private void LogIn(ActionEvent event) throws IOException
     {
-       /* FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
-        AnchorPane rootLayout = loader.load(); 
-        Scene scene = new Scene(rootLayout);
-        Main m = new Main();
-        m.usetScene(scene);
-        */
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
         AnchorPane rootLayout = loader.load(); 
         Scene scene = new Scene(rootLayout);
@@ -397,60 +315,6 @@ public class Controller {
     	  this.primaryStage = stage;
     	}
 
-    public static class Person {
-
-        private final SimpleStringProperty firstName;
-        private final SimpleStringProperty lastName;
-        private Person(String fName, String lName) {
-            this.firstName = new SimpleStringProperty(fName);
-            this.lastName = new SimpleStringProperty(lName);
-        }
-
-        public String getFirstName() {
-            return firstName.get();
-        }
-
-        public void setFirstName(String fName) {
-            firstName.set(fName);
-        }
-
-        public String getLastName() {
-            return lastName.get();
-        }
-
-        public void setLastName(String fName) {
-            lastName.set(fName);
-        }
-
-    }
-  //Define the button cell
-    private class ButtonCell extends TableCell<Person, Boolean> {
-        final Button cellButton = new Button("Delete");
-        
-        ButtonCell(){
-            
-        	//Action when the button is pressed
-            cellButton.setOnAction(new EventHandler<ActionEvent>(){
-
-                @Override
-                public void handle(ActionEvent t) {
-                    // get Selected Item
-                	Person currentPerson = (Person) ButtonCell.this.getTableView().getItems().get(ButtonCell.this.getIndex());
-                	//remove selected item from the table list
-                	data.remove(currentPerson);
-                }
-            });
-        }
-
-        //Display button if the row is not empty
-        @Override
-        protected void updateItem(Boolean t, boolean empty) {
-            super.updateItem(t, empty);
-            if(!empty){
-                setGraphic(cellButton);
-            }
-        }
-    }
 }
 
 

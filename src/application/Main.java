@@ -15,6 +15,7 @@ public class Main extends Application {
 	public Controller controller1;
 	public Controller controller2;
 	public Stage primaryStage;
+	
 	public static void main(String[] args) {
 		launch(args);
 	}

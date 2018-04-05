@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.DashboardController">
    <children>
       <JFXCheckBox fx:id="RememberMe" checkedColor="#9e6dcd" layoutX="55.0" layoutY="65.0" prefHeight="20.0" prefWidth="135.0" selected="true" text="Market Making" textFill="WHITE" unCheckedColor="WHITE">
          <font>
