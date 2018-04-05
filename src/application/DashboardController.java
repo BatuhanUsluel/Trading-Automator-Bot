@@ -54,12 +54,11 @@ public class DashboardController {
             new Person("Emma", "Jones"),
             new Person("Michael", "Brown")
     );
-	 @FXML private JFXButton tablee;
-	 @FXML private JFXButton tableUpdate;
 	 @FXML private TableView<Person> tableView = new TableView<Person>();
 	
 	@FXML
     public void initialize(){
+		
         System.out.println("TEST!ASDADSA");
         tableEnable();
     }
@@ -107,7 +106,8 @@ public class DashboardController {
         };
         actionCol.setCellFactory(cellFactory);
         System.out.println("TABLE30!");
-        
+        String css = this.getClass().getResource("/assets/tableview.css").toExternalForm();
+        tableView.getStylesheets().setAll(css);
         tableView.setItems(data);
         tableView.getColumns().addAll(firstNameCol, lastNameCol, actionCol);
 	}
