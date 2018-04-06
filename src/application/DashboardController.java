@@ -46,8 +46,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
 public class DashboardController {
-	 @FXML private TableView<Person> tableView = new TableView<Person>();
-	
+	@FXML private TableView<Person> tableView = new TableView<Person>();
+	public static ObservableList<Person> data = FXCollections.observableArrayList(
+    		new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running","000000"),
+    		new Person("Something","BTC","OMG", "EXCHNAGE", "28.2(5:30)", "NA", "Running","1111111"),
+    		new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running","222222"),
+    		new Person("Yes","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running","333333"),
+    		new Person("SuchProfit","MuchWow","Doge", "Bittrex", "28.2(5:30)", "NA", "Running","44444")
+    );
 	@FXML
     public void initialize(){
 		
@@ -58,14 +64,7 @@ public class DashboardController {
     @SuppressWarnings("unchecked")
 	@FXML
 	 private void tableEnable() {
-    	final ObservableList<Person> data
-        = FXCollections.observableArrayList(
-        		new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running","000000"),
-        		new Person("Something","BTC","OMG", "EXCHNAGE", "28.2(5:30)", "NA", "Running","1111111"),
-        		new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running","222222"),
-        		new Person("Yes","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running","333333"),
-        		new Person("SuchProfit","MuchWow","Doge", "Bittrex", "28.2(5:30)", "NA", "Running","44444")
-        );
+
 		System.out.println("TABLE2!");
 
 		TableColumn<Person, String> OrderTypeCol = new TableColumn<Person, String>("Order Type");
@@ -110,7 +109,7 @@ public class DashboardController {
                         } else {
                             btn.setOnAction(event -> {
                                 Person person = getTableView().getItems().get(getIndex());
-                                
+                                data.removeAll(person);
                                 System.out.println(person.getOrderID());
                             });
                             setGraphic(btn);
@@ -131,12 +130,8 @@ public class DashboardController {
     
 	@FXML
 	private void tableUpdate() {
-		ObservableList<Person> data2 = FXCollections.observableArrayList();
-		data2.addAll(new Person("Market Making","BTC","ETH", "Bittrex", "28.2(5:30)", "NA", "Running","111111"));
-		data2.addAll(new Person("Arbitrage","BTC","DCR", "Poloniex & Bittrex", "28.2(5:30)", "NA", "Running","22222"));
-		data2.addAll(new Person("QuickBuy","BTC","XRP", "Binance", "28.2(5:30)", "28.2(5:30)", "Stopped" , "33333"));
-		data2.addAll(new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running", "44444"));
-		tableView.setItems(data2);
+		//data.removeAll(elements)
+		//tableView.setItems(data2);
 		tableView.refresh();
 	}
     public static class Person {
@@ -190,8 +185,10 @@ public class DashboardController {
         public String getRunning() {
             return Running.get();
         }
+        
         public String getStartTime() {
             return StartTime.get();
         }
+        
     }
 }

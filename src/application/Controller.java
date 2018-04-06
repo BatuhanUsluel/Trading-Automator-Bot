@@ -14,6 +14,7 @@ import javafx.event.EventHandler;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 
+import application.DashboardController.Person;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,6 +38,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
 public class Controller {
+	
 	QuickBuy quickbuy = new QuickBuy();
 	AverageTrading averageTrading = new AverageTrading();
 	public static HashMap<JSONObject, TrailingStop> TrailingStopMap = new HashMap<JSONObject, TrailingStop>();
