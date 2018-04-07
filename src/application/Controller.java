@@ -86,20 +86,7 @@ public class Controller {
 	    @FXML private TextField qBAA;
 	    @FXML private JFXButton RunQBuy;
 	    @FXML private JFXComboBox<?> qEx;		    
-	    
-	//Fill Order Book
-	    @FXML private TextField FOBase;
-	    @FXML private TextField FOAlt;
-	    @FXML private TextField FOStartP;
-	    @FXML  private TextField FOEndP;
-	    @FXML private TextField FOBalanceUsed;
-	    @FXML private TextField FONumberOrders;
-	    @FXML private JFXRadioButton SellFO;
-	    @FXML private ToggleGroup FoBuySell;
-	    @FXML private JFXRadioButton BuyFO;
-	    @FXML private JFXButton RunFOBook;
-	    @FXML  private JFXComboBox<?> FOEx;
-	    
+
 	//Trailing Stop
 	    @FXML private TextField TStopBase;
 	    @FXML private TextField TStopAlt;
@@ -159,13 +146,15 @@ public class Controller {
     }
 	
     @FXML
-    private void LogIn(ActionEvent event) throws IOException
+    private void LogIn(ActionEvent event) throws IOException, JSONException, InterruptedException
     {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
         AnchorPane rootLayout = loader.load(); 
         Scene scene = new Scene(rootLayout);
         primaryStage.setScene(scene);
         primaryStage.show();
+        Exchanges ex = new Exchanges();
+        ex.createExchanges();
         SocketCommunication.setup();
     }
     public void quickPrice(ActionEvent event) {
@@ -248,23 +237,7 @@ public class Controller {
     	Thread t = new Thread(market);
     	t.start();
     }    
-    public void fillOrderBook(ActionEvent event) {
-    	String base = FOBase.getText();
-    	String alt = FOAlt.getText();
-    	String startprice = FOStartP.getText();
-    	String endprice = FOEndP.getText();
-    	String balanceused = FOBalanceUsed.getText();
-    	String nooforders = FONumberOrders.getText();
-    	String BuySell = ((RadioButton) FoBuySell.getSelectedToggle()).getText();
-    	//String exchange = FOEx.getValue().toString();
-    	String exchange = "bittrex";
-    	//Add check for valid inputs!!
-    	try {
-			FillOrderBook.fillOrderBook(base, alt, startprice,endprice, balanceused, nooforders, BuySell, exchange);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    }
+
     public void setPrimaryStage(Stage stage) {
     	  this.primaryStage = stage;
     	}

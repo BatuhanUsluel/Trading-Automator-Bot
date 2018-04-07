@@ -20,7 +20,7 @@ import org.knowm.xchange.currency.CurrencyPair;
 public class Exchanges {
 	public HashMap<String, String> exchangecodemap = new HashMap<String, String>();
 	public static HashMap<String, Exchange> exchangemap = new HashMap<String, Exchange>();
-	public ArrayList<String> list = new ArrayList<String>();
+	public static ArrayList<String> list = new ArrayList<String>();
 	public void createExchanges() throws JSONException, IOException, InterruptedException {
 		/*Create hashmap with exchanges short name, and long version. Then loop for everythign in the json text file, and do hashmap.get(exchangeshort).
 		 * Then create a exchange object with this using:
@@ -87,6 +87,7 @@ public class Exchanges {
 		    Exchange ex = ExchangeFactory.INSTANCE.createExchange(exSpec);
 			
 		    exchangemap.put(key, ex);
+		    System.out.println(key);
 		    list.add(key);
 		    //System.out.println(ex.getMarketDataService().getTicker(new CurrencyPair("ETH", "BTC")));
 	        } catch (Exception e) {
