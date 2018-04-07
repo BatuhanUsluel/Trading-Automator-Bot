@@ -77,25 +77,7 @@ public class Controller {
 		 @FXML private JFXButton fobook;
 		 @FXML private JFXButton settings;
    
-	 //Average Trading
-	 	@FXML private Label BPAv;
-	    @FXML private TextField BPAvU;
-	    @FXML private Label APAv;
-	    @FXML private TextField APAvU;
-	    @FXML private Label LTAv;
-	    @FXML private TextField LPAvU;
-	    @FXML private JFXRadioButton SAv;
-	    @FXML private ToggleGroup toggleBAAv;
-	    @FXML private ToggleGroup toggleBSAv;
-	    @FXML private JFXRadioButton BAv;
-	    @FXML private JFXRadioButton AskAv;
-	    @FXML private JFXRadioButton BidAv;
-	    @FXML private Label ExLabelAv;
-	    @FXML private JFXComboBox<String> ExAv;
-	    @FXML private JFXButton StartAv;
-	    @FXML private Label MBAv;
-	    @FXML private TextField VpOAV;
-	    @FXML private JFXTextField MABAv;
+
 
 	//QuickBuy
 	    @FXML private TextField qBase;
@@ -157,19 +139,7 @@ public class Controller {
         try {
             String menuItemID = ((JFXButton) event.getSource()).getId();
             System.out.println(menuItemID);
-            //if (menuItemID.toString() == "avtrad") {
-            	System.out.println("Adding ComboBox");
-            	final JFXComboBox<String> ExAv = new JFXComboBox<String>();
-                ExAv.getItems().addAll(
-                		"Highest",
-                        "High",
-                        "Normal",
-                        "Low",
-                        "Lowest" 
-                    );   
-            //}
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/" + menuItemID + ".fxml"));
-            loader.setController(this);
             
             System.out.println(loader);
             mainView.setCenter(loader.load()); 
@@ -226,25 +196,7 @@ public class Controller {
     	trailingstopclass.runOrder(trailingStop);
     	TrailingStopMap.put(trailingStop, trailingstopclass);
     }  
-    public void averageTrading(ActionEvent event) throws JSONException {
-      	 System.out.println("running averageTrading");
-     	JSONObject averageTrading = new JSONObject();
-     	averageTrading.put("Basecoin", BPAvU.getText());
-     	averageTrading.put("Altcoin", APAvU.getText());
-     	//averageTrading.put("Exchanges", ExAv.getValue().toString());
-     	averageTrading.put("Exchanges", "bittrex");
-     	averageTrading.put("request", "averageTrading");
-     	averageTrading.put("coinstotrade", MABAv.getText());
-     	averageTrading.put("volumeperorder", VpOAV.getText());
-     	averageTrading.put("licenceKey", SocketCommunication.licencekey);
-     	averageTrading.put("millisstart", System.currentTimeMillis());
-     	averageTrading.put("atbid", ((RadioButton) toggleBAAv.getSelectedToggle()).getText());
-     	averageTrading.put("buy", ((RadioButton) toggleBSAv.getSelectedToggle()).getText());
-     	averageTrading.put("loop", LPAvU.getText());
-     	System.out.println("--------------");
-     	System.out.println(averageTrading);
-      	AverageTrading.runOrder(averageTrading);
-    	}
+
     public void pendingOrder(ActionEvent event) throws JSONException  {
     	JSONObject pendingOrder = new JSONObject();
     	String base = POBPU.getText();
