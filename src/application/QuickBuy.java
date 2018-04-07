@@ -17,48 +17,6 @@ import javax.json.JsonObject;
 public class QuickBuy {
 
 	private static List<JsonObject> myList = new ArrayList<>();
-	/*
-	public static void main(String[] args) throws NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException, JSONException, InterruptedException {
-		ExchangeSpecification PoloniexEx = new PoloniexExchange().getDefaultExchangeSpecification();
-		PoloniexEx.setUserName("Batu");
-	    PoloniexEx.setApiKey("CBU5SD1G-G3K6U3VP-KIK9H73R-0AB52TC4");
-	    PoloniexEx.setSecretKey("fe7885337c05f746c53a020dc7591aafa1ab7b337ee2fc0aeefe9d29d26974a10d28815ef789b170f40949808fd9b04c15fb0585841e9ab010b5a7c664d99bef");
-	    Exchange exchange = ExchangeFactory.INSTANCE.createExchange(PoloniexEx);
-		Ticker ticker;
-		Currency currency = new Currency(coin);
-		CurrencyPair pair = new CurrencyPair(coin,base);
-		ticker = exchange.getMarketDataService().getTicker(pair);
-		JSONObject jsonobj = new JSONObject();
-	    jsonobj = new JSONObject(ticker);
-		double bid;
-		double ask;
-		bid = jsonobj.getDouble("bid");
-		ask = jsonobj.getDouble("ask");
-		altvolume = new BigDecimal(btcvolume/ask);
-		buyprice = new BigDecimal(ask*buypercent);
-		LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), altvolume, pair, null, null, buyprice);
-		System.out.println(BuyingOrder.toString());
-		
-		String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
-		System.out.println("Limit Order return value BUY: " + limitOrderReturnValueBUY);
-		if (sell==true) {
-			sellprice = new BigDecimal(ask*sellpercent);
-			LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), altvolume, pair, null, null, sellprice);
-			System.out.println(SellingOrder.toString());
-			String limitOrderReturnValueSELL = exchange.getTradeService().placeLimitOrder(SellingOrder);
-			System.out.println("Limit Order return value SELL: " + limitOrderReturnValueSELL);
-			TimeUnit.SECONDS.sleep(2);
-			final Map<Currency, Balance> ALLBalances;
-			ALLBalances = exchange.getAccountService().getAccountInfo().getWallet().getBalances();
-			BigDecimal	AvailableBalance = ALLBalances.get(currency).getAvailable();
-			LimitOrder SellingOrderRepeat = new LimitOrder((OrderType.ASK), AvailableBalance, pair, null, null, sellprice);
-			System.out.println(SellingOrderRepeat.toString());
-			String limitOrderReturnValueSELLRepeat = exchange.getTradeService().placeLimitOrder(SellingOrderRepeat);
-			System.out.println("Limit Order return value SELL REPEAT: " + limitOrderReturnValueSELLRepeat);
-		}
-	}
-	*/
-	
 	public void recievedQuickBuyMessage(JSONObject message) throws JSONException {
 		System.out.println("Recieved quickbuy");
 		System.out.println(myList.toString());
@@ -89,12 +47,12 @@ public class QuickBuy {
 
 	}
 	
-	public void addtolist(JsonObject quickpricelistadd) {
+	public static void addtolist(JsonObject quickpricelistadd) {
 		myList.add(quickpricelistadd);
 		System.out.println(myList.toString());
 	}
 	
-    public void sendQuickPriceRequest(String basecoin, String altcoin, String exchange, double btcvolume, double buypercent) {
+    public static void sendQuickPriceRequest(String basecoin, String altcoin, String exchange, double btcvolume, double buypercent) {
     	long millis = System.currentTimeMillis();
     	//String quickpricerequest = ("{\"Coin\":\"" + coin + "\",\"Exchanges\":\"" + exchange + "\",\"request\":\"QuickPrice\",\"licenceKey\":\"" + SocketCommunication.licencekey + "\",\"millis\":\"" + millis + "\"}");
     	String quickpricerequest = Json.createObjectBuilder()

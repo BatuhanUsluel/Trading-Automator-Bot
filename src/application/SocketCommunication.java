@@ -100,7 +100,7 @@ public class SocketCommunication {
 							AverageTrading.recievedAverageTrade(jsonmessage);
 							break;
 						case "trailingStop":
-							HashMap<JSONObject, TrailingStop> hashmap = Controller.TrailingStopMap;
+							HashMap<JSONObject, TrailingStop> hashmap = TrailingController.TrailingStopMap;
 							for (Entry<JSONObject, TrailingStop> entry : hashmap.entrySet()) {
 							    JSONObject key = entry.getKey();
 								if ((key.getString("base").equals(jsonmessage.getString("base")))
@@ -118,7 +118,7 @@ public class SocketCommunication {
 							}
 							break;
 						case "pendingOrder":
-							HashMap<JSONObject, PendingOrder> hashmappending = Controller.PendingOrderMap;
+							HashMap<JSONObject, PendingOrder> hashmappending = PendingController.PendingOrderMap;
 							for (Entry<JSONObject, PendingOrder> entry : hashmappending.entrySet()) {
 								JSONObject key = entry.getKey();
 								if ((key.getString("base").equals(jsonmessage.getString("base")))
@@ -136,7 +136,7 @@ public class SocketCommunication {
 							}
 							break;
 						case "marketMaking":
-							HashMap<JSONObject, MarketMaking> hashmapmarket = Controller.marketMakingMap;
+							HashMap<JSONObject, MarketMaking> hashmapmarket = MarketController.marketMakingMap;
 							for (Entry<JSONObject, MarketMaking> entry : hashmapmarket.entrySet()) {
 								JSONObject key = entry.getKey();
 								if ((key.getString("base").equals(jsonmessage.getString("base")))

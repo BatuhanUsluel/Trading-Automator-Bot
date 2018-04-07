@@ -38,24 +38,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
 public class Controller {
-	
-	QuickBuy quickbuy = new QuickBuy();
-	AverageTrading averageTrading = new AverageTrading();
-	public static HashMap<JSONObject, TrailingStop> TrailingStopMap = new HashMap<JSONObject, TrailingStop>();
-	public static HashMap<JSONObject, PendingOrder> PendingOrderMap = new HashMap<JSONObject, PendingOrder>();
-	public static HashMap<JSONObject, MarketMaking> marketMakingMap = new HashMap<JSONObject, MarketMaking>();
-	
-    private Main application;
-    private Scene scene;
+
     public Stage primaryStage;
-    
-	
-	 
-	 /*private final ObservableList<Person> data =
-		        FXCollections.observableArrayList(
-		            new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running")
-		        );
-	 */
+
     //Main
 		 @FXML private PasswordField Pass;
 		 @FXML private TextField Email;
@@ -76,49 +61,6 @@ public class Controller {
 		 @FXML private JFXButton tstop;
 		 @FXML private JFXButton fobook;
 		 @FXML private JFXButton settings;
-   
-
-
-	//QuickBuy
-	    @FXML private TextField qBase;
-	    @FXML private TextField qAlt;
-	    @FXML private TextField qVolume;
-	    @FXML private TextField qBAA;
-	    @FXML private JFXButton RunQBuy;
-	    @FXML private JFXComboBox<?> qEx;		    
-
-	//Trailing Stop
-	    @FXML private TextField TStopBase;
-	    @FXML private TextField TStopAlt;
-	    @FXML private TextField TStopVolume;
-	    @FXML private TextField TStopTrail;
-	    @FXML private JFXButton RunTStop;
-	    @FXML private JFXComboBox<?> TStopExchange;
-	    @FXML private JFXRadioButton TStopSell;
-	    @FXML private ToggleGroup TStopToggleBS;
-	    @FXML private JFXRadioButton TStopBuy;
-	    
-	//Pending Order
-	    @FXML private TextField POBPU;
-	    @FXML private TextField APPOU;
-	    @FXML private TextField PPOU;
-	    @FXML private TextField BVPOU;
-	    @FXML private JFXComboBox<?> ExPOU;
-	    @FXML private TextField POVPOU;
-	    @FXML private JFXButton RunPO;
-	    @FXML private JFXRadioButton SellPO;
-	    @FXML private JFXRadioButton BuyPO;
-	    @FXML private ToggleGroup toggleGroupPO;
-	
-	//Market Making
-	    @FXML private TextField BaseMM;
-	    @FXML private TextField AltMM;
-	    @FXML private JFXButton RunMM;
-	    @FXML private JFXComboBox<?> ExchangeMM;
-	    @FXML private TextField SpreadMM;
-	    @FXML private TextField MaxBalMM;
-	    @FXML private TextField MinBalMM;
-	    
 
 	@FXML
     private void handleChangeView(ActionEvent event) {
@@ -157,86 +99,6 @@ public class Controller {
         ex.createExchanges();
         SocketCommunication.setup();
     }
-    public void quickPrice(ActionEvent event) {
-   	 System.out.println("running quickPrice");
-   	 //quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),qEx.getValue().toString(), Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
-   	quickbuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),"bittrex", Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
- 	}    
-    public void trailingStop(ActionEvent event) throws JSONException {
-    	JSONObject trailingStop = new JSONObject();
-    	String base = TStopBase.getText();
-    	String alt = TStopAlt.getText();
-    	String volume = TStopVolume.getText();
-    	String trail = TStopTrail.getText();
-    	String buysell = ((RadioButton) TStopToggleBS.getSelectedToggle()).getText();
-    	//String exchange =TStopExchange.getValue().toString());
-    	String exchange = "bittrex";
-    	
-    	trailingStop.put("base", base);
-    	trailingStop.put("alt", alt);
-    	trailingStop.put("request", "trailingStop");
-    	trailingStop.put("volume", volume);
-    	trailingStop.put("trail", trail);
-    	trailingStop.put("buysell", buysell);
-    	trailingStop.put("exchange",exchange);
-    	trailingStop.put("licenceKey", SocketCommunication.licencekey);
-    	trailingStop.put("millisstart", System.currentTimeMillis());
-    	TrailingStop trailingstopclass = new TrailingStop();
-    	trailingstopclass.runOrder(trailingStop);
-    	TrailingStopMap.put(trailingStop, trailingstopclass);
-    }  
-
-    public void pendingOrder(ActionEvent event) throws JSONException  {
-    	JSONObject pendingOrder = new JSONObject();
-    	String base = POBPU.getText();
-    	String alt = APPOU.getText();
-    	String price = PPOU.getText();
-    	String volume = BVPOU.getText();
-    	String percent = POVPOU.getText();
-    	String buysell = ((RadioButton) toggleGroupPO.getSelectedToggle()).getText();
-    	//String exchange = ExPOU.getValue().toString();
-    	String exchange = "bittrex";
-    	
-    	pendingOrder.put("base",base);
-    	pendingOrder.put("alt",alt);
-    	pendingOrder.put("request","pendingOrder");
-    	pendingOrder.put("priceorder",price);
-    	pendingOrder.put("volume",volume);
-    	pendingOrder.put("percent",percent);
-    	pendingOrder.put("licenceKey", SocketCommunication.licencekey);
-    	pendingOrder.put("millisstart", System.currentTimeMillis());
-    	pendingOrder.put("buysell",buysell);
-    	pendingOrder.put("exchange",exchange);
-    	//PendingOrder pendingorderclass = new PendingOrder(pendingOrder);
-    	PendingOrder pend = new PendingOrder(pendingOrder);
-    	PendingOrderMap.put(pendingOrder, pend);
-    	Thread t = new Thread(pend);
-    	t.start();
-    } 
-    public void marketMaking(ActionEvent event)  throws JSONException {
-    	JSONObject marketMaking = new JSONObject();
-    	String base = BaseMM.getText();
-    	String Alt = AltMM.getText();
-    	String Spread = SpreadMM.getText();
-    	String MaxBal = MaxBalMM.getText();
-    	String MinBal = MinBalMM.getText();
-    	//String exchange = ExchangeMM.getValue().toString();
-    	String exchange = "bittrex";
-
-		marketMaking.put("base", base);
-    	marketMaking.put("alt", Alt);
-    	marketMaking.put("spread", Spread);
-    	marketMaking.put("MaxBal", MaxBal);
-    	marketMaking.put("MinBal", MinBal);
-    	marketMaking.put("exchange", exchange);
-    	marketMaking.put("licencekey", SocketCommunication.licencekey);
-    	marketMaking.put("millisstart", System.currentTimeMillis());
-    	marketMaking.put("request","marketMaking");
-    	MarketMaking market = new MarketMaking(marketMaking);
-    	marketMakingMap.put(marketMaking, market);
-    	Thread t = new Thread(market);
-    	t.start();
-    }    
 
     public void setPrimaryStage(Stage stage) {
     	  this.primaryStage = stage;

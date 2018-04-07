@@ -1,5 +1,8 @@
 package application;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,8 +45,8 @@ public class AveragetradingController {
 	@FXML
     public void initialize(){
     	System.out.println("Adding ComboBox");
-        ObservableList<String> oo=FXCollections.observableArrayList("b","a");
-        ExAv.getItems().addAll(oo);
+        List<String> list = new ArrayList<String>(Exchanges.list);
+        ExAv.getItems().addAll(list);
     }
 	
 	@FXML
