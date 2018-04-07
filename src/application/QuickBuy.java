@@ -1,18 +1,18 @@
 package application;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
-import java.lang.Long;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.json.Json;
-import javax.json.JsonObject;
 
 public class QuickBuy {
 

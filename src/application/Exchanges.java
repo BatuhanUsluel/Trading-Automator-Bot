@@ -7,15 +7,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.ExchangeFactory;
 import org.knowm.xchange.ExchangeSpecification;
-import org.knowm.xchange.bittrex.BittrexExchange;
-import org.knowm.xchange.currency.CurrencyPair;
 
 public class Exchanges {
 	public HashMap<String, String> exchangecodemap = new HashMap<String, String>();

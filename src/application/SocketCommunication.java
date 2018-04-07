@@ -2,17 +2,12 @@ package application;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
-import java.lang.Runnable;
-import javax.json.Json;
-import javax.json.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
