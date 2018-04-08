@@ -13,7 +13,7 @@ import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
-
+import  java.lang.Long;
 public class QuickBuy {
 
 	private static List<JsonObject> myList = new ArrayList<>();

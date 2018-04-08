@@ -1,5 +1,14 @@
 package application;
 
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.Locale;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,13 +22,7 @@ import javafx.util.Callback;
 
 public class DashboardController {
 	@FXML private TableView<Person> tableView = new TableView<Person>();
-	public static ObservableList<Person> data = FXCollections.observableArrayList(
-    		new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running","000000"),
-    		new Person("Something","BTC","OMG", "EXCHNAGE", "28.2(5:30)", "NA", "Running","1111111"),
-    		new Person("AverageTrading","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running","222222"),
-    		new Person("Yes","BTC","OMG", "Bittrex", "28.2(5:30)", "NA", "Running","333333"),
-    		new Person("SuchProfit","MuchWow","Doge", "Bittrex", "28.2(5:30)", "NA", "Running","44444")
-    );
+	public static ObservableList<Person> data =  FXCollections.observableArrayList();
 	@FXML
     public void initialize(){
 		
@@ -64,7 +67,7 @@ public class DashboardController {
             @Override
             public TableCell<Person, String> call(final TableColumn<Person, String> param) {
                 final TableCell<Person, String> cell = new TableCell<Person, String>() {
-                    final Button btn = new Button("Just Do It");
+                    final Button btn = new Button("Stop");
                     @Override
                    
                     public void updateItem(String item, boolean empty) {
@@ -75,8 +78,15 @@ public class DashboardController {
                         } else {
                             btn.setOnAction(event -> {
                                 Person person = getTableView().getItems().get(getIndex());
-                                data.removeAll(person);
+                                person.setRunning("False");
                                 System.out.println(person.getOrderID());
+                                btn.setVisible(false);
+                                tableView.refresh();
+                                try {
+									RemoveOrder.removeOrder(person);
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
                             });
                             setGraphic(btn);
                             setText(null);
@@ -94,12 +104,6 @@ public class DashboardController {
         tableView.getColumns().addAll(OrderTypeCol, BasePairCol, AltPairCol,ExchangesCol,StartTimeCol,EndTimeCol,RunningCol,OrderIDCol,actionCol);
 	}
     
-	@FXML
-	private void tableUpdate() {
-		//data.removeAll(elements)
-		//tableView.setItems(data2);
-		tableView.refresh();
-	}
     public static class Person {
     	private final SimpleStringProperty OrderType;
     	private final SimpleStringProperty BasePair;
@@ -152,9 +156,18 @@ public class DashboardController {
             return Running.get();
         }
         
+        public void setRunning(String fName) {
+        	Running.set(fName);
+        }
         public String getStartTime() {
             return StartTime.get();
         }
         
+    }
+    
+    public void newOrder(JSONObject json) throws JSONException {
+    	data.add(new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"), String.valueOf(json.getLong("millisstart")), "Endtime", "True", String.valueOf(json.getInt("orderid"))));
+    	tableView.setItems(data);
+    	tableView.refresh();
     }
 }

@@ -2,6 +2,7 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
@@ -98,8 +99,8 @@ public class AveragetradingController {
     		String run = FxDialogs.showConfirm("Run Order?",confirm, "Run", "Cancel");
     		System.out.println(run);
 			if (run.equals("Run")) {
-		    	averageTrading.put("Basecoin", base);
-		    	averageTrading.put("Altcoin", alt);
+		    	averageTrading.put("base", base);
+		    	averageTrading.put("alt", alt);
 		    	averageTrading.put("Exchanges",exchange);
 		    	averageTrading.put("request", "averageTrading");
 		    	averageTrading.put("coinstotrade", coinstotrade);
@@ -109,6 +110,9 @@ public class AveragetradingController {
 		    	averageTrading.put("atbid", atbid);
 		    	averageTrading.put("buy", buy);
 		    	averageTrading.put("loop", loop);
+		    	Random rand = new Random(); 
+		    	int value = rand.nextInt(1000000000); 
+		    	averageTrading.put("orderid", value);
 		    	System.out.println("--------------");
 		    	System.out.println(averageTrading);
 		     	AverageTrading.runOrder(averageTrading);

@@ -50,6 +50,12 @@ public class AverageTrading {
 			JSONObject message;
 			OneShotTask(JSONObject message2) {message= message2; }
 	        public void run() {
+	        	try {
+	        		DashboardController dash = new DashboardController();
+	        		dash.newOrder(message);
+				} catch (JSONException e1) {
+					e1.printStackTrace();
+				}
 	            boolean run=true;
 	            
 	            try {
@@ -59,6 +65,7 @@ public class AverageTrading {
 					double coinstotrade = Double.parseDouble(message.getString("coinstotrade"));
 					double ordersize = Double.parseDouble(message.getString("volumeperorder"));
 		            while (run==true) {
+		            	System.out.println("Running Average Again");
 		            	if (Orders1.contains(message)) {
 		            		System.out.println("Orders contains");
 		            		if (coinstotrade>total+ordersize) {
@@ -75,6 +82,7 @@ public class AverageTrading {
 		            		System.out.println("Removing Order");
 		            		run=false;
 		            	}
+		            	System.out.println("Waiting for " + loop);
 		            	TimeUnit.SECONDS.sleep(loop);
 		            }
 				} catch (JSONException | InterruptedException e) {
@@ -101,8 +109,8 @@ public class AverageTrading {
 			JSONObject listitem = Orders.get(i);
 			System.out.println("Looping");
 			
-			if ((listitem.getString("Basecoin").equals(message.getString("Basecoin")))
-			&& (listitem.getString("Altcoin").equals(message.getString("Altcoin")))
+			if ((listitem.getString("base").equals(message.getString("base")))
+			&& (listitem.getString("alt").equals(message.getString("alt")))
 			&& (listitem.getString("Exchanges").equals(message.getString("Exchanges")))
 			&& (listitem.getString("request").equals(message.getString("request")))
 			&& (listitem.getString("coinstotrade").equals(message.getString("coinstotrade")))
@@ -143,8 +151,12 @@ public class AverageTrading {
 		}		
 	}
 	 
-	public static void removeOrder(JSONObject message) {
-		Orders1.remove(message);
+	public static void removeOrder(String orderid) throws JSONException {
+		for (int i = 0; i < Orders1.size(); i++) {
+			if (Orders1.get(i).getInt("orderid") == Integer.parseInt(orderid)) {
+				Orders1.remove(i);
+			}
+		}
 	}
 	
 }
