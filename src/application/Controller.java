@@ -19,8 +19,6 @@ import javafx.stage.Stage;
 
 public class Controller {
 
-    public Stage primaryStage;
-
     //Main
 		 @FXML private PasswordField Pass;
 		 @FXML private TextField Email;
@@ -73,16 +71,12 @@ public class Controller {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
         AnchorPane rootLayout = loader.load(); 
         Scene scene = new Scene(rootLayout);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Main.primaryStage.setScene(scene);
+        Main.primaryStage.show();
         Exchanges ex = new Exchanges();
         ex.createExchanges();
         SocketCommunication.setup();
     }
-
-    public void setPrimaryStage(Stage stage) {
-    	  this.primaryStage = stage;
-    	}
 
 }
 

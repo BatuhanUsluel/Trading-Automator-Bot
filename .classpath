@@ -96,5 +96,14 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jdk8/jre/lib/ext/jfxrt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Batuhan/.m2/repository/org/apache/commons/commons-lang3/3.7/commons-lang3-3.7.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="org.apache.commons"/>
+			<attribute name="maven.artifactId" value="commons-lang3"/>
+			<attribute name="maven.version" value="3.7"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

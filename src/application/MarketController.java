@@ -39,8 +39,8 @@ public class MarketController {
     	String Spread = SpreadMM.getText();
     	String MaxBal = MaxBalMM.getText();
     	String MinBal = MinBalMM.getText();
-    	//String exchange = ExchangeMM.getValue().toString();
-    	String exchange = "bittrex";
+    	String exchange = ExchangeMM.getValue().toString();
+    	//String exchange = "bittrex";
 
 		marketMaking.put("base", base);
     	marketMaking.put("alt", Alt);

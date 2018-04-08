@@ -44,8 +44,7 @@ public class TrailingController {
 	    	String volume = TStopVolume.getText();
 	    	String trail = TStopTrail.getText();
 	    	String buysell = ((RadioButton) TStopToggleBS.getSelectedToggle()).getText();
-	    	//String exchange =TStopExchange.getValue().toString());
-	    	String exchange = "bittrex";
+	    	String exchange = TStopExchange.getValue().toString();
 	    	
 	    	trailingStop.put("base", base);
 	    	trailingStop.put("alt", alt);

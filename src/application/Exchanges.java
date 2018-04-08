@@ -29,6 +29,7 @@ public class Exchanges {
 		
 		exchangecodemap.put("Binance", "org.knowm.xchange.binance.BinanceExchange");
 		exchangecodemap.put("Bitbay", "org.knowm.xchange.bitbay.BitbayExchange");
+		
 		exchangecodemap.put("Bitfinexv1", "org.knowm.xchange.bitfinex.v1.BitfinexExchange");
 		exchangecodemap.put("Bitmarket", "org.knowm.xchange.bitmarket.BitMarketExchange");
 		exchangecodemap.put("Bitstamp", "org.knowm.xchange.bitstamp.BitstampExchange");

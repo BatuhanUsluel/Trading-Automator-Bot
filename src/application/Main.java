@@ -8,9 +8,7 @@ import javafx.stage.Stage;
 
 
 public class Main extends Application {
-	public Controller controller1;
-	public Controller controller2;
-	public Stage primaryStage;
+	public static Stage primaryStage;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -29,13 +27,12 @@ public class Main extends Application {
 		    */
 	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Sample.fxml"));
 	        AnchorPane rootLayout = loader.load(); 
-	        ((Controller) loader.getController()).setPrimaryStage(primaryStage);
 	        Scene scene = new Scene(rootLayout);
 	        primaryStage.setScene(scene);
 	        primaryStage.setOpacity(0.99);
 	        primaryStage.show();
 	        primaryStage.setResizable(false);
-
+	        this.primaryStage = primaryStage;
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
