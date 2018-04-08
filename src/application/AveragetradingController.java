@@ -3,6 +3,7 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,7 +18,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import org.apache.commons.lang3.math.NumberUtils;
 public class AveragetradingController {
 	
 	//Average Trading

@@ -11,7 +11,6 @@ import java.util.Iterator;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
-import org.knowm.xchange.ExchangeFactory;
 import org.knowm.xchange.ExchangeSpecification;
 
 public class Exchanges {

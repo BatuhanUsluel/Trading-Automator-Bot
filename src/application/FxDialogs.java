@@ -1,20 +1,22 @@
 package application;
 
-import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.stage.StageStyle;
-
-import java.awt.*;
+import java.awt.Robot;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.stage.StageStyle;
 
 public class FxDialogs {
 
