@@ -12,7 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-
+import org.apache.commons.lang3.math.NumberUtils;
 public class FillbookController {
     
 //Fill Order Book
@@ -44,11 +44,50 @@ public class FillbookController {
     	String nooforders = FONumberOrders.getText();
     	String BuySell = ((RadioButton) FoBuySell.getSelectedToggle()).getText();
     	String exchange = FOEx.getValue().toString();
-    	//Add check for valid inputs!!
-    	try {
-			FillOrderBook.fillOrderBook(base, alt, startprice,endprice, balanceused, nooforders, BuySell, exchange);
-		} catch (Exception e) {
-			e.printStackTrace();
+    	boolean noerror = true;
+		StringBuilder stringBuilder = new StringBuilder();
+		
+    	if (!Exchanges.list.contains(exchange)) {
+    		noerror=false;
+    		stringBuilder.append(exchange + " is not a valid exchange.\n");
+    	}
+    	
+    	if(!NumberUtils.isCreatable(startprice)) {
+    		noerror=false;
+    		stringBuilder.append(startprice + " is not a valid number(startprice).\n");
+    	}
+    	
+    	if(!NumberUtils.isCreatable(endprice)) {
+    		noerror=false;
+    		stringBuilder.append(endprice + " is not a valid number(endprice).\n");
+    	}
+    	
+    	if(!NumberUtils.isCreatable(balanceused)) {
+    		noerror=false;
+    		stringBuilder.append(balanceused + " is not a valid number(balanceused).\n");
+    	}
+    	
+    	if(!NumberUtils.isCreatable(nooforders)) {
+    		noerror=false;
+    		stringBuilder.append(nooforders + " is not a valid number(nooforders).\n");
+    	}
+    	
+		if (noerror==true) {
+	    	try {
+	    		String confirm = ("Base: " + base + "\nAlt: " + alt + "\nStartprice: " + startprice + "\nEndprice: " + endprice + "\nBalanceused: " + balanceused + "\nNooforders: " + nooforders + "\nBuySell: " + BuySell + "\nExchange: " + exchange);
+	    		String run = FxDialogs.showConfirm("Run Order?",confirm, "Run", "Cancel");
+	    		System.out.println(run);
+				if (run.equals("Run")) {
+					FillOrderBook.fillOrderBook(base, alt, startprice,endprice, balanceused, nooforders, BuySell, exchange);
+				} else {
+					System.out.println("Not running order");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			String finalString = stringBuilder.toString();
+    		FxDialogs.showError(null, finalString);
 		}
     }
 }

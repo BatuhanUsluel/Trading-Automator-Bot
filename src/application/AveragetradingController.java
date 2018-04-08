@@ -17,7 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-
+import org.apache.commons.lang3.math.NumberUtils;
 public class AveragetradingController {
 	
 	//Average Trading
@@ -51,20 +51,63 @@ public class AveragetradingController {
     public void averageTrading(ActionEvent event) throws JSONException {
      	 System.out.println("running averageTrading");
     	JSONObject averageTrading = new JSONObject();
-    	averageTrading.put("Basecoin", BPAvU.getText());
-    	averageTrading.put("Altcoin", APAvU.getText());
-    	averageTrading.put("Exchanges", ExAv.getValue().toString());
-    	averageTrading.put("request", "averageTrading");
-    	averageTrading.put("coinstotrade", MABAv.getText());
-    	averageTrading.put("volumeperorder", VpOAV.getText());
-    	averageTrading.put("licenceKey", SocketCommunication.licencekey);
-    	averageTrading.put("millisstart", System.currentTimeMillis());
-    	averageTrading.put("atbid", ((RadioButton) toggleBAAv.getSelectedToggle()).getText());
-    	averageTrading.put("buy", ((RadioButton) toggleBSAv.getSelectedToggle()).getText());
-    	averageTrading.put("loop", LPAvU.getText());
-    	System.out.println("--------------");
-    	System.out.println(averageTrading);
-     	AverageTrading.runOrder(averageTrading);
-   	}
-
+    	String base = BPAvU.getText();
+    	String alt =APAvU.getText();
+    	String exchange =ExAv.getValue().toString();
+    	String coinstotrade = MABAv.getText();
+    	String volumeperorder = VpOAV.getText();
+    	String loop = LPAvU.getText();
+    	String atbid = ((RadioButton) toggleBAAv.getSelectedToggle()).getText();
+    	String buy = ((RadioButton) toggleBSAv.getSelectedToggle()).getText();
+    	
+    	boolean noerror = true;
+		StringBuilder stringBuilder = new StringBuilder();
+		
+    	if (!Exchanges.list.contains(exchange)) {
+    		noerror=false;
+    		stringBuilder.append(exchange + " is not a valid exchange.\n");
+    	}
+    	
+    	if(!NumberUtils.isCreatable(coinstotrade)) {
+    		noerror=false;
+    		stringBuilder.append(coinstotrade + " is not a valid number(coinstotrade).\n");
+    	}
+    	
+    	if(!NumberUtils.isCreatable(volumeperorder)) {
+    		noerror=false;
+    		stringBuilder.append(volumeperorder + " is not a valid number(volumeperorder).\n");
+    	}
+    	
+    	if(!NumberUtils.isCreatable(loop)) {
+    		noerror=false;
+    		stringBuilder.append(loop + " is not a valid number(loop).\n");
+    	}
+    	
+    	if (noerror==true) {
+    		String confirm = ("Base: " + base + "\nAlt: " + alt + "\nCoinstoTrade: " + coinstotrade + "\nVolumeperOrder: " + volumeperorder + "\nAtBid: " + atbid + "\nBuySell: " + buy + "\nLoop: " + loop + "\nExchange: " + exchange);
+    		String run = FxDialogs.showConfirm("Run Order?",confirm, "Run", "Cancel");
+    		System.out.println(run);
+			if (run.equals("Run")) {
+		    	averageTrading.put("Basecoin", base);
+		    	averageTrading.put("Altcoin", alt);
+		    	averageTrading.put("Exchanges",exchange);
+		    	averageTrading.put("request", "averageTrading");
+		    	averageTrading.put("coinstotrade", coinstotrade);
+		    	averageTrading.put("volumeperorder", volumeperorder);
+		    	averageTrading.put("licenceKey", SocketCommunication.licencekey);
+		    	averageTrading.put("millisstart", System.currentTimeMillis());
+		    	averageTrading.put("atbid", atbid);
+		    	averageTrading.put("buy", buy);
+		    	averageTrading.put("loop", loop);
+		    	System.out.println("--------------");
+		    	System.out.println(averageTrading);
+		     	AverageTrading.runOrder(averageTrading);
+			} else {
+				System.out.println("Not running order");
+			}
+    	} else {
+		    String finalString = stringBuilder.toString();
+	    	FxDialogs.showError(null, finalString);
+    	}
+	}
 }

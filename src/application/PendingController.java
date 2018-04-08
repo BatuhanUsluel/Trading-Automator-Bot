@@ -19,30 +19,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderPaneBuilder;
-import javafx.stage.Popup;
-import javafx.stage.Stage;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.stage.StageStyle;
-import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.stage.StageStyle;
-
-import java.awt.*;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class PendingController {
     
@@ -75,6 +51,7 @@ public class PendingController {
     	String buysell = ((RadioButton) toggleGroupPO.getSelectedToggle()).getText();
     	
     	String exchange = ExPOU.getValue().toString();
+    	
     	if (!Exchanges.list.contains(exchange)) {
     		noerror=false;
     		stringBuilder.append(exchange + " is not a valid exchange.\n");
@@ -96,20 +73,27 @@ public class PendingController {
     	}
     	
 		if (noerror==true) {
-    	pendingOrder.put("base",base);
-    	pendingOrder.put("alt",alt);
-    	pendingOrder.put("request","pendingOrder");
-    	pendingOrder.put("priceorder",price);
-    	pendingOrder.put("volume",volume);
-    	pendingOrder.put("percent",percent);
-    	pendingOrder.put("licenceKey", SocketCommunication.licencekey);
-    	pendingOrder.put("millisstart", System.currentTimeMillis());
-    	pendingOrder.put("buysell",buysell);
-    	pendingOrder.put("exchange",exchange);
-    	PendingOrder pend = new PendingOrder(pendingOrder);
-    	PendingOrderMap.put(pendingOrder, pend);
-    	Thread t = new Thread(pend);
-    	t.start();
+			String confirm = ("Base: " + base + "\nAlt: " + alt + "\nPrice: " + price + "\nVolume" + volume + "\nPercent: " + percent + "\nBuySell: " + buysell + "\nExchange:" + exchange);
+			String run = FxDialogs.showConfirm("Run Order?",confirm, "Run", "Cancel");
+    		System.out.println(run);
+			if (run.equals("Run")) {
+		    	pendingOrder.put("base",base);
+		    	pendingOrder.put("alt",alt);
+		    	pendingOrder.put("request","pendingOrder");
+		    	pendingOrder.put("priceorder",price);
+		    	pendingOrder.put("volume",volume);
+		    	pendingOrder.put("percent",percent);
+		    	pendingOrder.put("licenceKey", SocketCommunication.licencekey);
+		    	pendingOrder.put("millisstart", System.currentTimeMillis());
+		    	pendingOrder.put("buysell",buysell);
+		    	pendingOrder.put("exchange",exchange);
+		    	PendingOrder pend = new PendingOrder(pendingOrder);
+		    	PendingOrderMap.put(pendingOrder, pend);
+		    	Thread t = new Thread(pend);
+		    	t.start();
+			} else {
+				System.out.println("Not running order");
+			}
     	} else {
     		String finalString = stringBuilder.toString();
     		FxDialogs.showError(null, finalString);

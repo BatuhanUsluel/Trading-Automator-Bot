@@ -9,7 +9,7 @@ import com.jfoenix.controls.JFXComboBox;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-
+import org.apache.commons.lang3.math.NumberUtils;
 public class QuickbuyController {
 	//QuickBuy
     @FXML private TextField qBase;
@@ -24,10 +24,39 @@ public class QuickbuyController {
         List<String> list = new ArrayList<String>(Exchanges.list);
         qEx.getItems().addAll(list);
     }
-	
+
 	@FXML
     public void quickPrice(ActionEvent event) {
       	 System.out.println("running quickPrice");
-      	 QuickBuy.sendQuickPriceRequest(qBase.getText(),qAlt.getText(),qEx.getValue().toString(), Double.parseDouble(qVolume.getText()), Double.parseDouble(qBAA.getText()));
-    	}    
+      	String base = qBase.getText();
+      	String alt = qAlt.getText();
+      	String exchange = qEx.getValue().toString();
+      	String volume =qVolume.getText();
+      	String percent = qBAA.getText();
+     	boolean noerror = true;
+    	StringBuilder stringBuilder = new StringBuilder();
+    	
+    	if (!Exchanges.list.contains(exchange)) {
+    		noerror=false;
+    		stringBuilder.append(exchange + " is not a valid exchange.\n");
+    	}
+    	
+    	if(!NumberUtils.isCreatable(volume)) {
+    		noerror=false;
+    		stringBuilder.append(volume + " is not a valid number(volume).\n");
+    	}
+    	
+    	if(!NumberUtils.isCreatable(percent)) {
+    		noerror=false;
+    		stringBuilder.append(percent + " is not a valid number(percent).\n");
+    	}
+    	if (noerror==true) {
+    		QuickBuy.sendQuickPriceRequest(base,alt,exchange, Double.parseDouble(volume), Double.parseDouble(percent));
+    		FxDialogs.showInformation(null, "Order Placed");
+    	} else {
+			String finalString = stringBuilder.toString();
+			FxDialogs.showError(null, finalString);
+	}	
+	
+	}    
 }
