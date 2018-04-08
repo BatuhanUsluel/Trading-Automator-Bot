@@ -43,11 +43,21 @@ public class FillbookController {
     	String balanceused = FOBalanceUsed.getText();
     	String nooforders = FONumberOrders.getText();
     	String BuySell = ((RadioButton) FoBuySell.getSelectedToggle()).getText();
-    	String exchange = FOEx.getValue().toString();
+    	
     	boolean noerror = true;
 		StringBuilder stringBuilder = new StringBuilder();
-		
-    	if (!Exchanges.list.contains(exchange)) {
+     	boolean noexchange = false;
+    	String exchange = "";
+		 	
+    	try {
+    		exchange = FOEx.getValue().toString();
+    	} catch (NullPointerException e) {
+    		noerror=false;
+    		noexchange=true;
+    		stringBuilder.append("Please enter a exchange\n");
+    	}
+    	
+    	if (!Exchanges.list.contains(exchange) && noexchange!=true) {
     		noerror=false;
     		stringBuilder.append(exchange + " is not a valid exchange.\n");
     	}

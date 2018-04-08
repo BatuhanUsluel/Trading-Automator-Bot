@@ -41,6 +41,8 @@ public class PendingController {
     @FXML
     public void pendingOrder(ActionEvent event) throws JSONException  {
     	boolean noerror=true;
+    	boolean noexchange = false;
+    	String exchange = "";
     	StringBuilder stringBuilder = new StringBuilder();
     	JSONObject pendingOrder = new JSONObject();
     	String base = POBPU.getText();
@@ -50,9 +52,15 @@ public class PendingController {
     	String percent = POVPOU.getText();
     	String buysell = ((RadioButton) toggleGroupPO.getSelectedToggle()).getText();
     	
-    	String exchange = ExPOU.getValue().toString();
+    	try {
+    		exchange = ExPOU.getValue().toString();
+    	} catch (NullPointerException e) {
+    		noerror=false;
+    		noexchange=true;
+    		stringBuilder.append("Please enter a exchange\n");
+    	}
     	
-    	if (!Exchanges.list.contains(exchange)) {
+    	if (!Exchanges.list.contains(exchange) && noexchange!=true) {
     		noerror=false;
     		stringBuilder.append(exchange + " is not a valid exchange.\n");
     	}

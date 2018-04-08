@@ -53,7 +53,7 @@ public class AveragetradingController {
     	JSONObject averageTrading = new JSONObject();
     	String base = BPAvU.getText();
     	String alt =APAvU.getText();
-    	String exchange =ExAv.getValue().toString();
+    	
     	String coinstotrade = MABAv.getText();
     	String volumeperorder = VpOAV.getText();
     	String loop = LPAvU.getText();
@@ -62,8 +62,18 @@ public class AveragetradingController {
     	
     	boolean noerror = true;
 		StringBuilder stringBuilder = new StringBuilder();
-		
-    	if (!Exchanges.list.contains(exchange)) {
+		boolean noexchange = false;
+    	String exchange = "";
+     	
+    	try {
+    		exchange = ExAv.getValue().toString();
+    	} catch (NullPointerException e) {
+    		noerror=false;
+    		noexchange=true;
+    		stringBuilder.append("Please enter a exchange\n");
+    	}
+    	
+    	if (!Exchanges.list.contains(exchange) && noexchange!=true) {
     		noerror=false;
     		stringBuilder.append(exchange + " is not a valid exchange.\n");
     	}

@@ -38,18 +38,26 @@ public void initialize(){
 
 @FXML
  public void trailingStop(ActionEvent event) throws JSONException {
-		
+		boolean noerror=true;
+		boolean noexchange = false;
+		String exchange = "";
+		StringBuilder stringBuilder = new StringBuilder();
 		JSONObject trailingStop = new JSONObject();
     	String base = TStopBase.getText();
     	String alt = TStopAlt.getText();
     	String volume = TStopVolume.getText();
     	String trail = TStopTrail.getText();
     	String buysell = ((RadioButton) TStopToggleBS.getSelectedToggle()).getText();
-    	String exchange = TStopExchange.getValue().toString();
-    	boolean noerror = true;
-		StringBuilder stringBuilder = new StringBuilder();
-		
-    	if (!Exchanges.list.contains(exchange)) {
+    	
+    	try {
+    		exchange = TStopExchange.getValue().toString();
+		} catch (NullPointerException e) {
+			noerror=false;
+			noexchange=true;
+			stringBuilder.append("Please enter a exchange\n");
+		}
+    	
+    	if (!Exchanges.list.contains(exchange)  && noexchange!=true) {
     		noerror=false;
     		stringBuilder.append(exchange + " is not a valid exchange.\n");
     	}

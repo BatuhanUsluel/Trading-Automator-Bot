@@ -30,13 +30,22 @@ public class QuickbuyController {
       	 System.out.println("running quickPrice");
       	String base = qBase.getText();
       	String alt = qAlt.getText();
-      	String exchange = qEx.getValue().toString();
       	String volume =qVolume.getText();
       	String percent = qBAA.getText();
      	boolean noerror = true;
+     	boolean noexchange = false;
+    	String exchange = "";
     	StringBuilder stringBuilder = new StringBuilder();
     	
-    	if (!Exchanges.list.contains(exchange)) {
+    	try {
+    		exchange = qEx.getValue().toString();
+    	} catch (NullPointerException e) {
+    		noerror=false;
+    		noexchange=true;
+    		stringBuilder.append("Please enter a exchange\n");
+    	}
+    	
+    	if (!Exchanges.list.contains(exchange) && noexchange!=true) {
     		noerror=false;
     		stringBuilder.append(exchange + " is not a valid exchange.\n");
     	}
