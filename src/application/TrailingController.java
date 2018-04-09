@@ -3,6 +3,8 @@ package application;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
@@ -11,13 +13,13 @@ import org.json.JSONObject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXRadioButton;
-
+import java.lang.Exception;
+import java.lang.Integer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-
 public class TrailingController {
 	public static HashMap<JSONObject, TrailingStop> TrailingStopMap = new HashMap<JSONObject, TrailingStop>();
 	//Trailing Stop
@@ -84,9 +86,12 @@ public void initialize(){
 		    	trailingStop.put("volume", volume);
 		    	trailingStop.put("trail", trail);
 		    	trailingStop.put("buysell", buysell);
-		    	trailingStop.put("exchange",exchange);
+		    	trailingStop.put("Exchanges",exchange);
 		    	trailingStop.put("licenceKey", SocketCommunication.licencekey);
 		    	trailingStop.put("millisstart", System.currentTimeMillis());
+		    	Random rand = new Random(); 
+		    	int value = rand.nextInt(1000000000); 
+		    	trailingStop.put("orderid", value);
 		    	TrailingStop trailingstopclass = new TrailingStop();
 		    	trailingstopclass.runOrder(trailingStop);
 		    	TrailingStopMap.put(trailingStop, trailingstopclass);
@@ -97,5 +102,19 @@ public void initialize(){
 	    	String finalString = stringBuilder.toString();
     		FxDialogs.showError(null, finalString);
 	    }
+	}
+	public static void removeOrder(String orderid) {
+		for (Map.Entry<JSONObject, TrailingStop> entry : TrailingStopMap.entrySet()) {
+		    JSONObject key = entry.getKey();
+			try {
+				if (key.getInt("orderid") == Integer.parseInt(orderid)) {
+					TrailingStop value = entry.getValue();
+					value.stopOrder();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+	}
 	}
 }

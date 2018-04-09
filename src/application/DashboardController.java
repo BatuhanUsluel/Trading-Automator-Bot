@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Locale;
 
+import org.controlsfx.control.table.TableFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +24,7 @@ import javafx.util.Callback;
 public class DashboardController {
 	@FXML private TableView<Person> tableView = new TableView<Person>();
 	public static ObservableList<Person> data =  FXCollections.observableArrayList();
+	TableFilter<Person> filter;
 	@FXML
     public void initialize(){
 		
@@ -84,6 +86,9 @@ public class DashboardController {
                                 tableView.refresh();
                                 try {
 									RemoveOrder.removeOrder(person);
+							    	filter.executeFilter();
+							    	filter = new TableFilter<Person>(tableView);
+							    	tableView.refresh();
 								} catch (JSONException e) {
 									e.printStackTrace();
 								}
@@ -102,6 +107,7 @@ public class DashboardController {
         tableView.getStylesheets().setAll(css);
         tableView.setItems(data);
         tableView.getColumns().addAll(OrderTypeCol, BasePairCol, AltPairCol,ExchangesCol,StartTimeCol,EndTimeCol,RunningCol,OrderIDCol,actionCol);
+        filter = new TableFilter<Person>(tableView);
 	}
     
     public static class Person {

@@ -28,6 +28,12 @@ public class TrailingStop {
 			final JSONObject messagefinal = message;
 			Thread thread = new Thread(new Runnable() {
 				public void run() {
+				DashboardController dash = new DashboardController();
+	        	try {
+					dash.newOrder(message);
+				} catch (JSONException e1) {
+					e1.printStackTrace();
+				}
 	            boolean run=true;
 	            try {
 					//int loop = Integer.parseInt(message.getString("loop"));
@@ -38,7 +44,7 @@ public class TrailingStop {
 		                	System.out.println(messagefinal);
 		                	SocketCommunication.out.print(messagefinal.toString());
 		                	SocketCommunication.out.flush();
-		            	TimeUnit.SECONDS.sleep(60);
+		            	TimeUnit.SECONDS.sleep(20);
 		            }
 				} catch (InterruptedException | JSONException e) {
 					e.printStackTrace();
@@ -58,7 +64,7 @@ public class TrailingStop {
 			&& (listitem.getString("volume").equals(message.getString("volume")))
 			&& (listitem.getString("trail").equals(message.getString("trail")))
 			&& (listitem.getString("buysell").equals(message.getString("buysell")))
-			&& (listitem.getString("exchange").equals(message.getString("exchange")))
+			&& (listitem.getString("Exchanges").equals(message.getString("Exchanges")))
 			&& (listitem.getString("licenceKey").equals(message.getString("licenceKey")))
 			&& listitem.getLong("millisstart") == (message.getLong("millisstart"))
 			&& listitem.getLong("millis") == (message.getLong("millis"))) {
@@ -132,5 +138,8 @@ public class TrailingStop {
 				
 			}
 		}		
+	}
+	public void stopOrder() {
+		run=false;
 	}
 }
