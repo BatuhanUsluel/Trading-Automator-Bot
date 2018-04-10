@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.DashboardController">
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.DashboardController">
    <children>
       <Separator layoutX="5.0" layoutY="87.0" prefHeight="0.0" prefWidth="920.0" />
       <TableView fx:id="tableView" layoutX="42.0" layoutY="120.0" prefHeight="457.0" prefWidth="846.0" />

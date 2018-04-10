@@ -15,12 +15,16 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
+import controllers.MarketController;
+import controllers.PendingController;
+import controllers.TrailingController;
+
 
 public class SocketCommunication {
     static Thread receive;
     static long startTime = System.nanoTime();
 	public static PrintWriter out;
-	static String licencekey = ("5718570290571");
+	public static String licencekey = ("5718570290571");
 	private static BufferedReader stdIn;
 	public static void setup() throws UnknownHostException, IOException{
     	Socket socket = new Socket("localhost",8888);

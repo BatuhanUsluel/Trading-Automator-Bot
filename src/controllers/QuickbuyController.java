@@ -1,5 +1,5 @@
-package application;
-
+package controllers;
+import java.lang.Double;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +8,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 
+import application.Exchanges;
+import application.FxDialogs;
+import application.QuickBuy;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;

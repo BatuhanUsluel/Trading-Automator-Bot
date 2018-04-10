@@ -17,6 +17,8 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
+import controllers.DashboardController;
+import  java.lang.Thread;
 public class TrailingStop {
 	ArrayList<JSONObject> OrdersTrailing = new ArrayList<JSONObject>();
 	boolean run = true;

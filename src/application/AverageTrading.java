@@ -15,6 +15,8 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
+import controllers.DashboardController;
+import  java.lang.Thread;
 public class AverageTrading {
 	public static ArrayList<JSONObject> Orders = new ArrayList<JSONObject>();
 	public static ArrayList<JSONObject> Orders1 = new ArrayList<JSONObject>();

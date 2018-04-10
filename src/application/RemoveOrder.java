@@ -2,6 +2,9 @@ package application;
 
 import org.json.JSONException;
 
+import controllers.DashboardController;
+import controllers.TrailingController;
+
 public class RemoveOrder {
 	public static void removeOrder(DashboardController.Person person) throws JSONException {
 		String ordertype = person.getOrderType();

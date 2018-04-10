@@ -26,7 +26,7 @@ public class Main extends Application {
 		    System.out.println(bittrex2.getMarketDataService().getTicker(new CurrencyPair("ETH", "BTC")));
 		    */
 	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Sample.fxml"));
-	        AnchorPane rootLayout = loader.load(); 
+	        AnchorPane rootLayout = loader.load();
 	        Scene scene = new Scene(rootLayout);
 	        primaryStage.setScene(scene);
 	        primaryStage.setOpacity(0.99);

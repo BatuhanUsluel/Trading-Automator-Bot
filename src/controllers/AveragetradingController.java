@@ -1,4 +1,4 @@
-package application;
+package controllers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,10 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 
+import application.AverageTrading;
+import application.Exchanges;
+import application.FxDialogs;
+import application.SocketCommunication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

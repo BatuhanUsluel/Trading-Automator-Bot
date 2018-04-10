@@ -11,6 +11,8 @@ import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
 
+import controllers.DashboardController;
+
 public class PendingOrder implements Runnable {
 	ArrayList<JSONObject> OrdersPending = new ArrayList<JSONObject>();
 	

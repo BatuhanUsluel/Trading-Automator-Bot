@@ -1,11 +1,11 @@
-package application;
-
+package controllers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
+import java.lang.Integer;
+import java.lang.Exception;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,8 +13,11 @@ import org.json.JSONObject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXRadioButton;
-import java.lang.Exception;
-import java.lang.Integer;
+
+import application.Exchanges;
+import application.FxDialogs;
+import application.SocketCommunication;
+import application.TrailingStop;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;

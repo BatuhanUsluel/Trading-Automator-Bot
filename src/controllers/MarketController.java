@@ -1,5 +1,5 @@
-package application;
-
+package controllers;
+import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +11,10 @@ import org.json.JSONObject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 
+import application.Exchanges;
+import application.FxDialogs;
+import application.MarketMaking;
+import application.SocketCommunication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;

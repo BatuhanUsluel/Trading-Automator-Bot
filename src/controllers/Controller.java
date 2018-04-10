@@ -1,4 +1,4 @@
-package application;
+package controllers;
 
 import java.io.IOException;
 
@@ -7,6 +7,9 @@ import org.json.JSONException;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 
+import application.Exchanges;
+import application.Main;
+import application.SocketCommunication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
