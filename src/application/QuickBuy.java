@@ -3,6 +3,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -54,25 +55,38 @@ public class QuickBuy {
 	
     public static void sendQuickPriceRequest(String basecoin, String altcoin, String exchange, double btcvolume, double buypercent) {
     	long millis = System.currentTimeMillis();
-    	//String quickpricerequest = ("{\"Coin\":\"" + coin + "\",\"Exchanges\":\"" + exchange + "\",\"request\":\"QuickPrice\",\"licenceKey\":\"" + SocketCommunication.licencekey + "\",\"millis\":\"" + millis + "\"}");
+    	Random rand = new Random(); 
+    	int value = rand.nextInt(1000000000); 
+    	
     	String quickpricerequest = Json.createObjectBuilder()
-    			.add("Basecoin", basecoin)
-    			.add("Altcoin", altcoin)
+    			.add("base", basecoin)
+    			.add("alt", altcoin)
                 .add("Exchanges", exchange)
-                .add("request", "QuickPrice")
+                .add("request", "Quick Buy")
                 .add("licenceKey", SocketCommunication.licencekey)
-                .add("millis", millis)
+                .add("millisstart", millis)
+                .add("orderid", value)
+                .add("running","False")
 				.build()
 				.toString();
     	JsonObject quickpricelistadd = Json.createObjectBuilder()
-    			.add("Basecoin", basecoin)
-                .add("Altcoin", altcoin)
+    			.add("base", basecoin)
+                .add("alt", altcoin)
                 .add("Exchanges", exchange)
                 .add("volume", btcvolume)
                 .add("buypercent", buypercent)
-                .add("millis", millis)
+                .add("request", "Quick Buy")
+                .add("millisstart", millis)
+                .add("orderid", value)
+                .add("running","False")
 				.build();
     	addtolist(quickpricelistadd);
+		DashboardController dash = new DashboardController();
+    	try {
+			dash.newOrder(new JSONObject(quickpricelistadd.toString()));
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
     	SocketCommunication.out.print(quickpricerequest);
     	SocketCommunication.out.flush();
     }

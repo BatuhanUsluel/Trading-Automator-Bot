@@ -1,5 +1,5 @@
 package application;
-
+import java.util.Random;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,14 +12,14 @@ import org.json.JSONObject;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXRadioButton;
-
+import java.lang.Thread;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
-
+import java.util.Random;
 public class PendingController {
     
 //Pending Order
@@ -94,7 +94,11 @@ public class PendingController {
 		    	pendingOrder.put("licenceKey", SocketCommunication.licencekey);
 		    	pendingOrder.put("millisstart", System.currentTimeMillis());
 		    	pendingOrder.put("buysell",buysell);
-		    	pendingOrder.put("exchange",exchange);
+		    	pendingOrder.put("Exchanges",exchange);
+		    	Random rand = new Random(); 
+		    	int value = rand.nextInt(1000000000); 
+		    	pendingOrder.put("orderid", value);
+		    	pendingOrder.put("running","True");
 		    	PendingOrder pend = new PendingOrder(pendingOrder);
 		    	PendingOrderMap.put(pendingOrder, pend);
 		    	Thread t = new Thread(pend);

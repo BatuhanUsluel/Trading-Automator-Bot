@@ -113,6 +113,7 @@ public class AveragetradingController {
 		    	Random rand = new Random(); 
 		    	int value = rand.nextInt(1000000000); 
 		    	averageTrading.put("orderid", value);
+		    	averageTrading.put("running","True");
 		    	System.out.println("--------------");
 		    	System.out.println(averageTrading);
 		     	AverageTrading.runOrder(averageTrading);

@@ -1,8 +1,11 @@
 package application;
+import java.util.Random;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.lang.Exception;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.jfoenix.controls.JFXButton;
@@ -89,7 +92,23 @@ public class FillbookController {
 	    		String run = FxDialogs.showConfirm("Run Order?",confirm, "Run", "Cancel");
 	    		System.out.println(run);
 				if (run.equals("Run")) {
+					JSONObject filloBook = new JSONObject();
+					filloBook.put("base", base);
+					filloBook.put("alt", alt);
+					filloBook.put("request", "Fill Order Book");
+					filloBook.put("Exchanges",exchange);
+					filloBook.put("millisstart", System.currentTimeMillis());
+			    	Random rand = new Random(); 
+			    	int value = rand.nextInt(1000000000); 
+			    	filloBook.put("orderid", value);
+			    	filloBook.put("running","False");
 					FillOrderBook.fillOrderBook(base, alt, startprice,endprice, balanceused, nooforders, BuySell, exchange);
+					DashboardController dash = new DashboardController();
+			    	try {
+						dash.newOrder(filloBook);
+					} catch (JSONException e1) {
+						e1.printStackTrace();
+					}
 				} else {
 					System.out.println("Not running order");
 				}

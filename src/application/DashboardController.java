@@ -172,7 +172,7 @@ public class DashboardController {
     }
     
     public void newOrder(JSONObject json) throws JSONException {
-    	data.add(new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"), String.valueOf(json.getLong("millisstart")), "Endtime", "True", String.valueOf(json.getInt("orderid"))));
+    	data.add(new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"), String.valueOf(json.getLong("millisstart")), "Endtime", json.getString("running"), String.valueOf(json.getInt("orderid"))));
     	tableView.setItems(data);
     	tableView.refresh();
     }

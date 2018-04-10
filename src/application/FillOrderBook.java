@@ -20,6 +20,7 @@ public class FillOrderBook {
 		double nooforders = Double.parseDouble(noofordersS);
 		Exchange exchange = Exchanges.exchangemap.get(exchangeS);
 		
+		
 		double volumeperorder = balanceused/nooforders;
 		double currentprice = startprice;
 		CurrencyPair pair = new CurrencyPair(alt,base);

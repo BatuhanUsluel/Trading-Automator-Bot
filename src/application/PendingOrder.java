@@ -39,7 +39,13 @@ public class PendingOrder implements Runnable {
 			this.priceorder = Double.parseDouble(this.json.getString("priceorder"));
 			this.volume = Double.parseDouble(this.json.getString("volume"));
 			this.percent = Double.parseDouble(this.json.getString("percent"));
-			this.exchange = Exchanges.exchangemap.get(this.json.getString("exchange"));
+			this.exchange = Exchanges.exchangemap.get(this.json.getString("Exchanges"));
+			DashboardController dash = new DashboardController();
+	    	try {
+				dash.newOrder(json);
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
 			boolean buy = true;
 				if (this.json.getString("base").equals("Buy")) {
 					buy=true;
