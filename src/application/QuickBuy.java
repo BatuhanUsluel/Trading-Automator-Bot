@@ -28,15 +28,14 @@ public class QuickBuy {
 			JsonObject listitem = myList.get(i);
 			System.out.println("Looping");
 			
-			if ((listitem.getString("Basecoin").equals(message.getString("Basecoin"))) && (listitem.getString("Altcoin").equals(message.getString("Altcoin"))) && (listitem.getString("Exchanges").equals(message.getString("Exchanges"))) && listitem.get("millis").toString().equals(Long.toString(message.getLong("millis")))) {
+			if ((listitem.getString("base").equals(message.getString("base"))) && (listitem.getString("alt").equals(message.getString("alt"))) && (listitem.getString("Exchanges").equals(message.getString("Exchanges"))) && listitem.get("millisstart").toString().equals(Long.toString(message.getLong("millisstart")))) {
 				myList.remove(listitem);
 				System.out.println(myList.toString());
 				double btcvolume = Double.parseDouble(listitem.get("volume").toString());
 				double buypercent =  Double.parseDouble(listitem.get("buypercent").toString());
 				Exchange exchange = Exchanges.exchangemap.get(listitem.getString("Exchanges"));
 				double ask = message.getDouble("Ask");
-				String coin = listitem.getString("Basecoin");
-				CurrencyPair pair = new CurrencyPair(listitem.getString("Altcoin"),listitem.getString("Basecoin"));
+				CurrencyPair pair = new CurrencyPair(listitem.getString("alt"),listitem.getString("base"));
 				System.out.println(ask);
 				double buyprice = ask*((buypercent/100)+1);
 				System.out.println(buyprice);

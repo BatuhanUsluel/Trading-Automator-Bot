@@ -97,7 +97,7 @@ public class FillbookController {
 					JSONObject filloBook = new JSONObject();
 					filloBook.put("base", base);
 					filloBook.put("alt", alt);
-					filloBook.put("request", "Fill Order Book");
+					filloBook.put("request", "fillOrderBook");
 					filloBook.put("Exchanges",exchange);
 					filloBook.put("millisstart", System.currentTimeMillis());
 			    	Random rand = new Random(); 

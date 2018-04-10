@@ -114,7 +114,7 @@ public class SocketCommunication {
 											&& (key.getString("volume").equals(jsonmessage.getString("volume")))
 											&& (key.getString("trail").equals(jsonmessage.getString("trail")))
 											&& (key.getString("buysell").equals(jsonmessage.getString("buysell")))
-											&& (key.getString("exchange").equals(jsonmessage.getString("exchange")))
+											&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
 											&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
 											&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
 												TrailingStop value = entry.getValue();
@@ -132,7 +132,7 @@ public class SocketCommunication {
 											&& (key.getString("priceorder").equals(jsonmessage.getString("priceorder")))
 											&& (key.getString("volume").equals(jsonmessage.getString("volume")))
 											&& (key.getString("percent").equals(jsonmessage.getString("percent")))
-											&& (key.getString("exchange").equals(jsonmessage.getString("exchange")))
+											&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
 											&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
 											&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
 												PendingOrder value = entry.getValue();
@@ -149,7 +149,7 @@ public class SocketCommunication {
 											&& (key.getString("spread").equals(jsonmessage.getString("spread")))
 											&& (key.getString("MaxBal").equals(jsonmessage.getString("MaxBal")))
 											&& (key.getString("MinBal").equals(jsonmessage.getString("MinBal")))
-											&& (key.getString("exchange").equals(jsonmessage.getString("exchange")))
+											&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
 											&& (key.getString("request").equals(jsonmessage.getString("request")))
 											&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
 											&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {

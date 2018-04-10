@@ -80,7 +80,7 @@ public class MarketMaking implements Runnable {
 			&& (listitem.getString("spread").equals(message.getString("spread")))
 			&& (listitem.getString("MaxBal").equals(message.getString("MaxBal")))
 			&& (listitem.getString("MinBal").equals(message.getString("MinBal")))
-			&& (listitem.getString("exchange").equals(message.getString("exchange")))
+			&& (listitem.getString("Exchanges").equals(message.getString("Exchanges")))
 			&& (listitem.getString("licenceKey").equals(message.getString("licenceKey")))
 			&& (listitem.getString("request").equals(message.getString("request")))
 			&& listitem.getLong("millisstart") == (message.getLong("millisstart"))

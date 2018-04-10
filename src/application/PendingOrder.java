@@ -88,7 +88,7 @@ public class PendingOrder implements Runnable {
 			&& (listitem.getString("volume").equals(message.getString("volume")))
 			&& (listitem.getString("priceorder").equals(message.getString("trail")))
 			&& (listitem.getString("percent").equals(message.getString("buysell")))
-			&& (listitem.getString("exchange").equals(message.getString("exchange")))
+			&& (listitem.getString("Exchanges").equals(message.getString("Exchanges")))
 			&& (listitem.getString("licenceKey").equals(message.getString("licenceKey")))
 			&& (listitem.getString("buysell").equals(message.getString("buysell")))
 			&& listitem.getLong("millisstart") == (message.getLong("millisstart"))
