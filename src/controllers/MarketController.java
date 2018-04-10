@@ -88,6 +88,7 @@ public class MarketController {
 		    	marketMaking.put("licencekey", SocketCommunication.licencekey);
 		    	marketMaking.put("millisstart", System.currentTimeMillis());
 		    	marketMaking.put("request","marketMaking");
+		    	marketMaking.put("endtime","N/A");
 		    	MarketMaking market = new MarketMaking(marketMaking);
 		    	marketMakingMap.put(marketMaking, market);
 		    	Thread t = new Thread(market);

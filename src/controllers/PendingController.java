@@ -99,6 +99,7 @@ public class PendingController {
 		    	pendingOrder.put("millisstart", System.currentTimeMillis());
 		    	pendingOrder.put("buysell",buysell);
 		    	pendingOrder.put("Exchanges",exchange);
+		    	pendingOrder.put("endtime","N/A");
 		    	Random rand = new Random(); 
 		    	int value = rand.nextInt(1000000000); 
 		    	pendingOrder.put("orderid", value);

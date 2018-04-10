@@ -95,6 +95,7 @@ public void initialize(){
 		    	Random rand = new Random(); 
 		    	int value = rand.nextInt(1000000000); 
 		    	trailingStop.put("orderid", value);
+		    	trailingStop.put("endtime","N/A");
 		    	trailingStop.put("running","True");
 		    	TrailingStop trailingstopclass = new TrailingStop();
 		    	trailingstopclass.runOrder(trailingStop);

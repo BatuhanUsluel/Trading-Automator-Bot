@@ -1,5 +1,9 @@
 package controllers;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import org.controlsfx.control.table.TableFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,18 +79,25 @@ public class DashboardController {
                         } else {
                             btn.setOnAction(event -> {
                                 Person person = getTableView().getItems().get(getIndex());
-                                person.setRunning("False");
-                                System.out.println(person.getOrderID());
-                                btn.setVisible(false);
-                                tableView.refresh();
-                                try {
-									RemoveOrder.removeOrder(person);
-							    	filter.executeFilter();
-							    	filter = new TableFilter<Person>(tableView);
-							    	tableView.refresh();
-								} catch (JSONException e) {
-									e.printStackTrace();
-								}
+                                if(person.getRunning()!="False") {
+	                                person.setRunning("False");
+	                                long millis = System.currentTimeMillis();
+	                            	Date date = new Date(millis);
+	                            	SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss", Locale.US);
+	                            	String text = format.format(date);
+	                                person.setEndTime(text);
+	                                System.out.println(person.getOrderID());
+	                                btn.setVisible(false);
+	                                tableView.refresh();
+	                                try {
+										RemoveOrder.removeOrder(person);
+								    	filter.executeFilter();
+								    	filter = new TableFilter<Person>(tableView);
+								    	tableView.refresh();
+									} catch (JSONException e) {
+										e.printStackTrace();
+									}
+                                }
                             });
                             setGraphic(btn);
                             setText(null);
@@ -163,11 +174,18 @@ public class DashboardController {
         public String getStartTime() {
             return StartTime.get();
         }
+        public void setEndTime(String fName) {
+        	EndTime.set(fName);
+        }
         
     }
     
     public void newOrder(JSONObject json) throws JSONException {
-    	data.add(new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"), String.valueOf(json.getLong("millisstart")), "Endtime", json.getString("running"), String.valueOf(json.getInt("orderid"))));
+    	
+    	Date date = new Date(json.getLong("millisstart"));
+    	SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss", Locale.US);
+    	String text = format.format(date);
+    	data.add(new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"),text, json.getString("endtime"), json.getString("running"), String.valueOf(json.getInt("orderid"))));
     	tableView.setItems(data);
     	tableView.refresh();
     }

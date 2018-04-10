@@ -1,8 +1,11 @@
 package application;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import javax.json.Json;
@@ -59,15 +62,18 @@ public class QuickBuy {
     	long millis = System.currentTimeMillis();
     	Random rand = new Random(); 
     	int value = rand.nextInt(1000000000); 
-    	
+    	Date date = new Date(millis);
+    	SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss", Locale.US);
+    	String text = format.format(date);
     	String quickpricerequest = Json.createObjectBuilder()
     			.add("base", basecoin)
     			.add("alt", altcoin)
                 .add("Exchanges", exchange)
-                .add("request", "Quick Buy")
+                .add("request", "quickBuy")
                 .add("licenceKey", SocketCommunication.licencekey)
                 .add("millisstart", millis)
                 .add("orderid", value)
+                .add("endtime",text)
                 .add("running","False")
 				.build()
 				.toString();
@@ -77,9 +83,10 @@ public class QuickBuy {
                 .add("Exchanges", exchange)
                 .add("volume", btcvolume)
                 .add("buypercent", buypercent)
-                .add("request", "Quick Buy")
+                .add("request", "quickBuy")
                 .add("millisstart", millis)
                 .add("orderid", value)
+                .add("endtime",text)
                 .add("running","False")
 				.build();
     	addtolist(quickpricelistadd);
