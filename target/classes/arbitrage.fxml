@@ -54,6 +54,6 @@
          </font>
       </Label>
       <Separator fx:id="sepVertical" layoutX="426.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="0.0" style="-fx-opacity: 0.8;" />
-      <CheckComboBox fx:id="ArbitrageExchange" layoutX="453.0" layoutY="111.0" prefHeight="42.0" prefWidth="179.0" style="-fx-background-color: BLACK; -fx-region-background: BLACK; -fx-border-color: BLACK; -fx-region-background: BLACK; -fx-region-border: BLACK;" />
+      <CheckComboBox fx:id="ArbitrageExchange" layoutX="453.0" layoutY="111.0" prefHeight="42.0" prefWidth="179.0" />
    </children>
 </AnchorPane>

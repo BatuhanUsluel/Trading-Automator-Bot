@@ -80,7 +80,8 @@ public class DashboardController {
                         } else {
                             btn.setOnAction(event -> {
                                 Person person = getTableView().getItems().get(getIndex());
-                                if(person.getRunning()!="False") {
+                                System.out.println(person.getRunning());
+                                if(!person.getRunning().equals("False")) {
 	                                person.setRunning("False");
 	                                long millis = System.currentTimeMillis();
 	                            	Date date = new Date(millis);
