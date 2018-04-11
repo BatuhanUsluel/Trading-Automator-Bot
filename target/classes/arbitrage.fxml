@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.CheckComboBox?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ArbitrageController">
    <children>
       <Label layoutX="76.0" layoutY="66.0" prefHeight="42.0" prefWidth="115.0" text="Base Pair:" textFill="#3592dd">
          <font>
@@ -54,54 +53,7 @@
             <Font size="23.0" />
          </font>
       </Label>
-      <JFXComboBox fx:id="Ex1Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="111.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
       <Separator fx:id="sepVertical" layoutX="426.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="0.0" style="-fx-opacity: 0.8;" />
-      <Label layoutX="456.0" layoutY="103.0" prefHeight="42.0" prefWidth="24.0" text="1:" textFill="#4adeff">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
-      <Label layoutX="456.0" layoutY="260.0" prefHeight="42.0" prefWidth="24.0" text="5:" textFill="#4adeff">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
-      <Label layoutX="456.0" layoutY="222.0" prefHeight="42.0" prefWidth="24.0" text="4:" textFill="#4adeff">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
-      <Label layoutX="456.0" layoutY="181.0" prefHeight="42.0" prefWidth="24.0" text="3:" textFill="#4adeff">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
-      <Label layoutX="456.0" layoutY="140.0" prefHeight="42.0" prefWidth="24.0" text="2:" textFill="#4adeff">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
-      <Label layoutX="456.0" layoutY="381.0" prefHeight="42.0" prefWidth="24.0" text="8:" textFill="#4adeff">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
-      <Label layoutX="456.0" layoutY="339.0" prefHeight="42.0" prefWidth="24.0" text="7:" textFill="#4adeff">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
-      <Label layoutX="456.0" layoutY="297.0" prefHeight="42.0" prefWidth="24.0" text="6:" textFill="#4adeff">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
-      <JFXComboBox fx:id="Ex2Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="149.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
-      <JFXComboBox fx:id="Ex3Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="190.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
-      <JFXComboBox fx:id="Ex4Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="231.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
-      <JFXComboBox fx:id="Ex5Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="269.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
-      <JFXComboBox fx:id="Ex6Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="306.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
-      <JFXComboBox fx:id="Ex7Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="348.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
-      <JFXComboBox fx:id="Ex8Ar" editable="true" focusColor="#8397d3" layoutX="502.0" layoutY="390.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <CheckComboBox fx:id="ArbitrageExchange" layoutX="453.0" layoutY="111.0" prefHeight="42.0" prefWidth="179.0" />
    </children>
 </AnchorPane>
