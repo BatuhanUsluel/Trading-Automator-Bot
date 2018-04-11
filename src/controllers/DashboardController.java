@@ -8,6 +8,7 @@ import org.controlsfx.control.table.TableFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import application.FxDialogs;
 import application.RemoveOrder;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -97,6 +98,8 @@ public class DashboardController {
 									} catch (JSONException e) {
 										e.printStackTrace();
 									}
+                                } else {
+                                	FxDialogs.showError(null, "Order Already Stopped");
                                 }
                             });
                             setGraphic(btn);

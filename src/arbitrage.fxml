@@ -43,7 +43,7 @@
          </font>
       </TextField>
       <Separator layoutX="81.0" layoutY="323.0" prefHeight="9.0" prefWidth="14.0" />
-      <JFXButton fx:id="RunArbitrage" layoutX="708.0" layoutY="492.0" prefHeight="54.0" prefWidth="162.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
+      <JFXButton fx:id="RunArbitrage" layoutX="708.0" layoutY="492.0" onAction="#arbitrageEvent" prefHeight="54.0" prefWidth="162.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
          <font>
             <Font size="33.0" />
          </font>
