@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.controlsfx.control.MasterDetailPane;
+import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.table.TableFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,17 +16,23 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Side;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 public class DashboardController {
 	@FXML private TableView<Person> tableView = new TableView<Person>();
+    @FXML private MasterDetailPane pane;
 	public static ObservableList<Person> data =  FXCollections.observableArrayList();
-	TableFilter<Person> filter;
+	//TableFilter<Person> filter;
 	@FXML
     public void initialize(){
 		
@@ -93,8 +101,8 @@ public class DashboardController {
 	                                tableView.refresh();
 	                                try {
 										RemoveOrder.removeOrder(person);
-								    	filter.executeFilter();
-								    	filter = new TableFilter<Person>(tableView);
+								    	//filter.executeFilter();
+								    	//filter = new TableFilter<Person>(tableView);
 								    	tableView.refresh();
 									} catch (JSONException e) {
 										e.printStackTrace();
@@ -117,7 +125,26 @@ public class DashboardController {
         tableView.getStylesheets().setAll(css);
         tableView.setItems(data);
         tableView.getColumns().addAll(OrderTypeCol, BasePairCol, AltPairCol,ExchangesCol,StartTimeCol,EndTimeCol,RunningCol,OrderIDCol,actionCol);
-        filter = new TableFilter<Person>(tableView);
+        TextArea textArea = new TextArea();
+	   	pane.setMasterNode(tableView);
+	   	pane.setDetailNode(textArea);
+	   	pane.setDetailSide(Side.RIGHT);
+	   	pane.setShowDetailNode(true);
+	   
+	   	
+	   	tableView.setRowFactory(tv -> {
+            TableRow<Person> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if ((!row.isEmpty()) ) {
+                    Person rowData = row.getItem();
+                    System.out.println("Double click on: "+rowData.getOrderType());
+                    textArea.setText(rowData.getOrderData());
+                }
+            });
+            return row ;
+        });
+
+        //filter = new TableFilter<Person>(tableView);
 	}
     
     public static class Person {
@@ -129,7 +156,8 @@ public class DashboardController {
     	private final SimpleStringProperty EndTime;
     	private final SimpleStringProperty Running;
     	private final SimpleStringProperty OrderID;
-        private Person(String OrderType,String BasePair,String AltPair, String Exchanges, String StartTime, String EndTime, String Running, String OrderID) {
+    	private final SimpleStringProperty OrderData;
+        private Person(String OrderType,String BasePair,String AltPair, String Exchanges, String StartTime, String EndTime, String Running, String OrderID, String OrderData) {
 			this.OrderType = new SimpleStringProperty(OrderType);
 			this.BasePair  = new SimpleStringProperty(BasePair);
 			this.AltPair = new SimpleStringProperty(AltPair);
@@ -138,12 +166,25 @@ public class DashboardController {
 			this.EndTime = new SimpleStringProperty(EndTime);
 			this.Running = new SimpleStringProperty(Running);
 			this.OrderID = new SimpleStringProperty(OrderID);
+			this.OrderData = new SimpleStringProperty(OrderData);
         }
         
         public String getOrderType() {
             return OrderType.get();
         }
 
+        public String getOrderData() {
+            return OrderData.get();
+        }
+        
+        public void setOrderData(String fName) {
+        	OrderData.set(fName);
+        }
+        
+        public void addOrderData(String fName) {
+        	OrderData.set(getOrderData() + fName);
+        }
+        
         public void setOrderType(String fName) {
         	OrderType.set(fName);
         }
@@ -189,7 +230,7 @@ public class DashboardController {
     	Date date = new Date(json.getLong("millisstart"));
     	SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss", Locale.US);
     	String text = format.format(date);
-    	data.add(new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"),text, json.getString("endtime"), json.getString("running"), String.valueOf(json.getInt("orderid"))));
+    	data.add(new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"),text, json.getString("endtime"), json.getString("running"), String.valueOf(json.getInt("orderid")), json.toString()));
     	tableView.setItems(data);
     	tableView.refresh();
     }

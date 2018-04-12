@@ -5,15 +5,17 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.MasterDetailPane?>
 
 <AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.DashboardController">
    <children>
       <Separator layoutX="5.0" layoutY="87.0" prefHeight="0.0" prefWidth="920.0" />
-      <TableView fx:id="tableView" layoutX="42.0" layoutY="120.0" prefHeight="457.0" prefWidth="846.0" />
+      <TableView fx:id="tableView" layoutX="42.0" layoutY="120.0" prefHeight="457.0" prefWidth="535.0" />
       <Label layoutX="42.0" layoutY="14.0" text="Dashboard" textFill="WHITE">
          <font>
             <Font name="System Bold" size="48.0" />
          </font>
       </Label>
+      <MasterDetailPane fx:id="pane" layoutX="12.0" layoutY="99.0" prefHeight="492.0" prefWidth="895.0" />
    </children>
 </AnchorPane>
