@@ -137,7 +137,7 @@ public class DashboardController {
             row.setOnMouseClicked(event -> {
                 if ((!row.isEmpty()) ) {
                     Person rowData = row.getItem();
-                    System.out.println("Double click on: "+rowData.getOrderType());
+                    System.out.println("Selected: "+rowData.getOrderType());
                     textArea.setText(rowData.getOrderData());
                 }
             });
@@ -225,13 +225,15 @@ public class DashboardController {
         
     }
     
-    public void newOrder(JSONObject json) throws JSONException {
+    public Person newOrder(JSONObject json) throws JSONException {
     	
     	Date date = new Date(json.getLong("millisstart"));
     	SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss", Locale.US);
     	String text = format.format(date);
-    	data.add(new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"),text, json.getString("endtime"), json.getString("running"), String.valueOf(json.getInt("orderid")), json.toString()));
+    	Person person = new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"),text, json.getString("endtime"), json.getString("running"), String.valueOf(json.getInt("orderid")),"");
+    	data.add(person);
     	tableView.setItems(data);
     	tableView.refresh();
+    	return person;
     }
 }

@@ -86,90 +86,91 @@ public class SocketCommunication {
 				    	Thread t = new Thread(new Runnable() {
 				            public void run() {
 				            	try {
-							JSONObject jsonmessage = new JSONObject(message);
-							String request = jsonmessage.getString("request");
-							switch (request) {
-							case "QuickPrice":
-								System.out.println("QuikcPrice");
-								QuickBuy quickbuy = new QuickBuy();
-									quickbuy.recievedQuickBuyMessage(jsonmessage);
-								break;
-							case "BidAsk":
-								
-								break;
-							case "Historic":
-								
-								break;
-							case "averageTrading":
-								System.out.println("Recieved AVERAGE");
-									AverageTrading.recievedAverageTrade(jsonmessage);
-								break;
-							case "trailingStop":
-								HashMap<JSONObject, TrailingStop> hashmap = TrailingController.TrailingStopMap;
-								for (Entry<JSONObject, TrailingStop> entry : hashmap.entrySet()) {
-								    JSONObject key = entry.getKey();
-										if ((key.getString("base").equals(jsonmessage.getString("base")))
-											&& (key.getString("alt").equals(jsonmessage.getString("alt")))
-											&& (key.getString("request").equals(jsonmessage.getString("request")))
-											&& (key.getString("volume").equals(jsonmessage.getString("volume")))
-											&& (key.getString("trail").equals(jsonmessage.getString("trail")))
-											&& (key.getString("buysell").equals(jsonmessage.getString("buysell")))
-											&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
-											&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
-											&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
-												TrailingStop value = entry.getValue();
-												value.recievedTrailingStop(jsonmessage);
+									JSONObject jsonmessage = new JSONObject(message);
+									String request = jsonmessage.getString("request");
+									switch (request) {
+									case "QuickPrice":
+										System.out.println("QuikcPrice");
+										QuickBuy quickbuy = new QuickBuy();
+											quickbuy.recievedQuickBuyMessage(jsonmessage);
+										break;
+									case "BidAsk":
+										
+										break;
+									case "Historic":
+										
+										break;
+									case "averageTrading":
+										System.out.println("Recieved AVERAGE");
+											AverageTrading.recievedAverageTrade(jsonmessage);
+										break;
+									case "trailingStop":
+										HashMap<JSONObject, TrailingStop> hashmap = TrailingController.TrailingStopMap;
+										for (Entry<JSONObject, TrailingStop> entry : hashmap.entrySet()) {
+										    JSONObject key = entry.getKey();
+												if ((key.getString("base").equals(jsonmessage.getString("base")))
+													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
+													&& (key.getString("request").equals(jsonmessage.getString("request")))
+													&& (key.getString("volume").equals(jsonmessage.getString("volume")))
+													&& (key.getString("trail").equals(jsonmessage.getString("trail")))
+													&& (key.getString("buysell").equals(jsonmessage.getString("buysell")))
+													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
+													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
+													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
+														TrailingStop value = entry.getValue();
+														value.recievedTrailingStop(jsonmessage);
+												}
 										}
-								}
-								break;
-							case "pendingOrder":
-								HashMap<JSONObject, PendingOrder> hashmappending = PendingController.PendingOrderMap;
-								for (Entry<JSONObject, PendingOrder> entry : hashmappending.entrySet()) {
-									JSONObject key = entry.getKey();
-										if ((key.getString("base").equals(jsonmessage.getString("base")))
-											&& (key.getString("alt").equals(jsonmessage.getString("alt")))
-											&& (key.getString("request").equals(jsonmessage.getString("request")))
-											&& (key.getString("priceorder").equals(jsonmessage.getString("priceorder")))
-											&& (key.getString("volume").equals(jsonmessage.getString("volume")))
-											&& (key.getString("percent").equals(jsonmessage.getString("percent")))
-											&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
-											&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
-											&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
-												PendingOrder value = entry.getValue();
-												value.recievedPendingOrder(jsonmessage);
+										break;
+									case "pendingOrder":
+										HashMap<JSONObject, PendingOrder> hashmappending = PendingController.PendingOrderMap;
+										for (Entry<JSONObject, PendingOrder> entry : hashmappending.entrySet()) {
+											JSONObject key = entry.getKey();
+												if ((key.getString("base").equals(jsonmessage.getString("base")))
+													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
+													&& (key.getString("request").equals(jsonmessage.getString("request")))
+													&& (key.getString("priceorder").equals(jsonmessage.getString("priceorder")))
+													&& (key.getString("volume").equals(jsonmessage.getString("volume")))
+													&& (key.getString("percent").equals(jsonmessage.getString("percent")))
+													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
+													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
+													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
+														PendingOrder value = entry.getValue();
+														value.recievedPendingOrder(jsonmessage);
+												}
 										}
-								}
-								break;
-							case "marketMaking":
-								HashMap<JSONObject, MarketMaking> hashmapmarket = MarketController.marketMakingMap;
-								for (Entry<JSONObject, MarketMaking> entry : hashmapmarket.entrySet()) {
-									JSONObject key = entry.getKey();
-										if ((key.getString("base").equals(jsonmessage.getString("base")))
-											&& (key.getString("alt").equals(jsonmessage.getString("alt")))
-											&& (key.getString("spread").equals(jsonmessage.getString("spread")))
-											&& (key.getString("MaxBal").equals(jsonmessage.getString("MaxBal")))
-											&& (key.getString("MinBal").equals(jsonmessage.getString("MinBal")))
-											&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
-											&& (key.getString("request").equals(jsonmessage.getString("request")))
-											&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
-											&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
-												MarketMaking value = entry.getValue();
-												value.recievedMarketOrder(jsonmessage);
+										break;
+									case "marketMaking":
+										HashMap<JSONObject, MarketMaking> hashmapmarket = MarketController.marketMakingMap;
+										for (Entry<JSONObject, MarketMaking> entry : hashmapmarket.entrySet()) {
+											JSONObject key = entry.getKey();
+												if ((key.getString("base").equals(jsonmessage.getString("base")))
+													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
+													&& (key.getString("spread").equals(jsonmessage.getString("spread")))
+													&& (key.getString("MaxBal").equals(jsonmessage.getString("MaxBal")))
+													&& (key.getString("MinBal").equals(jsonmessage.getString("MinBal")))
+													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
+													&& (key.getString("request").equals(jsonmessage.getString("request")))
+													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
+													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
+														MarketMaking value = entry.getValue();
+														value.recievedMarketOrder(jsonmessage);
+												}
 										}
-								}
-								break;
-							default:
-								System.out.println("Invalid");
-							}	
-							System.out.println("M:   " + message);
-				            } catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
-									| ExchangeException | IOException e) {
-								e.printStackTrace();
-				           } catch (JSONException e) {
-								e.printStackTrace();
-							}
-				          }
-				    	});
+										break;
+									default:
+										System.out.println("Invalid");
+									}	
+									System.out.println("M:   " + message);
+						            } catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
+											| ExchangeException | IOException e) {
+										e.printStackTrace();
+						           } catch (JSONException e) {
+										e.printStackTrace();
+									}
+						          }
+						    	});
+				    	t.start();
 					} catch (SocketException e) {
 						System.out.println("Socket Exception");
 						e.printStackTrace();
