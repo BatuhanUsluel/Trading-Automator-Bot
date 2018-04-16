@@ -3,6 +3,7 @@ package controllers;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.controlsfx.control.MasterDetailPane;
 import org.controlsfx.control.PropertySheet;
@@ -143,7 +144,23 @@ public class DashboardController {
             });
             return row ;
         });
-
+	   	Thread selectedrow = new Thread() {
+	   	    public void run() {
+	   	    	while(true) {
+	   	    	Person person = tableView.getSelectionModel().getSelectedItem();
+	   	    	if (person!=null) {
+	   	    		textArea.setText(person.getOrderData());
+	   	    	}
+	   	    	try {
+					TimeUnit.SECONDS.sleep(2);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+	   	    }
+	   	    }
+	   	};
+	   	selectedrow.start();
+	   	
         //filter = new TableFilter<Person>(tableView);
 	}
     

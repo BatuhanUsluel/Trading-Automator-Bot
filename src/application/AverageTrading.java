@@ -79,8 +79,8 @@ public class AverageTrading  implements Runnable  {
 					+ "\nParameters:\n"
 					+ "Base: " + base
 					+ "\nAlt: " + alt
-					+ "\nVolume: " +  volume
-					+ "\nExchange: " +  exchange
+					+ "\nLoop Time: " +  loop
+					+ "\nExchange: " +  exchangestring
 					+ "\nCoins to Trade: " + coinstotrade
 					+ "\nVolume Per Order: " + volume
 					+ "\nOrder Type: " + buystring + "\n--------------------------------------\n\n") ;
