@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -21,10 +22,11 @@ import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
 
 import controllers.DashboardController;
+import controllers.DashboardController.Person;
 
 import  java.lang.Long;
 public class QuickBuy {
-
+	static HashMap<Integer, Person> hmap = new HashMap<Integer, Person>();
 	private static List<JsonObject> myList = new ArrayList<>();
 	public static void recievedQuickBuyMessage(JSONObject message) throws JSONException {
 		System.out.println("Recieved quickbuy");
@@ -34,19 +36,23 @@ public class QuickBuy {
 			System.out.println("Looping");
 			
 			if ((listitem.getString("base").equals(message.getString("base"))) && (listitem.getString("alt").equals(message.getString("alt"))) && (listitem.getString("Exchanges").equals(message.getString("Exchanges"))) && listitem.get("millisstart").toString().equals(Long.toString(message.getLong("millisstart")))) {
+				Person person = hmap.get(listitem.getInt("orderid"));
+				
 				myList.remove(listitem);
 				System.out.println(myList.toString());
 				double btcvolume = Double.parseDouble(listitem.get("volume").toString());
 				double buypercent =  Double.parseDouble(listitem.get("buypercent").toString());
 				Exchange exchange = Exchanges.exchangemap.get(listitem.getString("Exchanges"));
 				double ask = message.getDouble("Ask");
+				person.addOrderData("Price: " + ask + "\n");
 				CurrencyPair pair = new CurrencyPair(listitem.getString("alt"),listitem.getString("base"));
 				System.out.println(ask);
 				double buyprice = ask*((buypercent/100)+1);
 				System.out.println(buyprice);
 				double altvolume = btcvolume/buyprice;
 				LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN));
-				System.out.println(BuyingOrder.toString());
+				person.addOrderData("Placing buy order for " + btcvolume + (listitem.getString("base")) + "(" + new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN) + (listitem.getString("alt")) + ") @ price: " + new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN) + "\n");
+				person.addOrderData(BuyingOrder.toString());
 				//String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
 			} else {
 				System.out.println("Values don't match!!");
@@ -55,12 +61,13 @@ public class QuickBuy {
 
 	}
 	
-	public static void addtolist(JsonObject quickpricelistadd) {
+	public static void addtolist(JsonObject quickpricelistadd, Person person) {
 		myList.add(quickpricelistadd);
+		hmap.put(quickpricelistadd.getInt("orderid"),person);
 		System.out.println(myList.toString());
 	}
 	
-    public static void sendQuickPriceRequest(String basecoin, String altcoin, String exchange, double btcvolume, double buypercent) {
+    public static void sendQuickPriceRequest(String base, String alt, String Exchanges, double btcvolume, double buypercent) {
     	long millis = System.currentTimeMillis();
     	Random rand = new Random(); 
     	int value = rand.nextInt(1000000000); 
@@ -68,9 +75,9 @@ public class QuickBuy {
     	SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss", Locale.US);
     	String text = format.format(date);
     	String quickpricerequest = Json.createObjectBuilder()
-    			.add("base", basecoin)
-    			.add("alt", altcoin)
-                .add("Exchanges", exchange)
+    			.add("base", base)
+    			.add("alt", alt)
+                .add("Exchanges", Exchanges)
                 .add("request", "quickBuy")
                 .add("licenceKey", SocketCommunication.licencekey)
                 .add("millisstart", millis)
@@ -80,9 +87,9 @@ public class QuickBuy {
 				.build()
 				.toString();
     	JsonObject quickpricelistadd = Json.createObjectBuilder()
-    			.add("base", basecoin)
-                .add("alt", altcoin)
-                .add("Exchanges", exchange)
+    			.add("base", base)
+                .add("alt", alt)
+                .add("Exchanges", Exchanges)
                 .add("volume", btcvolume)
                 .add("buypercent", buypercent)
                 .add("request", "quickBuy")
@@ -91,10 +98,19 @@ public class QuickBuy {
                 .add("endtime",text)
                 .add("running","False")
 				.build();
-    	addtolist(quickpricelistadd);
+    	
 		DashboardController dash = new DashboardController();
     	try {
-			dash.newOrder(new JSONObject(quickpricelistadd.toString()));
+			Person person = dash.newOrder(new JSONObject(quickpricelistadd.toString()));
+			addtolist(quickpricelistadd,person);
+			person.addOrderData("Running Quick Buy"
+					+ "\nParameters:"
+					+ "\nBase: " + base
+					+ "\nAlt: " + alt
+					+ "\nVolume: " + btcvolume
+					+ "\nBuy Percent: " + buypercent
+					+ "\nExchange: " + Exchanges + "\n--------------------------------------\n\n");			
+			
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}

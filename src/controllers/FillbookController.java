@@ -94,32 +94,11 @@ public class FillbookController {
     	
 		if (noerror==true) {
 	    	try {
-	    		String confirm = ("Base: " + base + "\nAlt: " + alt + "\nStartprice: " + startprice + "\nEndprice: " + endprice + "\nBalanceused: " + balanceused + "\nNooforders: " + nooforders + "\nBuySell: " + BuySell + "\nExchange: " + exchange);
+	    		String confirm = ("Base: " + base + "\nAlt: " + alt + "\nStartprice: " + startprice + "\nEndprice: " + endprice + "\nBalance Used: " + balanceused + " " + base + "\nNumber Of Orders: " + nooforders + "\nOrder Type: " + BuySell + "\nExchange: " + exchange);
 	    		String run = FxDialogs.showConfirm("Run Order?",confirm, "Run", "Cancel");
 	    		System.out.println(run);
 				if (run.equals("Run")) {
-					Long millis = System.currentTimeMillis();
-					JSONObject filloBook = new JSONObject();
-					filloBook.put("base", base);
-					filloBook.put("alt", alt);
-					filloBook.put("request", "fillOrderBook");
-					filloBook.put("Exchanges",exchange);
-					filloBook.put("millisstart", millis);
-			    	Random rand = new Random(); 
-			    	int value = rand.nextInt(1000000000); 
-			    	filloBook.put("orderid", value);
-			    	Date date = new Date(millis);
-			    	SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss", Locale.US);
-			    	String text = format.format(date);
-			    	filloBook.put("endtime",text);
-			    	filloBook.put("running","False");
 					FillOrderBook.fillOrderBook(base, alt, startprice,endprice, balanceused, nooforders, BuySell, exchange);
-					DashboardController dash = new DashboardController();
-			    	try {
-						dash.newOrder(filloBook);
-					} catch (JSONException e1) {
-						e1.printStackTrace();
-					}
 				} else {
 					System.out.println("Not running order");
 				}
