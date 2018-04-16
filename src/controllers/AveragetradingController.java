@@ -1,7 +1,8 @@
 package controllers;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -12,7 +13,8 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
-
+import java.lang.Exception;
+import  java.lang.Integer;
 import application.AverageTrading;
 import application.Exchanges;
 import application.FxDialogs;
@@ -23,6 +25,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import java.lang.Thread;
 public class AveragetradingController {
 	
 	//Average Trading
@@ -51,10 +54,10 @@ public class AveragetradingController {
         List<String> list = new ArrayList<String>(Exchanges.list);
         ExAv.getItems().addAll(list);
     }
-	
+	public static HashMap<JSONObject, AverageTrading> AverageTradingMap = new HashMap<JSONObject, AverageTrading>();
 	@FXML
     public void averageTrading(ActionEvent event) throws JSONException {
-     	 System.out.println("running averageTrading");
+     	System.out.println("running averageTrading");
     	JSONObject averageTrading = new JSONObject();
     	String base = BPAvU.getText();
     	String alt =APAvU.getText();
@@ -121,7 +124,10 @@ public class AveragetradingController {
 		    	averageTrading.put("running","True");
 		    	System.out.println("--------------");
 		    	System.out.println(averageTrading);
-		     	AverageTrading.runOrder(averageTrading);
+		    	AverageTrading averagetradingclass = new AverageTrading(averageTrading);
+		    	AverageTradingMap.put(averageTrading, averagetradingclass);
+		    	Thread t = new Thread(averagetradingclass);
+		    	t.start();
 			} else {
 				System.out.println("Not running order");
 			}
@@ -129,5 +135,20 @@ public class AveragetradingController {
 		    String finalString = stringBuilder.toString();
 	    	FxDialogs.showError(null, finalString);
     	}
+	}
+	
+	public static void cancelAverageOrder(String orderid) {
+		for (Map.Entry<JSONObject, AverageTrading> entry : AverageTradingMap.entrySet()) {
+		    JSONObject key = entry.getKey();
+			try {
+				if (key.getInt("orderid") == Integer.parseInt(orderid)) {
+					AverageTrading value = entry.getValue();
+					value.stopOrder();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+	}
 	}
 }

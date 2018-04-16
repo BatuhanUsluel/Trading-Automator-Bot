@@ -100,13 +100,13 @@ public class TrailingStop {
 				if (firstrun==true) {
 					
 					if (buy==true) {
-						person.addOrderData("First run, Placing Buy Order @ " + (price+trail) + " with volume: " + volume + "\n");
+						person.addOrderData("First run\nCurrent price: " + price + "\nPlacing Buy Order @ " + round((price+trail),6) + "\n");
 						LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
 						System.out.println(LastOrder);
 						//lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
 						prevprice = price;
 					} else {
-						person.addOrderData("First run, Sell, Current price: " + price + " trail: " + trail + " volume: " + volume + "\n");
+						person.addOrderData("First run\nCurrent price: " + price + "\nSell order price: " + round((price-trail),6) +"\n");
 						System.out.println("---------------------------TRADING FIRST RUN SELL----------------------");
 						prevprice = price;
 					}
@@ -121,7 +121,7 @@ public class TrailingStop {
 						} else {
 							if (price<prevprice) {
 								person.addOrderData("Changing price of buy. New order @ " + price+trail + "\n");
-								person.addOrderData("Price has decreased. Changing price of buy.\nPrevious Lowest Price: " + prevprice + "\nNew lowest price: " + price + "\nNew buy order price: " + (price-trail) + "\n");
+								person.addOrderData("Price has decreased. Changing price of buy.\nPrevious Lowest Price: " + prevprice + "\nCurrent lowest price: " + price + "\nNew buy order price: " + (price+trail) + "\n");
 								System.out.println("---------------------------CHANGING BUY----------------------");
 								//exchange.getTradeService().cancelOrder(lastorder);
 								LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
@@ -130,7 +130,7 @@ public class TrailingStop {
 								System.out.println("PrevPrice: " +prevprice);
 								prevprice = price;
 							} else {
-								person.addOrderData("Price hasn't decreased.\nLowest price: " + prevprice + "\nCurrent price: " + price + "\n Buy order price: " + (prevprice+trail) + "\n");
+								person.addOrderData("Price hasn't decreased.\nLowest price: " + prevprice + "\nCurrent price: " + price + "\nBuy order price: " + (prevprice+trail) + "\n");
 								System.out.println("---------------------------NOT TRADING BUY----------------------");
 								System.out.println("Price:" + price);
 								System.out.println("PrevPrice: " +prevprice);
@@ -149,7 +149,7 @@ public class TrailingStop {
 							//lastorder = exchange.getTradeService().placeLimitOrder(SellingOrder);
 							run=false;
 						} else {
-							person.addOrderData("Price hasn't increased.\n Highest price: " + prevprice + "\nNew highest price: " + price + "\nSell order price: " + (prevprice-trail) + "\n");
+							person.addOrderData("Price hasn't increased.\nHighest price: " + prevprice + "\nCurrent price: " + price + "\nSell order price: " + round((prevprice-trail),6) + "\n");
 							System.out.println("Price hasn't increased. Keeping sell at same price");
 						}
 						
@@ -160,6 +160,14 @@ public class TrailingStop {
 		}		
 	}
 	public void stopOrder() {
+		person.addOrderData("\nTrailing Stop order has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Trailing Stop.");
 		run=false;
+	}
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    BigDecimal bd = new BigDecimal(value);
+	    bd = bd.setScale(places, RoundingMode.HALF_DOWN);
+	    return bd.doubleValue();
 	}
 }

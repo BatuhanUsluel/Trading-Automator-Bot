@@ -26,7 +26,7 @@ import  java.lang.Long;
 public class QuickBuy {
 
 	private static List<JsonObject> myList = new ArrayList<>();
-	public void recievedQuickBuyMessage(JSONObject message) throws JSONException {
+	public static void recievedQuickBuyMessage(JSONObject message) throws JSONException {
 		System.out.println("Recieved quickbuy");
 		System.out.println(myList.toString());
 		for (int i = 0; i < myList.size(); i++) {

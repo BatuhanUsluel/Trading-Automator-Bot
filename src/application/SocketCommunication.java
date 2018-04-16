@@ -15,6 +15,7 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
+import controllers.AveragetradingController;
 import controllers.MarketController;
 import controllers.PendingController;
 import controllers.TrailingController;
@@ -75,7 +76,7 @@ public class SocketCommunication {
     }
     
     public static void listen() throws IOException {
-    	Thread t = new Thread(new Runnable() {
+    	Thread t = new Thread(new java.lang.Runnable() {
             @Override
             public void run() {
             	boolean x = true;
@@ -89,10 +90,8 @@ public class SocketCommunication {
 									JSONObject jsonmessage = new JSONObject(message);
 									String request = jsonmessage.getString("request");
 									switch (request) {
-									case "QuickPrice":
-										System.out.println("QuikcPrice");
-										QuickBuy quickbuy = new QuickBuy();
-											quickbuy.recievedQuickBuyMessage(jsonmessage);
+									case "quickBuy":
+										QuickBuy.recievedQuickBuyMessage(jsonmessage);
 										break;
 									case "BidAsk":
 										
@@ -101,12 +100,29 @@ public class SocketCommunication {
 										
 										break;
 									case "averageTrading":
-										System.out.println("Recieved AVERAGE");
-											AverageTrading.recievedAverageTrade(jsonmessage);
+										System.out.println("Recieved AVERAGE");										
+										HashMap<JSONObject, AverageTrading> hashmapaverage = AveragetradingController.AverageTradingMap;
+										for (Entry<JSONObject, AverageTrading> entry : hashmapaverage.entrySet()) {
+										    JSONObject key = entry.getKey();
+												if ((key.getString("base").equals(jsonmessage.getString("base")))
+													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
+													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
+													&& (key.getString("request").equals(jsonmessage.getString("request")))
+													&& (key.getString("coinstotrade").equals(jsonmessage.getString("coinstotrade")))
+													&& (key.getString("volumeperorder").equals(jsonmessage.getString("volumeperorder")))
+													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
+													&& (key.getString("atbid").equals(jsonmessage.getString("atbid")))
+													&& (key.getString("buy").equals(jsonmessage.getString("buy")))
+													&& (key.getString("loop").equals(jsonmessage.getString("loop")))
+													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
+														AverageTrading value = entry.getValue();
+														value.recievedAverageTrade(jsonmessage);
+												}
+										}
 										break;
 									case "trailingStop":
-										HashMap<JSONObject, TrailingStop> hashmap = TrailingController.TrailingStopMap;
-										for (Entry<JSONObject, TrailingStop> entry : hashmap.entrySet()) {
+										HashMap<JSONObject, TrailingStop> hashmaptrailing = TrailingController.TrailingStopMap;
+										for (Entry<JSONObject, TrailingStop> entry : hashmaptrailing.entrySet()) {
 										    JSONObject key = entry.getKey();
 												if ((key.getString("base").equals(jsonmessage.getString("base")))
 													&& (key.getString("alt").equals(jsonmessage.getString("alt")))

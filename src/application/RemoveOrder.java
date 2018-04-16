@@ -2,7 +2,9 @@ package application;
 
 import org.json.JSONException;
 
+import controllers.AveragetradingController;
 import controllers.DashboardController;
+import controllers.PendingController;
 import controllers.TrailingController;
 
 public class RemoveOrder {
@@ -10,14 +12,12 @@ public class RemoveOrder {
 		String ordertype = person.getOrderType();
 		System.out.println("REMOVING");
 		if (ordertype.equals("averageTrading")) {
-			AverageTrading.removeOrder(person.getOrderID());
+			AveragetradingController.cancelAverageOrder(person.getOrderID());
 		} else if(ordertype.equals("trailingStop")) {
 			TrailingController.removeOrder(person.getOrderID());
 		} else if(ordertype.equals("pendingOrder")) {
-			
+			PendingController.cancelPendingOrder(person.getOrderID());
 		} else if(ordertype.equals("marketMaking")) {
-			
-		} else if(ordertype.equals("pendingOrder")) {
 			
 		} else if(ordertype.equals("arbitrage")) {
 			

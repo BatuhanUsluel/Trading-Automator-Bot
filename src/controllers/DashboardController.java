@@ -124,13 +124,13 @@ public class DashboardController {
         String css = this.getClass().getResource("/assets/tableview.css").toExternalForm();
         tableView.getStylesheets().setAll(css);
         tableView.setItems(data);
-        tableView.getColumns().addAll(OrderTypeCol, BasePairCol, AltPairCol,ExchangesCol,StartTimeCol,EndTimeCol,RunningCol,OrderIDCol,actionCol);
+        tableView.getColumns().addAll(OrderTypeCol,actionCol, BasePairCol, AltPairCol,ExchangesCol,StartTimeCol,RunningCol,EndTimeCol,OrderIDCol);
         TextArea textArea = new TextArea();
 	   	pane.setMasterNode(tableView);
 	   	pane.setDetailNode(textArea);
 	   	pane.setDetailSide(Side.RIGHT);
 	   	pane.setShowDetailNode(true);
-	   
+	    pane.setDividerPosition(0.64);
 	   	
 	   	tableView.setRowFactory(tv -> {
             TableRow<Person> row = new TableRow<>();

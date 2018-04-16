@@ -1,7 +1,10 @@
 package controllers;
+import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -13,6 +16,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXRadioButton;
 
+import application.AverageTrading;
 import application.Exchanges;
 import application.FxDialogs;
 import application.PendingOrder;
@@ -122,5 +126,19 @@ public class PendingController {
         ExPOU.getItems().addAll(list);
     }
 	
+	public static void cancelPendingOrder(String orderid) {
+		for (Entry<JSONObject, PendingOrder> entry : PendingOrderMap.entrySet()) {
+		    JSONObject key = entry.getKey();
+			try {
+				if (key.getInt("orderid") == java.lang.Integer.parseInt(orderid)) {
+					PendingOrder value = entry.getValue();
+					value.stopOrder();
+				}
+			} catch (java.lang.Exception e) {
+				e.printStackTrace();
+			}
+
+	}
+	}
 
 }

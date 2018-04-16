@@ -12,6 +12,8 @@ import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
 
 import controllers.DashboardController;
+import controllers.DashboardController.Person;
+
 import java.lang.Thread;
 public class PendingOrder implements Runnable {
 	ArrayList<JSONObject> OrdersPending = new ArrayList<JSONObject>();
@@ -27,7 +29,8 @@ public class PendingOrder implements Runnable {
 	private boolean orderplaced;
 	private CurrencyPair pair;
 	private boolean ordercanceled = false;
-	
+	private String buystring;
+	Person person;
 	public PendingOrder(JSONObject json) throws JSONException {
 		this.json = json;
 	}
@@ -43,20 +46,33 @@ public class PendingOrder implements Runnable {
 			this.percent = Double.parseDouble(this.json.getString("percent"));
 			this.exchange = Exchanges.exchangemap.get(this.json.getString("Exchanges"));
 			DashboardController dash = new DashboardController();
-	    	try {
-				dash.newOrder(json);
-			} catch (JSONException e1) {
-				e1.printStackTrace();
-			}
+
 			boolean buy = true;
-				if (this.json.getString("base").equals("Buy")) {
+				
+				if (this.json.getString("buysell").equals("Buy")) {
 					buy=true;
-				} else if (this.json.getString("base").equals("Sell")) {
+					buystring="Buy";
+				} else if (this.json.getString("buysell").equals("Sell")) {
 					buy=false;
+					buystring="Sell";
 				} else {
 					System.out.println("error!");
 				}
 			this.buy = buy;
+	    	try {
+				person = dash.newOrder(json);
+				person.addOrderData("Starting Trailing Stop"
+						+ "\nParameters:\n"
+						+ "Base: " + base
+						+ "\nAlt: " + alt
+						+ "\nVolume: " +  volume
+						+ "\nExchange: " +  exchange
+						+ "\nPrice of Order: " + priceorder
+						+ "\nPercent: " + percent
+						+ "\nOrder Type: " + buystring + "\n--------------------------------------\n\n") ;
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
@@ -64,7 +80,7 @@ public class PendingOrder implements Runnable {
         try {
 			//int loop = Integer.parseInt(message.getString("loop"));
             while (orderplaced!=true && ordercanceled!=true) {
-            		System.out.println("Sending Order Request");
+            	person.addOrderData("\nRequesting price\n");
             		JSONObject jsonrun = this.json;
 					jsonrun.put("millis", System.currentTimeMillis());
             		OrdersPending.add(jsonrun);
@@ -86,39 +102,48 @@ public class PendingOrder implements Runnable {
 			&& (listitem.getString("alt").equals(message.getString("alt")))
 			&& (listitem.getString("request").equals(message.getString("request")))
 			&& (listitem.getString("volume").equals(message.getString("volume")))
-			&& (listitem.getString("priceorder").equals(message.getString("trail")))
-			&& (listitem.getString("percent").equals(message.getString("buysell")))
+			&& (listitem.getString("priceorder").equals(message.getString("priceorder")))
+			&& (listitem.getString("percent").equals(message.getString("percent")))
 			&& (listitem.getString("Exchanges").equals(message.getString("Exchanges")))
 			&& (listitem.getString("licenceKey").equals(message.getString("licenceKey")))
 			&& (listitem.getString("buysell").equals(message.getString("buysell")))
 			&& listitem.getLong("millisstart") == (message.getLong("millisstart"))
 			&& listitem.getLong("millis") == (message.getLong("millis"))) {
 				OrdersPending.remove(listitem);
+				person.addOrderData("Recieved price\n");
 				double price = Double.parseDouble(message.getString("price"));
-				
+				if (ordercanceled!=true) {
 				if (this.buy==true) { //Buying order
 					if((this.priceorder*(1+this.percent))>=price) { //Buying order activated
 						LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(this.volume), this.pair, null, null, new BigDecimal(this.priceorder));
 						System.out.println(BuyingOrder.toString());
 						this.orderplaced = true;
+						person.addOrderData("Trigger Price has been hit for buy order, order has been placed!\n-------------------------------------------\n Stopping Pending Order.");
 					} else {
-						System.out.println("Trigger Price for BUY is: "+ (this.priceorder*(1+this.percent)) + " which is lower than current price: " + price);
+						System.out.println("Trigger Price for BUY is: "+ (this.priceorder*(1+(0.01 * this.percent))) + " which is lower than current price: " + price + "\n");
+						person.addOrderData("Trigger Price is: "+ (this.priceorder*(1+(0.01*this.percent))) + ", lower than current price: " + price);
 					}
 				} else { //Selling order
 					if((this.priceorder*(1-this.percent))<=price) {  //Selling order activated
 						LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(this.volume), this.pair, null, null, new BigDecimal(this.priceorder));
 						System.out.println(SellingOrder.toString());
 						this.orderplaced = true;
+						person.addOrderData("Trigger Price has been hit for sell order, order has been placed!\n-------------------------------------------\n Stopping Pending Order.");
 					} else {
 						System.out.println("Trigger Price for SELL is: "+ (this.priceorder*(1-this.percent)) + " which is higher than current price: " + price);
+						person.addOrderData("Trigger Price is: "+ (this.priceorder*(1-this.percent)) + ", higher than current price: " + price + "\n");
 					}
+				  }
 				}
 			}
 		}
 	}
 	
-	public void cancelPendingOrder() {
+	public void stopOrder() {
 		System.out.println("cancelPendingOrder!!");
+		person.addOrderData("\nPending order has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Pending Order.");
 		this.ordercanceled = true;
 	}
+	
+	
 }
