@@ -3,6 +3,7 @@ import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
@@ -88,7 +89,12 @@ public class MarketController {
 		    	marketMaking.put("licenceKey", SocketCommunication.licencekey);
 		    	marketMaking.put("millisstart", System.currentTimeMillis());
 		    	marketMaking.put("request","marketMaking");
+		    	marketMaking.put("running","True");
+		    	Random rand = new Random(); 
+		    	int value = rand.nextInt(1000000000); 
+		    	marketMaking.put("orderid", value);
 		    	marketMaking.put("endtime","N/A");
+		    	marketMaking.put("cancel","False");
 		    	MarketMaking market = new MarketMaking(marketMaking);
 		    	marketMakingMap.put(marketMaking, market);
 		    	Thread t = new Thread(market);
