@@ -15,6 +15,9 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
+import controllers.DashboardController;
+import controllers.DashboardController.Person;
+
 public class MarketMaking implements Runnable {
 	ArrayList<JSONObject> OrdersMarketMaking = new ArrayList<JSONObject>();
 	
@@ -34,6 +37,8 @@ public class MarketMaking implements Runnable {
 	private String prevaskorder;
 	private boolean firstrun=true;
 	private double distancefrombest;
+	private Person person;
+	private int loop;
 	
 	public MarketMaking(JSONObject json) throws JSONException {
 		this.json = json;
@@ -42,6 +47,8 @@ public class MarketMaking implements Runnable {
 	@Override
 	public void run() {
 		try {
+	    	DashboardController dash = new DashboardController();
+	    	person = dash.newOrder(json);
 			this.base = this.json.getString("base");
 			this.alt = this.json.getString("alt");
 			this.pair = new CurrencyPair(this.base,this.alt);
@@ -49,21 +56,29 @@ public class MarketMaking implements Runnable {
 			this.MaxBal = Double.parseDouble(this.json.getString("MaxBal"));
 			this.MinBal = Double.parseDouble(this.json.getString("MinBal"));
 			this.exchange = Exchanges.exchangemap.get(this.json.getString("exchange"));
+			//this.loop = Integer.parseInt(this.json.getString("loop"));
+			person.addOrderData("Starting Market Making\n"
+					+ "\nParameters:\n"
+					+ "Base: " + base
+					+ "\nAlt: " + alt
+					+ "\nMin Spread " +  spread
+					+ "\nExchange: " +  this.json.getString("exchange")
+					+ "\nMax Balance " + MaxBal
+					+ "\nMin Balance: " + MinBal + "\n--------------------------------------\n\n") ;
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
         try {
-			//int loop = Integer.parseInt(message.getString("loop"));
-           
 			while (ordercanceled!=true) {
-            		System.out.println("Sending Market Making Request");
+            		person.addOrderData("Sending price request\n");
             		JSONObject jsonrun = this.json;
 					jsonrun.put("millis", System.currentTimeMillis());
 					OrdersMarketMaking.add(jsonrun);
                 	System.out.println(jsonrun);
                 	SocketCommunication.out.print(jsonrun.toString());
                 	SocketCommunication.out.flush();
-            	TimeUnit.SECONDS.sleep(60);
+            	TimeUnit.SECONDS.sleep(20);
             }
 		} catch (InterruptedException | JSONException e) {
 			e.printStackTrace();
@@ -88,9 +103,12 @@ public class MarketMaking implements Runnable {
 				OrdersMarketMaking.remove(listitem);
 				double bid = Double.parseDouble(message.getString("bid"));
 				double ask = Double.parseDouble(message.getString("ask"));
+				person.addOrderData("Bid: " + bid + "\nAsk: " + ask);
 				if (firstrun==true) {
+					person.addOrderData("\nPlacing buy order @ " + (bid+distancefrombest));
 					LimitOrder buyingorder = new LimitOrder((OrderType.BID), new BigDecimal(5), this.pair, null, null, new BigDecimal(bid+distancefrombest));
 					prevbidorder = exchange.getTradeService().placeLimitOrder(buyingorder);
+					person.addOrderData("\nPlacing sell order @ " + (ask-distancefrombest));
 					LimitOrder sellingorder  = new LimitOrder((OrderType.ASK), new BigDecimal(5), this.pair, null, null, new BigDecimal(ask-distancefrombest));
 					prevaskorder = exchange.getTradeService().placeLimitOrder(sellingorder);
 					prevbid = bid;
@@ -98,16 +116,22 @@ public class MarketMaking implements Runnable {
 				} else {
 					if (bid!=prevbid) {
 						exchange.getTradeService().cancelOrder(prevbidorder);
+						person.addOrderData("Canceled previous buy order\n");
 						LimitOrder buyingorder = new LimitOrder((OrderType.BID), new BigDecimal(5), this.pair, null, null, new BigDecimal(bid+distancefrombest));
+						person.addOrderData("\nPlacing buy order @ " + (bid+distancefrombest));
 						prevbidorder = exchange.getTradeService().placeLimitOrder(buyingorder);
 					} else {
+						person.addOrderData("Bid is equal to previous bid, not changing buying order\n");
 						System.out.println("Bid is equal to prevbid");
 					}
 					if (ask!=prevask) {
 						exchange.getTradeService().cancelOrder(prevaskorder);
+						person.addOrderData("Canceled previous sell order\n");
 						LimitOrder sellingorder  = new LimitOrder((OrderType.ASK), new BigDecimal(5), this.pair, null, null, new BigDecimal(ask-distancefrombest));
+						person.addOrderData("\nPlacing sell order @ " + (ask-distancefrombest));
 						prevaskorder = exchange.getTradeService().placeLimitOrder(sellingorder);
 					} else {
+						person.addOrderData("Ask is equal to previous ask, not changing selling order\n");
 						System.out.println("Ask is equal to prevask");
 					}
 				}

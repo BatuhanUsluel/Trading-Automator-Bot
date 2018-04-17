@@ -85,7 +85,7 @@ public class MarketController {
 		    	marketMaking.put("MaxBal", MaxBal);
 		    	marketMaking.put("MinBal", MinBal);
 		    	marketMaking.put("Exchanges", exchange);
-		    	marketMaking.put("licencekey", SocketCommunication.licencekey);
+		    	marketMaking.put("licenceKey", SocketCommunication.licencekey);
 		    	marketMaking.put("millisstart", System.currentTimeMillis());
 		    	marketMaking.put("request","marketMaking");
 		    	marketMaking.put("endtime","N/A");
