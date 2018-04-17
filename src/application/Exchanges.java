@@ -11,6 +11,7 @@ import java.util.Iterator;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.ExchangeFactory;
 import org.knowm.xchange.ExchangeSpecification;
 
 public class Exchanges {
@@ -81,9 +82,9 @@ public class Exchanges {
 			exSpec.setApiKey(apikey);
 			exSpec.setSecretKey(apisecret);
 			try {
-		    //Exchange ex = ExchangeFactory.INSTANCE.createExchange(exSpec);
+		    Exchange ex = ExchangeFactory.INSTANCE.createExchange(exSpec);
 			
-		    //exchangemap.put(key, ex);
+		    exchangemap.put(key, ex);
 		    System.out.println(key);
 		    list.add(key);
 		    //System.out.println(ex.getMarketDataService().getTicker(new CurrencyPair("ETH", "BTC")));

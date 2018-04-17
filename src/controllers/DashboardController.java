@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -10,8 +11,12 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.control.table.TableFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.knowm.xchange.exceptions.ExchangeException;
+import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
+import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
 import application.FxDialogs;
+import application.MarketMaking;
 import application.RemoveOrder;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -38,12 +43,26 @@ public class DashboardController {
     public void initialize(){
 		
         System.out.println("TEST!ASDADSA");
-        tableEnable();
+        try {
+			tableEnable();
+		} catch (NotAvailableFromExchangeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotYetImplementedForExchangeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExchangeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     @SuppressWarnings("unchecked")
 	@FXML
-	 private void tableEnable() {
+	 private void tableEnable() throws NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
 
 		System.out.println("TABLE2!");
 
@@ -162,6 +181,7 @@ public class DashboardController {
 	   	selectedrow.start();
 	   	
         //filter = new TableFilter<Person>(tableView);
+
 	}
     
     public static class Person {

@@ -20,6 +20,7 @@ import org.knowm.xchange.service.account.AccountService;
 import org.knowm.xchange.service.marketdata.MarketDataService;
 
 import controllers.DashboardController;
+import controllers.DashboardController.Person;
 
 public class ArbitrageOrder implements Runnable{
 	private Currency base;
@@ -30,7 +31,7 @@ public class ArbitrageOrder implements Runnable{
 	private boolean ordercanceled;
 	private CurrencyPair pair;
 	private int exchangesize;
-	
+	private Person person;
 	public ArbitrageOrder(String base, String alt, String minarb, List<Exchange> exchanges, JSONObject json) throws JSONException {
 		this.base= new Currency(base);
 		this.alt= new Currency(alt);
@@ -45,7 +46,14 @@ public class ArbitrageOrder implements Runnable{
 	public void run() {
 		DashboardController dash = new DashboardController();
     	try {
-			dash.newOrder(json);
+			person = dash.newOrder(json);
+	
+	    	person.addOrderData("Starting Market Making\n"
+					+ "\nParameters:"
+					+ "\nBase: " + base
+					+ "\nAlt: " + alt
+					+ "\nMin Arbitrage " +  minarb
+					+ "\nExchange: " +  this.json.getString("Exchanges") + "\n--------------------------------------\n\n") ;
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}

@@ -9,6 +9,7 @@ import com.jfoenix.controls.JFXCheckBox;
 
 import application.Exchanges;
 import application.Main;
+import application.MarketMaking;
 import application.SocketCommunication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -62,6 +63,7 @@ public class Controller {
     @SuppressWarnings("unchecked")
     private void DashBoard(ActionEvent event) throws IOException
     {
+	   	MarketMaking.testtheMarket();
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/home.fxml"));
 		mainView.setCenter(loader.load());
 		System.out.println("TABLE1!");

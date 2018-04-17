@@ -183,7 +183,10 @@ public class SocketCommunication {
 										e.printStackTrace();
 						           } catch (JSONException e) {
 										e.printStackTrace();
-									}
+									} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 						          }
 						    	});
 				    	t.start();
