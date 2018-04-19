@@ -31,32 +31,9 @@ public class SocketCommunication {
 	public static Socket socket;
 	static String server="localhost";
 	static int port=8888;
-    private static boolean tryToReconnect = true;
-    private static Thread heartbeatThread;
-    private static long heartbeatDelayMillis = 5000;
 	public static void setup() throws UnknownHostException, IOException{
 		connect(server,port);
         listen();
-        /*
-        heartbeatThread = new Thread() {
-            public void run() {
-                while (tryToReconnect) {
-                    //send a test signal
-                    try {
-                        socket.getOutputStream().write(1);
-                        sleep(heartbeatDelayMillis);
-                    } catch (InterruptedException e) {
-                    	tryToReconnect=false;
-                    } catch (IOException e) {
-                        //logger.warn("Server is offline");
-                    	System.out.println("Server is offline, retrying connection");
-                        connect(server, port);
-                    }
-                }
-            };
-        };
-        heartbeatThread.start();
-        */
         System.out.println("Done");
     }
     
@@ -188,7 +165,6 @@ public class SocketCommunication {
 						try {
 							TimeUnit.SECONDS.sleep(2);
 						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 						e.printStackTrace();

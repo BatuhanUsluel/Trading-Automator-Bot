@@ -328,8 +328,8 @@ public class MarketMaking implements Runnable {
 							person.addOrderData("\nNot changing buy order");
 						}
 						
-						if (ask2+distancefrombest<(prevsellprice.doubleValue())) {
-							person.addOrderData("\nSell order price is too high, canceling and placing new order");
+						if (ask2-distancefrombest>(prevsellprice.doubleValue())) {
+							person.addOrderData("\nSell order price is too low, canceling and placing new order");
 							BigDecimal SellPrice = new BigDecimal(ask2-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
 							BigDecimal SellVolume = balancesU.altBalance.multiply(new BigDecimal(0.99));
 							prevsellprice = SellPrice;
@@ -340,8 +340,8 @@ public class MarketMaking implements Runnable {
 							} else {
 								person.addOrderData("Order size for sell too low");
 							}
-						} else if (ask2+distancefrombest>(prevsellprice.doubleValue())) {
-							person.addOrderData("\nSell order price is too low, canceling and placing new order");
+						} else if (ask2-distancefrombest<(prevsellprice.doubleValue())) {
+							person.addOrderData("\nSell order price is too high, canceling and placing new order");
 							BigDecimal SellPrice = new BigDecimal(ask1-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
 							BigDecimal SellVolume = balancesU.altBalance.multiply(new BigDecimal(0.99));
 							prevsellprice = SellPrice;
