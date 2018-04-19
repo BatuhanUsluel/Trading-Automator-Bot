@@ -166,15 +166,16 @@ public class DashboardController {
 	   	Thread selectedrow = new Thread() {
 	   	    public void run() {
 	   	    	while(true) {
-	   	    	Person person = tableView.getSelectionModel().getSelectedItem();
-	   	    	if (person!=null) {
-	   	    		textArea.setText(person.getOrderData());
-	   	    	}
-	   	    	try {
-					TimeUnit.SECONDS.sleep(2);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+		   	    	Person person = tableView.getSelectionModel().getSelectedItem();
+		   	    	if (person!=null) {
+		   	    		textArea.setText(person.getOrderData());
+		   	    		textArea.setScrollTop(Double.MAX_VALUE);
+		   	    	}
+		   	    	try {
+						TimeUnit.SECONDS.sleep(2);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 	   	    }
 	   	    }
 	   	};

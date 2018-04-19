@@ -113,11 +113,14 @@ public class MarketController {
 	    	FxDialogs.showError(null, finalString);
 	    }
 	}
-	public static void cancelPendingOrder(String orderid) {
+	public static void cancelMarketOrder(String orderid) {
+		System.out.println("Cancel market order");
 		for (Map.Entry<JSONObject, MarketMaking> entry : marketMakingMap.entrySet()) {
 		    JSONObject key = entry.getKey();
 			try {
+				System.out.println("Order1: " + key.getInt("orderid") + " Order2: " + java.lang.Integer.parseInt(orderid));
 				if (key.getInt("orderid") == java.lang.Integer.parseInt(orderid)) {
+					System.out.println("They are equal!");
 					MarketMaking value = entry.getValue();
 					value.stopOrder();
 				}

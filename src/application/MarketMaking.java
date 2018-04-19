@@ -254,14 +254,14 @@ public class MarketMaking implements Runnable {
 							prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
 							prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
 						} else {
-							person.addOrderData("Order size for buy too low");
+							person.addOrderData("\nOrder size for buy too low");
 						}
 						if (SellVolume.doubleValue()>0.000001) {
 							person.addOrderData("\nAsk1: " + ask1 + " Ask2: " + ask2 + "\nPlacing sell order @ " + SellPrice  + "with volume: " + SellVolume);
 							prevaskorderlimit  = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
 							prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
 						} else {
-							person.addOrderData("Order size for sell too low");
+							person.addOrderData("\nOrder size for sell too low");
 						}
 						firstrun=false;
 						person.addOrderData("\nFirst run= " + firstrun);
@@ -296,7 +296,7 @@ public class MarketMaking implements Runnable {
 						}
 						
 						if (wait==true) {
-							person.addOrderData("Waiting to make sure orders are canceled");
+							person.addOrderData("\nWaiting to make sure orders are canceled");
 							TimeUnit.MILLISECONDS.sleep(2000);
 						}
 						
