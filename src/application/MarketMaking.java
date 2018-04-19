@@ -403,6 +403,14 @@ public class MarketMaking implements Runnable {
 		System.out.println("cancel Market Making order!!!");
 		person.addOrderData("\nMarket Making has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Market Making.");
 		this.ordercanceled = true;
+		try {
+			tradeExchange.cancelOrder(prevbidorder);
+			tradeExchange.cancelOrder(prevaskorder);
+		} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException | ExchangeException
+				| IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		JSONObject jsoncancel = this.json;
 		try {
 			jsoncancel.put("cancel","True");
