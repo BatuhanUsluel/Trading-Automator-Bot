@@ -63,7 +63,6 @@ public class Controller {
     @SuppressWarnings("unchecked")
     private void DashBoard(ActionEvent event) throws IOException
     {
-	   	MarketMaking.testtheMarket();
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/home.fxml"));
 		mainView.setCenter(loader.load());
 		System.out.println("TABLE1!");

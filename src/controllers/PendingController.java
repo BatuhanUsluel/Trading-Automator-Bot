@@ -127,7 +127,7 @@ public class PendingController {
     }
 	
 	public static void cancelPendingOrder(String orderid) {
-		for (Entry<JSONObject, PendingOrder> entry : PendingOrderMap.entrySet()) {
+		for (Map.Entry<JSONObject, PendingOrder> entry : PendingOrderMap.entrySet()) {
 		    JSONObject key = entry.getKey();
 			try {
 				if (key.getInt("orderid") == java.lang.Integer.parseInt(orderid)) {

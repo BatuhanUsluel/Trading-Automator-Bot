@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Map;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
@@ -35,6 +36,11 @@ public class MarketController {
     public void initialize(){
         List<String> list = new ArrayList<String>(Exchanges.list);
         ExchangeMM.getItems().addAll(list);
+        try {
+			MarketMaking.testtheMarket();
+		} catch (java.lang.Exception e) {
+			e.printStackTrace();
+		}
     }
 	
 	public void marketMaking(ActionEvent event)  throws JSONException {
@@ -106,5 +112,19 @@ public class MarketController {
 		    String finalString = stringBuilder.toString();
 	    	FxDialogs.showError(null, finalString);
 	    }
+	}
+	public static void cancelPendingOrder(String orderid) {
+		for (Map.Entry<JSONObject, MarketMaking> entry : marketMakingMap.entrySet()) {
+		    JSONObject key = entry.getKey();
+			try {
+				if (key.getInt("orderid") == java.lang.Integer.parseInt(orderid)) {
+					MarketMaking value = entry.getValue();
+					value.stopOrder();
+				}
+			} catch (java.lang.Exception e) {
+				e.printStackTrace();
+			}
+
+	}
 	}
 }
