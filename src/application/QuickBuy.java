@@ -26,7 +26,7 @@ import controllers.DashboardController.Person;
 
 import  java.lang.Long;
 public class QuickBuy {
-	static HashMap<Integer, Person> hmap = new HashMap<Integer, Person>();
+	static HashMap<java.lang.Integer, Person> hmap = new HashMap<java.lang.Integer, Person>();
 	private static List<JsonObject> myList = new ArrayList<>();
 	public static void recievedQuickBuyMessage(JSONObject message) throws JSONException {
 		System.out.println("Recieved quickbuy");

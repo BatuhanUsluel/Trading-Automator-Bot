@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,51 +28,42 @@ public class SocketCommunication {
 	public static PrintWriter out;
 	public static String licencekey = ("5718570290571");
 	private static BufferedReader stdIn;
+	public static Socket socket;
+	static String server="localhost";
+	static int port=8888;
+    private static boolean tryToReconnect = true;
+    private static Thread heartbeatThread;
+    private static long heartbeatDelayMillis = 5000;
 	public static void setup() throws UnknownHostException, IOException{
-    	Socket socket = new Socket("localhost",8888);
-        BufferedReader stdIn =new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        SocketCommunication.out = out;
-        SocketCommunication.stdIn = stdIn;
+		connect(server,port);
         listen();
-        System.out.println("Done");    
-            	/*Request Types:
-            	 * 
-            	 * QuickPrice(returns ask, only 1 exchange, single time)
-            	 * 		Example: ("{\"Coin\":\"ETH\",\"Exchanges\":\"bittrex\",\"request\":\"QuickPrice\",\"cancel\":\"False\",\"licenceKey\":\"752175198Afs25\"}");
-            	 * 
-            	 * Historic(Retruns historic OHLCV, 1 exchange, single time)
-            	 * 		Example: ("{\"Coin\":\"ETH\",\"Exchanges\":\"bittrex\",\"request\":\"Historic\",\"cancel\":\"False\",\"licenceKey\":\"752175198Afs25\", \"Historic\":{\"StartTime\": \"2018-01-01 00:00:00\", \"Timeframe\":\"1h\", \"Index\":4}}");
-            	 * 
-            	 * BidAsk(Returns bid, ask & sizes of each, multiple exchanges, repeating every 5 seconds(subsription system))
-            	 * 		Example: String decredrequest= ("{\"Coin\":\"DCR\",\"Exchanges\":[\"bittrex\",\"poloniex\"],\"request\":\"BidAsk\",\"cancel\":\"False\",\"licenceKey\":\"752175198Afs25\"}");
-            	 * 
-            	 * Canceling a Request(Send same exact request, but with cancel being true)
-            	 * 		Example: String decredcancel = ("{\"Coin\":\"DCR\",\"Exchanges\":[\"bittrex\", \"poloniex\"],\"request\":\"BidAsk\",\"cancel\":\"True\",\"licenceKey\":\"752175198Afs25\"}");
-            	 */
-    		    
-                	/* Historical:
-                	 * 	0: UTC timestamp in milliseconds, integer
-                	 *  1: (O)pen price, float
-                	 *  2: (H)ighest price, float
-                	 *  3: (L)owest price, float
-                	 *  4: (C)losing price, float
-                	 *  5: (V)olume (in terms of the base currency), float
-                	 *  Example: ("{\"Coin\":\"ETH\",\"Exchanges\":\"bittrex\",\"request\":\"Historic\",\"cancel\":\"False\",\"licenceKey\":\"752175198Afs25\", \"Historic\":{\"StartTime\": \"2018-01-01 00:00:00\", \"Timeframe\":\"1h\", \"Index\":4}}");
-                	 */
+        /*
+        heartbeatThread = new Thread() {
+            public void run() {
+                while (tryToReconnect) {
+                    //send a test signal
+                    try {
+                        socket.getOutputStream().write(1);
+                        sleep(heartbeatDelayMillis);
+                    } catch (InterruptedException e) {
+                    	tryToReconnect=false;
+                    } catch (IOException e) {
+                        //logger.warn("Server is offline");
+                    	System.out.println("Server is offline, retrying connection");
+                        connect(server, port);
+                    }
+                }
+            };
+        };
+        heartbeatThread.start();
+        */
+        System.out.println("Done");
     }
     
 	//Not done
     public static void sendHistoricalRequest(String coin, String exchange, String starttime, String timeframe, int index) {
     	String historicalrequest = ("{\"Coin\":\"" + coin + "\",\"Exchanges\":\"" + exchange + "\",\"request\":\"Historic\",\"licenceKey\":\"" + licencekey + "\", \"Historic\":{\"StartTime\": \"" + starttime + "\", \"Timeframe\":\"" + timeframe + "\", \"Index\":" + index + "}}");
     	out.print(historicalrequest);
-        out.flush();
-    }
-    
-    //Not done
-    public static void sendBidAskRequest(String coin, String[] exchanges, boolean cancel) {
-    	String bidaskrequest = ("{\"Coin\":\"" + coin + "\",\"Exchanges\":\"" + exchanges + "\",\"request\":\"BidAsk\",\"cancel\":\"False\",\"licenceKey\":\"" + licencekey + "\"}");
-    	out.print(bidaskrequest);
         out.flush();
     }
     
@@ -192,8 +184,14 @@ public class SocketCommunication {
 				    	t.start();
 					} catch (SocketException e) {
 						System.out.println("Socket Exception");
+						connect(server, port);
+						try {
+							TimeUnit.SECONDS.sleep(2);
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						e.printStackTrace();
-						x = false;
 					} catch (IOException e3) {
 						e3.printStackTrace();
 					}
@@ -203,4 +201,15 @@ public class SocketCommunication {
     t.start();
     }
     
+    private static void connect(String server, int port){
+        try {
+            socket = new Socket(server, port);
+            stdIn =new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+        } catch (UnknownHostException e) {
+
+        } catch (IOException e) {
+
+        }
+    }
 }

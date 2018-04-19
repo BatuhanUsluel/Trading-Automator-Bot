@@ -59,7 +59,7 @@ public class AverageTrading  implements Runnable  {
 		}
     	
         try {
-			this.loop = Integer.parseInt(json.getString("loop"));
+			this.loop = java.lang.Integer.parseInt(json.getString("loop"));
 			this.total = 0;
 			this.coinstotrade = Double.parseDouble(json.getString("coinstotrade"));
 			this.base = json.getString("base");
