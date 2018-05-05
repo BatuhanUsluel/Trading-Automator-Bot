@@ -75,6 +75,10 @@ public class ArbitrageController {
     		noerror=false;
     		stringBuilder.append(MinArbitrage + " is not a valid number(MinArbitrage).\n");
     	}
+    	if (exchanges.size()<1) {
+    		noerror=false;
+    		stringBuilder.append("Must have atleast 2 exchanges selected for arbitrage\n");
+    	}
     	if (noerror==true) {
 			JSONObject arbitrageJSON = new JSONObject();
 			arbitrageJSON.put("base", base);

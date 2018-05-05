@@ -32,6 +32,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
 import javafx.util.Callback;
 
 public class DashboardController {
@@ -148,10 +149,10 @@ public class DashboardController {
         TextArea textArea = new TextArea();
 	   	pane.setMasterNode(tableView);
 	   	pane.setDetailNode(textArea);
+	   	textArea.setFont(Font.font ("Courier New", 15));
 	   	pane.setDetailSide(Side.RIGHT);
 	   	pane.setShowDetailNode(true);
 	    pane.setDividerPosition(0.64);
-	   	
 	   	tableView.setRowFactory(tv -> {
             TableRow<Person> row = new TableRow<>();
             row.setOnMouseClicked(event -> {

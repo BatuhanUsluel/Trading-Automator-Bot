@@ -1,4 +1,5 @@
 package application;
+import java.io.IOException;
 import  java.lang.Double;
 import java.lang.Thread;
 import java.math.BigDecimal;
@@ -28,7 +29,7 @@ import  java.lang.Long;
 public class QuickBuy {
 	static HashMap<java.lang.Integer, Person> hmap = new HashMap<java.lang.Integer, Person>();
 	private static List<JsonObject> myList = new ArrayList<>();
-	public static void recievedQuickBuyMessage(JSONObject message) throws JSONException {
+	public static void recievedQuickBuyMessage(JSONObject message) throws JSONException, IOException {
 		System.out.println("Recieved quickbuy");
 		System.out.println(myList.toString());
 		for (int i = 0; i < myList.size(); i++) {
@@ -53,7 +54,9 @@ public class QuickBuy {
 				LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN));
 				person.addOrderData("Placing buy order for " + btcvolume + (listitem.getString("base")) + "(" + new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN) + (listitem.getString("alt")) + ") @ price: " + new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN) + "\n");
 				person.addOrderData(BuyingOrder.toString());
-				//String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+				if (btcvolume>0.0001) {
+					String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+				}
 			} else {
 				System.out.println("Values don't match!!");
 			}

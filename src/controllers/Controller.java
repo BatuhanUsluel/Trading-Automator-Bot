@@ -8,6 +8,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 
 import application.Exchanges;
+import application.FxDialogs;
 import application.Main;
 import application.MarketMaking;
 import application.SocketCommunication;
@@ -81,6 +82,13 @@ public class Controller {
         SocketCommunication.setup();
     }
 
+    public static void connectionError() {
+    	FxDialogs.showError("Connection Error", "Error connecting to server, retrying every 2 seconds");
+    }
+    
+    public static void connected() {
+    	FxDialogs.showInformation("Connected", "Succesfully connected to server");
+    }
 }
 
 

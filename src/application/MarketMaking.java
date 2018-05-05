@@ -204,6 +204,8 @@ public class MarketMaking implements Runnable {
 				double bid2 = Double.parseDouble((message.getJSONObject("Returned").getString("Bid2")));
 				final balancesU balancesU = new balancesU();
 				ArrayList<Thread> arrThreads = new ArrayList<Thread>();
+				//CHANGE BALANCE:
+				//GET BALANCE 4 SECONDS AFTER THE PRICE COMES AND SAVE IT IN THE BALANCE OBJECT WITH THE LONG TIME IN MILIS. THEN GET THE BALANCE FROM THERE WHILE TRADING SO THAT YOU HAVE NEW PRICE WITHOUT HAVING TO WAIT FOR IT ONCE AGAIN.
 				Thread baseBalance = new Thread() {
     	    	    public void run() {
     	    	    	try {
@@ -249,14 +251,14 @@ public class MarketMaking implements Runnable {
 						person.addOrderData("\nFirst run");
 						prevbuyprice = BuyPrice;
 						prevsellprice = SellPrice;
-						if (BuyVolume.doubleValue()>0.000001) {
+						if (BuyVolume.doubleValue()>0.0001) {
 							person.addOrderData("\nBid1: " + bid1 + " Bid2: " + bid2 + "\nPlacing buy order @ " + BuyPrice + "with volume: " + BuyVolume);
 							prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
 							prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
 						} else {
 							person.addOrderData("\nOrder size for buy too low");
 						}
-						if (SellVolume.doubleValue()>0.000001) {
+						if (SellVolume.doubleValue()>0.0001) {
 							person.addOrderData("\nAsk1: " + ask1 + " Ask2: " + ask2 + "\nPlacing sell order @ " + SellPrice  + "with volume: " + SellVolume);
 							prevaskorderlimit  = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
 							prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
@@ -286,7 +288,7 @@ public class MarketMaking implements Runnable {
 							}
 							wait=true;
 						}
-						if((ask2+distancefrombest<(prevsellprice.doubleValue()) || (ask2+distancefrombest>(prevsellprice.doubleValue())))) {
+						if((ask2-distancefrombest>(prevsellprice.doubleValue())) || (ask2-distancefrombest<(prevsellprice.doubleValue()))) {
 							try {
 								tradeExchange.cancelOrder(prevaskorder);
 							} catch (Exception e) {
@@ -305,7 +307,7 @@ public class MarketMaking implements Runnable {
 							BigDecimal BuyPrice = new BigDecimal(bid2+distancefrombest).setScale(8, RoundingMode.HALF_UP);
 							BigDecimal BuyVolume = (balancesU.baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN)).multiply(new BigDecimal(0.99));
 							prevbuyprice = BuyPrice;
-							if (BuyVolume.doubleValue()>0.000001) {
+							if (BuyVolume.doubleValue()>0.0001) {
 								prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
 								person.addOrderData("Placed buy order @ " + BuyPrice + "for volume: " + BuyVolume);
 								prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
@@ -317,7 +319,7 @@ public class MarketMaking implements Runnable {
 							BigDecimal BuyPrice = new BigDecimal(bid1+distancefrombest).setScale(8, RoundingMode.HALF_UP);
 							BigDecimal BuyVolume = (balancesU.baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN)).multiply(new BigDecimal(0.99));
 							prevbuyprice = BuyPrice;
-							if (BuyVolume.doubleValue()>0.000001) {
+							if (BuyVolume.doubleValue()>0.0001) {
 								prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, new BigDecimal(bid1+distancefrombest));
 								person.addOrderData("\nPlaced buy order @ " + BuyPrice + "for volume: " + BuyVolume);
 								prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
@@ -333,7 +335,7 @@ public class MarketMaking implements Runnable {
 							BigDecimal SellPrice = new BigDecimal(ask2-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
 							BigDecimal SellVolume = balancesU.altBalance.multiply(new BigDecimal(0.99));
 							prevsellprice = SellPrice;
-							if (SellVolume.doubleValue()>0.000001) {
+							if (SellVolume.doubleValue()>0.0001) {
 								prevaskorderlimit = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
 								person.addOrderData("\nPlaced sell order @ " + SellPrice + "for volume: " + SellVolume);
 								prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
@@ -345,7 +347,7 @@ public class MarketMaking implements Runnable {
 							BigDecimal SellPrice = new BigDecimal(ask1-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
 							BigDecimal SellVolume = balancesU.altBalance.multiply(new BigDecimal(0.99));
 							prevsellprice = SellPrice;
-							if (SellVolume.doubleValue()>0.000001) {
+							if (SellVolume.doubleValue()>0.0001) {
 								prevaskorderlimit = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
 								person.addOrderData("\nPlaced sell order @ " + SellPrice + "for volume: " + SellVolume);
 								prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);

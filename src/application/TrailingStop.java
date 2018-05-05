@@ -38,7 +38,7 @@ public class TrailingStop {
 				DashboardController dash = new DashboardController();
 	        	try {
 					person = dash.newOrder(message);
-					person.addOrderData("Starting Trailing Stop\nParameters:\nBase: " + message.getString("base") + "\nAlt: " + message.getString("alt") + "\nVolume: " +  message.getString("volume") + "\nExchange: " +  message.getString("Exchanges") + "\nTrail: " + message.getString("trail") + "\nOrder Type: " + message.getString("buysell") + "\n--------------------------------------\n\n");
+					person.addOrderData("Starting Trailing Stop\n" + String.format("%-10s:%10s\n","Base",message.getString("base")) + String.format("%-10s:%10s\n","Alt",message.getString("alt")) + String.format("%-10s:%10s\n","Volume", message.getString("volume")) + String.format("%-10s:%10s\n","Exchange", message.getString("Exchanges")) + String.format("%-10s:%10s\n","Trail", message.getString("trail")) + String.format("%-10s:%10s\n","Order Type",message.getString("buysell")) + "--------------------------------------\n");
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -103,7 +103,7 @@ public class TrailingStop {
 						person.addOrderData("First run\nCurrent price: " + price + "\nPlacing Buy Order @ " + round((price+trail),6) + "\n");
 						LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
 						System.out.println(LastOrder);
-						//lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
+						lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
 						prevprice = price;
 					} else {
 						person.addOrderData("First run\nCurrent price: " + price + "\nSell order price: " + round((price-trail),6) +"\n");
@@ -123,9 +123,9 @@ public class TrailingStop {
 								person.addOrderData("Changing price of buy. New order @ " + price+trail + "\n");
 								person.addOrderData("Price has decreased. Changing price of buy.\nPrevious Lowest Price: " + prevprice + "\nCurrent lowest price: " + price + "\nNew buy order price: " + (price+trail) + "\n");
 								System.out.println("---------------------------CHANGING BUY----------------------");
-								//exchange.getTradeService().cancelOrder(lastorder);
+								exchange.getTradeService().cancelOrder(lastorder);
 								LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
-								//lastorder = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+								lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
 								System.out.println("Price:" + price);
 								System.out.println("PrevPrice: " +prevprice);
 								prevprice = price;
@@ -146,7 +146,7 @@ public class TrailingStop {
 							System.out.println("---------------------------SELLING!!!----------------------");
 							LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
 							System.out.println(SellingOrder);
-							//lastorder = exchange.getTradeService().placeLimitOrder(SellingOrder);
+							lastorder = exchange.getTradeService().placeLimitOrder(SellingOrder);
 							run=false;
 						} else {
 							person.addOrderData("Price hasn't increased.\nHighest price: " + prevprice + "\nCurrent price: " + price + "\nSell order price: " + round((prevprice-trail),6) + "\n");
@@ -160,7 +160,7 @@ public class TrailingStop {
 		}		
 	}
 	public void stopOrder() {
-		person.addOrderData("\nTrailing Stop order has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Trailing Stop.");
+		person.addOrderData("\nTrailing Stop order has been manually stopped from dashboard.\n-------------------------------------------\n Stopping Trailing Stop.");
 		run=false;
 	}
 	public static double round(double value, int places) {

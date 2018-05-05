@@ -17,6 +17,7 @@ import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
 import controllers.AveragetradingController;
+import controllers.Controller;
 import controllers.MarketController;
 import controllers.PendingController;
 import controllers.TrailingController;
@@ -52,6 +53,7 @@ public class SocketCommunication {
             	while (x == true){
         			String message;
 					try {
+						
 						message = stdIn.readLine();
 				    	Thread t = new Thread(new Runnable() {
 				            public void run() {
@@ -187,5 +189,6 @@ public class SocketCommunication {
         } catch (IOException e) {
 
         }
+        
     }
 }
