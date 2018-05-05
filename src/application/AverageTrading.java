@@ -76,13 +76,13 @@ public class AverageTrading  implements Runnable  {
 				System.out.println("error!");
 			}
 			person.addOrderData("Starting Average Trading\n"
-					+ String.format("%-10s:%10s\n","Base: ", base)
-					+ String.format("%-10s:%10s\n","Alt: ", alt)
-					+ String.format("%-10s:%10s\n","Loop Time: ", loop)
-					+ String.format("%-10s:%10s\n","Exchange: ", exchangestring)
-					+ String.format("%-10s:%10s\n","Coins to Trade: ", coinstotrade)
-					+ String.format("%-10s:%10s\n","Volume Per Order: ", volume)
-					+ String.format("%-10s:%10s\n","Order Type: ", buystring)
+					+ String.format("%-10s:%10s\n","Base", base)
+					+ String.format("%-10s:%10s\n","Alt", alt)
+					+ String.format("%-10s:%10s\n","Loop Time", loop)
+					+ String.format("%-10s:%10s\n","Exchange", exchangestring)
+					+ String.format("%-10s:%10s\n","Coins to Trade", coinstotrade)
+					+ String.format("%-10s:%10s\n","Volume Per Order", volume)
+					+ String.format("%-10s:%10s\n","Order Type", buystring)
 					+ "--------------------------------------\n") ;
 			
             while (run==true && ordercanceled!=true) {

@@ -38,7 +38,14 @@ public class TrailingStop {
 				DashboardController dash = new DashboardController();
 	        	try {
 					person = dash.newOrder(message);
-					person.addOrderData("Starting Trailing Stop\n" + String.format("%-10s:%10s\n","Base",message.getString("base")) + String.format("%-10s:%10s\n","Alt",message.getString("alt")) + String.format("%-10s:%10s\n","Volume", message.getString("volume")) + String.format("%-10s:%10s\n","Exchange", message.getString("Exchanges")) + String.format("%-10s:%10s\n","Trail", message.getString("trail")) + String.format("%-10s:%10s\n","Order Type",message.getString("buysell")) + "--------------------------------------\n");
+					person.addOrderData("Starting Trailing Stop\n"
+					+ String.format("%-10s:%10s\n","Base",message.getString("base"))
+					+ String.format("%-10s:%10s\n","Alt",message.getString("alt"))
+					+ String.format("%-10s:%10s\n","Volume", message.getString("volume"))
+					+ String.format("%-10s:%10s\n","Exchange", message.getString("Exchanges"))
+					+ String.format("%-10s:%10s\n","Trail", message.getString("trail"))
+					+ String.format("%-10s:%10s\n","Order Type",message.getString("buysell"))
+					+ "--------------------------------------\n");
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}

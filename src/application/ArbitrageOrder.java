@@ -46,10 +46,10 @@ public class ArbitrageOrder implements Runnable{
 			person = dash.newOrder(json);
 	
 	    	person.addOrderData("Starting Arbitrage\n"
-					+ String.format("%-10s:%10s\n","Base: ", base)
-					+ String.format("%-10s:%10s\n","Alt: ", alt)
-					+ String.format("%-10s:%10s\n","Min Arbitrage ", minarb)
-					+ String.format("%-10s:%10s\n","Exchange: ", this.json.getString("Exchanges"))
+					+ String.format("%-10s:%10s\n","Base", base)
+					+ String.format("%-10s:%10s\n","Alt", alt)
+					+ String.format("%-10s:%10s\n","Min Arbitrage", minarb)
+					+ String.format("%-10s:%10s\n","Exchange", this.json.getString("Exchanges"))
 					+ "--------------------------------------\n") ;
 		} catch (JSONException e1) {
 			e1.printStackTrace();
