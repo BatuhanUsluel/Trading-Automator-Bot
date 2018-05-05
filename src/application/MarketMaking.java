@@ -135,13 +135,12 @@ public class MarketMaking implements Runnable {
 			this.tradeExchange = exchange.getTradeService();
 			//this.loop = Integer.parseInt(this.json.getString("loop"));
 			person.addOrderData("Starting Market Making\n"
-					+ "\nParameters:\n"
-					+ "Base: " + base
-					+ "\nAlt: " + alt
-					+ "\nMin Spread " +  spread
-					+ "\nExchange: " +  this.json.getString("Exchanges")
-					+ "\nMax Balance " + MaxBal
-					+ "\nMin Balance: " + MinBal + "\n--------------------------------------\n\n") ;
+					+ String.format("%-10s:%10s\n","Base", base)
+					+ String.format("%-10s:%10s\n","Alt", alt)
+					+ String.format("%-10s:%10s\n","Min Spread", spread)
+					+ String.format("%-10s:%10s\n","Exchange", this.json.getString("Exchanges"))
+					+ String.format("%-10s:%10s\n","Max Balance", MaxBal)
+					+ String.format("%-10s:%10s\n","Min Balance", MinBal) + "--------------------------------------\n") ;
 			
 		} catch (JSONException e) {
 			e.printStackTrace();

@@ -56,17 +56,16 @@ public class FillOrderBook {
 		Person person = null;
     	try {
 			person = dash.newOrder(fillorderJSON);
-			person.addOrderData("Running Quick Buy"
-					+ "\nParameters:"
-					+ "\nBase: " + base
-					+ "\nAlt: " + alt
-					+ "\nStart Price: " + startpriceS
-					+ "\nEnd Price: " + endpriceS
-					+ "\nBalance Used: " + balanceusedS
-					+ "\nNumber of Orders: " + noofordersS
-					+ "\nOrder Type: " + buysell
-					+ "\nExchange: " + exchangeS
-					+ "\n--------------------------------------\n\n");			
+			person.addOrderData("Running Quick Buy\n"
+					+ String.format("%-10s:%10s\n","Base: ", base)
+					+ String.format("%-10s:%10s\n","Alt: ", alt)
+					+ String.format("%-10s:%10s\n","Start Price: ", startpriceS)
+					+ String.format("%-10s:%10s\n","End Price: ", endpriceS)
+					+ String.format("%-10s:%10s\n","Balance Used: ", balanceusedS)
+					+ String.format("%-10s:%10s\n","Number of Orders: ", noofordersS)
+					+ String.format("%-10s:%10s\n","Order Type: ", buysell)
+					+ String.format("%-10s:%10s\n","Exchange: ", exchangeS)
+					+ "--------------------------------------\n");			
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}

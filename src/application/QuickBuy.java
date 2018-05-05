@@ -106,13 +106,12 @@ public class QuickBuy {
     	try {
 			Person person = dash.newOrder(new JSONObject(quickpricelistadd.toString()));
 			addtolist(quickpricelistadd,person);
-			person.addOrderData("Running Quick Buy"
-					+ "\nParameters:"
-					+ "\nBase: " + base
-					+ "\nAlt: " + alt
-					+ "\nVolume: " + btcvolume
-					+ "\nBuy Percent: " + buypercent
-					+ "\nExchange: " + Exchanges + "\n--------------------------------------\n\n");			
+			person.addOrderData("Running Quick Buy\n"
+					+ String.format("%-10s:%10s\n","Base",base)
+					+ String.format("%-10s:%10s\n","Alt", alt)
+					+ String.format("%-10s:%10s\n","Volume", btcvolume)
+					+ String.format("%-10s:%10s\n","Buy Percent", buypercent)
+					+ String.format("%-10s:%10s\n","Exchange", Exchanges) + "--------------------------------------\n");			
 			
 		} catch (JSONException e1) {
 			e1.printStackTrace();

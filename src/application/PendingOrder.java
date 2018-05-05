@@ -61,15 +61,14 @@ public class PendingOrder implements Runnable {
 			this.buy = buy;
 	    	try {
 				person = dash.newOrder(json);
-				person.addOrderData("Starting Trailing Stop"
-						+ "\nParameters:\n"
-						+ "Base: " + base
-						+ "\nAlt: " + alt
-						+ "\nVolume: " +  volume
-						+ "\nExchange: " +  exchange
-						+ "\nPrice of Order: " + priceorder
-						+ "\nPercent: " + percent
-						+ "\nOrder Type: " + buystring + "\n--------------------------------------\n\n") ;
+				person.addOrderData("Starting Pending Stop\n"
+						+ String.format("%-10s:%10s\n","Base", base)
+						+ String.format("%-10s:%10s\n","Alt", alt)
+						+ String.format("%-10s:%10s\n","Volume", volume)
+						+ String.format("%-10s:%10s\n","Exchange", exchange)
+						+ String.format("%-10s:%10s\n","Price of Order", priceorder)
+						+ String.format("%-10s:%10s\n","Percent", percent)
+						+ String.format("%-10s:%10s\n","Order Type", buystring) + "--------------------------------------\n") ;
 			} catch (JSONException e1) {
 				e1.printStackTrace();
 			}
