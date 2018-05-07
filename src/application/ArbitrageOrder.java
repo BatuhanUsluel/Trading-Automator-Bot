@@ -91,7 +91,6 @@ public class ArbitrageOrder implements Runnable{
 						        } 
 							} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
 									| ExchangeException | IOException | InterruptedException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 		    	    	}
@@ -100,8 +99,10 @@ public class ArbitrageOrder implements Runnable{
     		 	}
     		}
 		}
+	
 	public void cancelArbitrageOrder() {
 		System.out.println("cancelPendingOrder!!");
 		this.ordercanceled = true;
 	}
+	
 }

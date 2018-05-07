@@ -76,6 +76,9 @@ public class MarketMaking implements Runnable {
 
 
 	private long millisstart;
+	private boolean gotbalance;
+	private boolean gotBasebalance;
+	private boolean gotAltbalance;
 	
 	public static HashMap<java.lang.Long, BigDecimal> BaseBalance = new HashMap<java.lang.Long, BigDecimal>();
 	public static HashMap<java.lang.Long, BigDecimal> AltBalance = new HashMap<java.lang.Long, BigDecimal>();
@@ -83,35 +86,16 @@ public class MarketMaking implements Runnable {
 		this.json = json;
 	}
 	
+   public void gotBaseBalance() {
+	     this.gotBasebalance=true;
+	   }
+	   
+   public void gotAltBalance() {
+	     this.gotAltbalance=true;
+	   }
 	@Override
 	public void run() {
 		try {
-			/*
-	    	System.out.println("testCancelOrder!");
-	    	ExchangeSpecification exSpec = new ExchangeSpecification("org.knowm.xchange.poloniex.PoloniexExchange");
-			exSpec.setApiKey("WNT88N8E-PMI4NUMM-XKCZA114-FSMFW9II");
-			exSpec.setSecretKey("023874096f6ab514289f9cec6c739de63271403afe9b19565c5ab69119bdda49ab56dab29c07e289b3eacdd039c1a841bf5fe6758e2fe914456b88c477fc4102");
-		    Exchange ex = ExchangeFactory.INSTANCE.createExchange(exSpec);
-		   
-		    
-	    	TimeUnit.SECONDS.sleep(10);
-	    	System.out.println("buy orderr!");
-	    	LimitOrder buyingorder = new LimitOrder((OrderType.BID), new BigDecimal(0.1), new CurrencyPair("ETH","BTC"), null, null, new BigDecimal(0.06));
-	    	System.out.println("buy orderrRRRRR!");
-	    	String prevbidorder2 = ex.getTradeService().placeLimitOrder(buyingorder);
-	    	System.out.println("Placed order!");
-	    	System.out.println("Status: " + buyingorder.getStatus());
-	    	TimeUnit.SECONDS.sleep(10);
-	    	System.out.println("Status: " + buyingorder.getStatus());
-	    	TimeUnit.SECONDS.sleep(20);
-	    	System.out.println("Canceling order!");
-	    	System.out.println("Status: " + buyingorder.getStatus());
-	    	//System.out.println(ex.getTradeService().getOrder(prevbidorder2));
-	    	ex.getTradeService().cancelOrder(prevbidorder2);
-	    	System.out.println("Status: " + buyingorder.getStatus());
-	    	TimeUnit.SECONDS.sleep(10);
-	    	System.out.println("Status: " + buyingorder.getStatus());
-	    	*/
 	    	DashboardController dash = new DashboardController();
 	    	person = dash.newOrder(json);
 			this.base = this.json.getString("base");
@@ -145,13 +129,10 @@ public class MarketMaking implements Runnable {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} catch (NotAvailableFromExchangeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NotYetImplementedForExchangeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExchangeException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         try {
@@ -159,6 +140,34 @@ public class MarketMaking implements Runnable {
         	System.out.println("Json: "  + json);
         	SocketCommunication.out.print(json);
         	SocketCommunication.out.flush();
+			Thread baseBalance = new Thread() {
+	    	    public void run() {
+	    	    	try {
+						balancesU.baseBalance = accountExchange.getAccountInfo().getWallet().getBalance(basecurrency).getTotal();
+						gotBaseBalance();
+					} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
+							| ExchangeException | IOException e) {
+						e.printStackTrace();
+					}
+	    	    }
+			};
+			baseBalance.start();
+			Thread altBalance = new Thread() {
+	    	    public void run() {
+	    	    	try {
+	    	    		TimeUnit.MILLISECONDS.sleep(5);
+						balancesU.altBalance = accountExchange.getAccountInfo().getWallet().getBalance(altcurrency).getTotal();
+						gotAltBalance();
+					} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
+							| ExchangeException | IOException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+	    	    }
+			};
+			altBalance.start();
+
 		} catch (NotAvailableFromExchangeException e) {
 			e.printStackTrace();
 		} catch (NotYetImplementedForExchangeException e) {
@@ -167,24 +176,6 @@ public class MarketMaking implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
-	/*It should get the balances at the same time as the price request is sent to my server,
-	and then save it in a hashmap with the keys being the current time,
-	and the answer being the balance(it should do this in a new thread).
-	Then when the price request is recieved, it should check to see if the balance is null,
-	and if it is block the code untill it runs, with a timeout of a few seconds.
-	
-	Also, you can make the ordersizes max of balance for now, and only run the bot while the market is moving sideways.
-	Later on after the bot is fully finished and selling, add additonal volume features that adjust itself according to how far it is from the average of that days price
-	
-	TRADING STRATEGY:
-	Works for low priced coins such as DOGE & BCN. Do normal market making between the lowest interval(60 and 61).
-	BTW the engine probably matches orders on a first in first out basis.
-	When the wall order size on one side(ask||bid) gets close to the size of total balance, dump into the wall, so the price moves, and place market making orders in new price
-	Example:
-	Ask: 0.60, Bid: 0.61. Ask volume gets low over time, so we buy with max volume, new ask moves to 61, we place our sell order @ 61, and move our bid with the market
-	
-	*/
 	
 	public void recievedMarketOrder(JSONObject message) throws JSONException, NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException, InterruptedException  {
 		System.out.println("Recieved market order Message!");
@@ -201,45 +192,45 @@ public class MarketMaking implements Runnable {
 				double ask1 = Double.parseDouble((message.getJSONObject("Returned").getString("Ask1")));
 				double ask2 = Double.parseDouble((message.getJSONObject("Returned").getString("Ask2")));
 				double bid2 = Double.parseDouble((message.getJSONObject("Returned").getString("Bid2")));
-				final balancesU balancesU = new balancesU();
-				ArrayList<Thread> arrThreads = new ArrayList<Thread>();
-				//CHANGE BALANCE:
-				//GET BALANCE 4 SECONDS AFTER THE PRICE COMES AND SAVE IT IN THE BALANCE OBJECT WITH THE LONG TIME IN MILIS. THEN GET THE BALANCE FROM THERE WHILE TRADING SO THAT YOU HAVE NEW PRICE WITHOUT HAVING TO WAIT FOR IT ONCE AGAIN.
+				
+				while(gotBasebalance!=true && gotAltbalance!=true) {
+					TimeUnit.MILLISECONDS.sleep(10);
+				}
+				gotBasebalance=false;
+				gotAltbalance=false;
+				
 				Thread baseBalance = new Thread() {
-    	    	    public void run() {
-    	    	    	try {
-    	    	    		TimeUnit.MILLISECONDS.sleep(50);
+		    	    public void run() {
+		    	    	try {
+		    	    		TimeUnit.SECONDS.sleep(4);
 							balancesU.baseBalance = accountExchange.getAccountInfo().getWallet().getBalance(basecurrency).getTotal();
+							gotBaseBalance();
 						} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
 								| ExchangeException | IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-    	    	    }
+		    	    }
 				};
 				baseBalance.start();
-				arrThreads.add(baseBalance);
+				
 				Thread altBalance = new Thread() {
-    	    	    public void run() {
-    	    	    	try {
+		    	    public void run() {
+		    	    	try {
+		    	    		TimeUnit.MILLISECONDS.sleep(4005);
 							balancesU.altBalance = accountExchange.getAccountInfo().getWallet().getBalance(altcurrency).getTotal();
+							gotAltBalance();
 						} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
 								| ExchangeException | IOException e) {
-							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-    	    	    }
+		    	    }
 				};
 				altBalance.start();
-				arrThreads.add(altBalance);
 				
-		        for (int i = 0; i < arrThreads.size(); i++) 
-		        {
-		            arrThreads.get(i).join(); 
-		        } 
 		        person.addOrderData("\nFirst run== " + firstrun);
 				if (firstrun==true) {
 					if((ask1-bid1)>spread) {
@@ -377,10 +368,10 @@ public class MarketMaking implements Runnable {
 			}
 		}
 	}
-    private class balancesU {
+    private static class balancesU {
     	public java.lang.Long time;
-        public BigDecimal baseBalance;
-        public BigDecimal altBalance;
+        public static BigDecimal baseBalance;
+        public static BigDecimal altBalance;
     }
     
     public static void testCancelOrder() throws NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException, InterruptedException {
