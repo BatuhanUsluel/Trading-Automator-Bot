@@ -3,6 +3,7 @@ package application;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -52,7 +53,7 @@ public class ArbitrageOrder implements Runnable{
 					+ String.format("%-10s:%10s\n","Base", base)
 					+ String.format("%-10s:%10s\n","Alt", alt)
 					+ String.format("%-10s:%10s\n","Min Arbitrage", minarb)
-					+ String.format("%-10s:%10s\n","Exchange", this.json.get("Exchanges").toString())
+					+ String.format("%-10s:%10s\n","Exchange", String.join(",",(CharSequence[]) this.json.get("Exchanges")))
 					+ "--------------------------------------\n") ;
 		} catch (JSONException e1) {
 			e1.printStackTrace();
@@ -61,50 +62,6 @@ public class ArbitrageOrder implements Runnable{
     	SocketCommunication.out.flush();
 	    BigDecimal[] baseBalances = new BigDecimal[exchangesize];
 	    BigDecimal[] altBalances = new BigDecimal[exchangesize];
-	    /*
-    	while(ordercanceled!=true) {
-    		 for (int i=0; i<exchangesize; i++){
-	    	    final int x = i;
-		    	Thread exchangeThread = new Thread() {
-		    	    public void run() {
-		    	    	 ArrayList<Thread> specThreads = new ArrayList<Thread>();
-		    			 Exchange UExchange = exchanges.get(x);
-		    			 final AccountService account = UExchange.getAccountService();
-		    			 	try {
-								Wallet wallet = account.getAccountInfo().getWallet();
-								
-						    	Thread basethread = new Thread() {
-						    	    public void run() {
-						    	    	BigDecimal basebalance = wallet.getBalance(base).getAvailable();
-										baseBalances[x] = basebalance;
-						    	    }
-						    	};
-						    	basethread.start();
-						    	specThreads.add(basethread);		
-						    	Thread altthread = new Thread() {
-						    	    public void run() {
-										BigDecimal altbalance = wallet.getBalance(alt).getAvailable();
-										
-										altBalances[x] = altbalance;
-						    	    }
-						    	};
-						    	altthread.start();
-						    	specThreads.add(altthread);
-						    	
-						    	for (int i = 0; i < specThreads.size(); i++) 
-						        {
-						    		specThreads.get(i).join(); 
-						        } 
-							} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
-									| ExchangeException | IOException | InterruptedException e) {
-								e.printStackTrace();
-							}
-		    	    	}
-		    		};
-		    		exchangeThread.start();
-    		 	}
-    		}
-    		*/
 		}
 	
 	public void cancelArbitrageOrder() {
@@ -113,6 +70,7 @@ public class ArbitrageOrder implements Runnable{
 	}
 	
 	public void recievedArbitrageOrder(JSONObject message) throws JSONException, IOException, InterruptedException {
+		person.addOrderData("\nRecieved prices");
 		JSONObject object = message.getJSONObject("Returned");
 		double highestbid = 0,lowestask = 0,highestbidvol=0,lowestaskvol=0;
 		Exchange highestbidex = null;
@@ -146,7 +104,10 @@ public class ArbitrageOrder implements Runnable{
 			}
 			firstrun=false;
 		}
+		person.addOrderData("\nHighest Bid: " + highestbid + " with volume " + highestbidvol + " on exchange " + highestbidex.toString());
+		person.addOrderData("\nLowest Ask: " + lowestask + " with volume " + lowestaskvol + " on exchange " + lowestaskex.toString());
 		if ((highestbid/lowestask)>minarb) {
+			person.addOrderData("\nArbitrage is " + (highestbid/lowestask) + " which is higher than the minimum " + minarb + ". Executing Trade");
 			ArrayList<Thread> balanceThreads = new ArrayList<Thread>();
 			final Exchange newlowestaskex = lowestaskex;
 			final Exchange newhighestbidex = highestbidex;
@@ -157,6 +118,7 @@ public class ArbitrageOrder implements Runnable{
 					try {
 						Wallet basewallet = baseaccount.getAccountInfo().getWallet();
 						balancesClass.baseBalance = basewallet.getBalance(base).getAvailable();
+						person.addOrderData("\nBase balance on exchange " + newlowestaskex.toString() + " is " + balancesClass.baseBalance);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -174,6 +136,7 @@ public class ArbitrageOrder implements Runnable{
 					try {
 						altwallet = altaccount.getAccountInfo().getWallet();
 						balancesClass.altBalance = altwallet.getBalance(base).getAvailable();
+						person.addOrderData("\nAlt balance on exchange " + newhighestbidex.toString() + " is " + balancesClass.altBalance);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -188,25 +151,31 @@ public class ArbitrageOrder implements Runnable{
 	        }
 	    	
 	    	//Volume Calculation
-	    		double tradeSize = Math.min(highestbidvol,lowestaskvol);
-	    		
-		        if (tradeSize>balancesClass.altBalance.doubleValue()) {
-		        	tradeSize=balancesClass.altBalance.doubleValue();
-		        }
-		        
-		        if (balancesClass.baseBalance.doubleValue()<(tradeSize*lowestask)){
-		        	tradeSize=balancesClass.baseBalance.doubleValue()/lowestask;
-		        }
+    		double tradeSize = Math.min(highestbidvol,lowestaskvol);
+    		
+	        if (tradeSize>balancesClass.altBalance.doubleValue()) {
+	        	person.addOrderData("\nNot enough alt balance, reducing alt volume to: " + tradeSize);
+	        	tradeSize=balancesClass.altBalance.doubleValue();
+	        }
+	        
+	        if (balancesClass.baseBalance.doubleValue()<(tradeSize*lowestask)){
+	        	tradeSize=balancesClass.baseBalance.doubleValue()/lowestask;
+	        	person.addOrderData("\nNot enough base balance, reducing alt volume to: " + tradeSize);
+	        }
 
 	    	//Execute Trades
 	    	LimitOrder buyfromaskorder = new LimitOrder((OrderType.BID), new BigDecimal(tradeSize), this.pair, null, null, new BigDecimal(lowestask));
-			Object buyfromask = highestbidex.getTradeService().placeLimitOrder(buyfromaskorder);
+	    	person.addOrderData("\n" + buyfromaskorder.toString());
+			//Object buyfromask = highestbidex.getTradeService().placeLimitOrder(buyfromaskorder);
 			
 	    	LimitOrder selltobidorder = new LimitOrder((OrderType.ASK), new BigDecimal(tradeSize), this.pair, null, null, new BigDecimal(highestbid));
-			Object selltobid = lowestaskex.getTradeService().placeLimitOrder(selltobidorder);
+	    	person.addOrderData("\n" + selltobidorder.toString());
+			//Object selltobid = lowestaskex.getTradeService().placeLimitOrder(selltobidorder);
+	    	
+	    	person.addOrderData("Placed orders!");
 			
 		} else {
-			//Not enough arbitrage
+			person.addOrderData("Arbitrage is " + (highestbid/lowestask) + " which is lower than the required " + minarb);
 		}
 	}
 	
