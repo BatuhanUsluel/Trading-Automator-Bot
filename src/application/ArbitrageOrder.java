@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
@@ -22,7 +23,7 @@ import controllers.DashboardController.Person;
 public class ArbitrageOrder implements Runnable{
 	private Currency base;
 	private Currency alt;
-	private String minarb;
+	private double minarb;
 	private List<Exchange> exchanges;
 	private JSONObject json;
 	private boolean ordercanceled;
@@ -33,7 +34,7 @@ public class ArbitrageOrder implements Runnable{
 		this.base= new Currency(base);
 		this.alt= new Currency(alt);
 		this.pair= new CurrencyPair(alt,base);
-		this.minarb=minarb;
+		this.minarb=(1+(Double.parseDouble(minarb)/100));
 		this.exchanges=exchanges;
 		this.json=json;
 		this.exchangesize = exchanges.size();
@@ -109,7 +110,43 @@ public class ArbitrageOrder implements Runnable{
 		this.ordercanceled = true;
 	}
 	
-	public void recievedArbitrageOrder(JSONObject message) {
-		
+	public void recievedArbitrageOrder(JSONObject message) throws JSONException {
+		JSONObject object = message.getJSONObject("Returned");
+		double highestbid = 0,lowestask = 0,highestbidvol,lowestaskvol;
+		Exchange highestbidex,lowestaskex;
+		boolean firstrun=true;
+		for (Exchange exchange : exchanges) {
+			JSONObject object2 = object.getJSONObject(exchange.toString());
+			JSONArray bidarray = object2.getJSONArray("bid");
+			double bid = bidarray.getDouble(0);
+			JSONArray askarray = object2.getJSONArray("bid");
+			double ask = askarray.getDouble(0);
+			if (firstrun==true) {
+				highestbid=bid;
+				highestbidvol=bidarray.getDouble(1);
+				highestbidex = exchange;
+				
+				lowestask=bid;
+				lowestaskvol=askarray.getDouble(1);
+				lowestaskex = exchange;
+			} else {
+				if (bid>highestbid) {
+					highestbid=bid;
+					highestbidvol=bidarray.getDouble(1);
+					highestbidex = exchange;
+				}
+				if (ask<lowestask) {
+					lowestask=bid;
+					lowestaskvol=askarray.getDouble(1);
+					lowestaskex = exchange;
+				}
+			}
+			firstrun=false;
+		}
+		if ((highestbid/lowestask)>minarb) {
+			//Get Balances
+		} else {
+			//Not enough arbitrage
+		}
 	}
 }
