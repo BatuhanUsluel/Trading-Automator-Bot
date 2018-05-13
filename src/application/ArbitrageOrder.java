@@ -110,10 +110,11 @@ public class ArbitrageOrder implements Runnable{
 		this.ordercanceled = true;
 	}
 	
-	public void recievedArbitrageOrder(JSONObject message) throws JSONException {
+	public void recievedArbitrageOrder(JSONObject message) throws JSONException, IOException, InterruptedException {
 		JSONObject object = message.getJSONObject("Returned");
 		double highestbid = 0,lowestask = 0,highestbidvol,lowestaskvol;
-		Exchange highestbidex,lowestaskex;
+		Exchange highestbidex = null;
+		Exchange lowestaskex = null;
 		boolean firstrun=true;
 		for (Exchange exchange : exchanges) {
 			JSONObject object2 = object.getJSONObject(exchange.toString());
@@ -144,7 +145,46 @@ public class ArbitrageOrder implements Runnable{
 			firstrun=false;
 		}
 		if ((highestbid/lowestask)>minarb) {
-			//Get Balances
+			ArrayList<Thread> balanceThreads = new ArrayList<Thread>();
+			final Exchange newlowestaskex = lowestaskex;
+			final Exchange newhighestbidex = highestbidex;
+			//Get base balance from exchange with lowest ask
+	    	Thread basethread = new Thread() {
+	    	    public void run() {
+	    			AccountService baseaccount = newlowestaskex.getAccountService();
+	    			Wallet basewallet = null;
+					try {
+						basewallet = baseaccount.getAccountInfo().getWallet();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+	    			BigDecimal basebalance = basewallet.getBalance(base).getAvailable();
+	    	    }
+	    	};
+	    	basethread.start();
+	    	balanceThreads.add(basethread);
+
+			//Get alt balance from exchange with highest bid
+	    	Thread altthread = new Thread() {
+	    	    public void run() {
+	    			AccountService altaccount = newhighestbidex.getAccountService();
+	    			Wallet altwallet;
+					try {
+						altwallet = altaccount.getAccountInfo().getWallet();
+						BigDecimal altbalance = altwallet.getBalance(base).getAvailable();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+	    	    }
+	    	};
+	    	altthread.start();
+	    	balanceThreads.add(altthread);
+			
+	    	for (int i = 0; i < balanceThreads.size(); i++) 
+	        {
+	    		balanceThreads.get(i).join(); 
+	        } 
+	    	
 		} else {
 			//Not enough arbitrage
 		}
