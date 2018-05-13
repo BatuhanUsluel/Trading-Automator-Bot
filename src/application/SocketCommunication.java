@@ -16,6 +16,7 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
+import controllers.ArbitrageController;
 import controllers.AveragetradingController;
 import controllers.Controller;
 import controllers.MarketController;
@@ -64,8 +65,22 @@ public class SocketCommunication {
 									case "quickBuy":
 										QuickBuy.recievedQuickBuyMessage(jsonmessage);
 										break;
-									case "BidAsk":
-										
+									case "arbitrageOrder":
+										HashMap<JSONObject, ArbitrageOrder> arbitrageMap = ArbitrageController.ArbitrageOrderMap;
+										for (Entry<JSONObject, ArbitrageOrder> entry : arbitrageMap.entrySet()) {
+											JSONObject key = entry.getKey();
+												if ((key.getString("base").equals(jsonmessage.getString("base")))
+													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
+													&& (key.getString("MinArbitrage").equals(jsonmessage.getString("MinArbitrage")))
+													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
+													&& (key.getString("request").equals(jsonmessage.getString("request")))
+													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
+													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))
+													&& key.getLong("orderid") == (jsonmessage.getLong("orderid"))) {
+														ArbitrageOrder value = entry.getValue();
+														value.recievedArbitrageOrder(jsonmessage);
+												}
+										}
 										break;
 									case "Historic":
 										

@@ -75,7 +75,8 @@ public class ArbitrageController {
     		noerror=false;
     		stringBuilder.append(MinArbitrage + " is not a valid number(MinArbitrage).\n");
     	}
-    	if (exchanges.size()<1) {
+    	System.out.println(exchanges.size());
+    	if (exchanges.size()<2) {
     		noerror=false;
     		stringBuilder.append("Must have atleast 2 exchanges selected for arbitrage\n");
     	}
@@ -84,7 +85,13 @@ public class ArbitrageController {
 			arbitrageJSON.put("base", base);
 			arbitrageJSON.put("alt", alt);
 			arbitrageJSON.put("MinArbitrage",MinArbitrage);
-			arbitrageJSON.put("Exchanges",exchanges.toString());
+			String[] exchangestotal = new String[exchanges.size()];
+			int x=0;
+			for (String string : exchanges){
+				exchangestotal[x]=string;
+				x++;
+			}
+			arbitrageJSON.put("Exchanges",exchangestotal);
 			arbitrageJSON.put("request","arbitrageOrder");
 			arbitrageJSON.put("licenceKey", SocketCommunication.licencekey);
 			arbitrageJSON.put("millisstart", System.currentTimeMillis());
@@ -93,6 +100,7 @@ public class ArbitrageController {
 	    	int value = rand.nextInt(1000000000); 
 	    	arbitrageJSON.put("orderid", value);
 	    	arbitrageJSON.put("running","True");
+	    	arbitrageJSON.put("cancel","False");
 			System.out.println(arbitrageJSON);
 	    	ArbitrageOrder arbit = new ArbitrageOrder(base,alt,MinArbitrage,exchange,arbitrageJSON);
 	    	ArbitrageOrderMap.put(arbitrageJSON, arbit);

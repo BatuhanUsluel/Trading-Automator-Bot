@@ -15,7 +15,7 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import org.knowm.xchange.service.account.AccountService;
-
+import  java.lang.Thread;
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
 
@@ -49,13 +49,16 @@ public class ArbitrageOrder implements Runnable{
 					+ String.format("%-10s:%10s\n","Base", base)
 					+ String.format("%-10s:%10s\n","Alt", alt)
 					+ String.format("%-10s:%10s\n","Min Arbitrage", minarb)
-					+ String.format("%-10s:%10s\n","Exchange", this.json.getString("Exchanges"))
+					+ String.format("%-10s:%10s\n","Exchange", this.json.get("Exchanges").toString())
 					+ "--------------------------------------\n") ;
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
+    	SocketCommunication.out.print(json);
+    	SocketCommunication.out.flush();
 	    BigDecimal[] baseBalances = new BigDecimal[exchangesize];
 	    BigDecimal[] altBalances = new BigDecimal[exchangesize];
+	    /*
     	while(ordercanceled!=true) {
     		 for (int i=0; i<exchangesize; i++){
 	    	    final int x = i;
@@ -98,6 +101,7 @@ public class ArbitrageOrder implements Runnable{
 		    		exchangeThread.start();
     		 	}
     		}
+    		*/
 		}
 	
 	public void cancelArbitrageOrder() {
@@ -105,4 +109,7 @@ public class ArbitrageOrder implements Runnable{
 		this.ordercanceled = true;
 	}
 	
+	public void recievedArbitrageOrder(JSONObject message) {
+		
+	}
 }

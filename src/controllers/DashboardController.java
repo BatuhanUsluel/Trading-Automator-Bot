@@ -269,7 +269,7 @@ public class DashboardController {
     	Date date = new Date(json.getLong("millisstart"));
     	SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss", Locale.US);
     	String text = format.format(date);
-    	Person person = new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.getString("Exchanges"),text, json.getString("endtime"), json.getString("running"), String.valueOf(json.getInt("orderid")),"");
+    	Person person = new Person(json.getString("request"), json.getString("base"), json.getString("alt"), json.get("Exchanges").toString(),text, json.getString("endtime"), json.getString("running"), String.valueOf(json.getInt("orderid")),"");
     	data.add(person);
     	tableView.setItems(data);
     	tableView.refresh();
