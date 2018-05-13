@@ -11,7 +11,9 @@ import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
+import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.account.Wallet;
+import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
@@ -112,7 +114,7 @@ public class ArbitrageOrder implements Runnable{
 	
 	public void recievedArbitrageOrder(JSONObject message) throws JSONException, IOException, InterruptedException {
 		JSONObject object = message.getJSONObject("Returned");
-		double highestbid = 0,lowestask = 0,highestbidvol,lowestaskvol;
+		double highestbid = 0,lowestask = 0,highestbidvol=0,lowestaskvol=0;
 		Exchange highestbidex = null;
 		Exchange lowestaskex = null;
 		boolean firstrun=true;
@@ -137,7 +139,7 @@ public class ArbitrageOrder implements Runnable{
 					highestbidex = exchange;
 				}
 				if (ask<lowestask) {
-					lowestask=bid;
+					lowestask=ask;
 					lowestaskvol=askarray.getDouble(1);
 					lowestaskex = exchange;
 				}
@@ -152,13 +154,13 @@ public class ArbitrageOrder implements Runnable{
 	    	Thread basethread = new Thread() {
 	    	    public void run() {
 	    			AccountService baseaccount = newlowestaskex.getAccountService();
-	    			Wallet basewallet = null;
 					try {
-						basewallet = baseaccount.getAccountInfo().getWallet();
+						Wallet basewallet = baseaccount.getAccountInfo().getWallet();
+						balancesClass.baseBalance = basewallet.getBalance(base).getAvailable();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-	    			BigDecimal basebalance = basewallet.getBalance(base).getAvailable();
+	    			
 	    	    }
 	    	};
 	    	basethread.start();
@@ -171,7 +173,7 @@ public class ArbitrageOrder implements Runnable{
 	    			Wallet altwallet;
 					try {
 						altwallet = altaccount.getAccountInfo().getWallet();
-						BigDecimal altbalance = altwallet.getBalance(base).getAvailable();
+						balancesClass.altBalance = altwallet.getBalance(base).getAvailable();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -183,10 +185,34 @@ public class ArbitrageOrder implements Runnable{
 	    	for (int i = 0; i < balanceThreads.size(); i++) 
 	        {
 	    		balanceThreads.get(i).join(); 
-	        } 
+	        }
 	    	
+	    	//Volume Calculation
+	    		double tradeSize = Math.min(highestbidvol,lowestaskvol);
+	    		
+		        if (tradeSize>balancesClass.altBalance.doubleValue()) {
+		        	tradeSize=balancesClass.altBalance.doubleValue();
+		        }
+		        
+		        if (balancesClass.baseBalance.doubleValue()<(tradeSize*lowestask)){
+		        	tradeSize=balancesClass.baseBalance.doubleValue()/lowestask;
+		        }
+
+	    	//Execute Trades
+	    	LimitOrder buyfromaskorder = new LimitOrder((OrderType.BID), new BigDecimal(tradeSize), this.pair, null, null, new BigDecimal(lowestask));
+			Object buyfromask = highestbidex.getTradeService().placeLimitOrder(buyfromaskorder);
+			
+	    	LimitOrder selltobidorder = new LimitOrder((OrderType.ASK), new BigDecimal(tradeSize), this.pair, null, null, new BigDecimal(highestbid));
+			Object selltobid = lowestaskex.getTradeService().placeLimitOrder(selltobidorder);
+			
 		} else {
 			//Not enough arbitrage
 		}
 	}
+	
+    private static class balancesClass {
+        public static BigDecimal baseBalance;
+        public static BigDecimal altBalance;
+    }
+    
 }
