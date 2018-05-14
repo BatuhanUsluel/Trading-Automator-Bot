@@ -135,6 +135,7 @@ def main():
                     print('Connection no longer valid, closing thread!')
                     try:
                         del marketmakingconnections[conn]
+                        del arbitragegconnections[conn]
                     except KeyError:
                         print('Keyerror')
                     sys.exit()
@@ -261,7 +262,6 @@ def main():
         conn.send(sendMessage.encode('UTF-8'))
 
     def sendMarkettoclient(x, y):
-        # Not used anymore, can colapse it
         try:
             data4send = json.loads(y)
             coin = data4send['alt']
@@ -279,19 +279,26 @@ def main():
                 raise
 
     def sendArbitragetoclient(connection, y):
-        data4send = json.loads(y)
-        print (data4send)
-        coin = data4send['alt']
-        data4send["Returned"]={}
-        for a in data4send['Exchanges']:
-            data4send["Returned"][a] = ""
-           #print ("Returnedar: " + returnedar.get(coin).get(a))
-            #print ("Exchange: " + a)
-            data4send["Returned"][a] = returnedar.get(coin).get(a)
-        print()
-        sendMessage = (json.dumps(data4send) + "\r\n")
-        connection.send(sendMessage.encode('UTF-8'))
-
+        try:
+            data4send = json.loads(y)
+            print (data4send)
+            coin = data4send['alt']
+            data4send["Returned"]={}
+            for a in data4send['Exchanges']:
+                data4send["Returned"][a] = ""
+               #print ("Returnedar: " + returnedar.get(coin).get(a))
+                #print ("Exchange: " + a)
+                data4send["Returned"][a] = returnedar.get(coin).get(a)
+            print()
+            sendMessage = (json.dumps(data4send) + "\r\n")
+            connection.send(sendMessage.encode('UTF-8'))
+        except socket.error as error:
+            if error.errno == errno.WSAECONNRESET:
+                print("Connection was reset!")
+                del arbitragegconnections[x]
+            else:
+                print("Something else happened!")
+                raise
     # Bind socket to local host and port
     try:
         s.bind((HOST, PORT))
