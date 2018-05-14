@@ -72,43 +72,51 @@ public class ArbitrageOrder implements Runnable{
 	}
 	
 	public void recievedArbitrageOrder(JSONObject message) throws JSONException, IOException, InterruptedException {
-		person.addOrderData("\nRecieved prices");
+		System.out.println(message.toString());
 		JSONObject object = message.getJSONObject("Returned");
+		System.out.println(object.toString());
 		double highestbid = 0,lowestask = 0,highestbidvol=0,lowestaskvol=0;
 		Exchange highestbidex = null;
 		Exchange lowestaskex = null;
+		String highestbidexstring = null;
+		String lowestaskexstring = null;
 		boolean firstrun=true;
 		for (String exchange : exchangestotal) {
 			Exchange realexchange = Exchanges.exchangemap.get(exchange);
 			JSONObject object2 = (JSONObject) object.get(exchange);
-			JSONArray bidarray = object2.getJSONArray("bid");
+			System.out.println(exchange);
+			JSONArray bidarray = object2.getJSONArray("Bid");
 			double bid = bidarray.getDouble(0);
-			JSONArray askarray = object2.getJSONArray("bid");
+			JSONArray askarray = object2.getJSONArray("Ask");
 			double ask = askarray.getDouble(0);
 			if (firstrun==true) {
 				highestbid=bid;
 				highestbidvol=bidarray.getDouble(1);
 				highestbidex = realexchange;
+				highestbidexstring = exchange;
 				
 				lowestask=bid;
 				lowestaskvol=askarray.getDouble(1);
 				lowestaskex = realexchange;
+				lowestaskexstring = exchange;
 			} else {
 				if (bid>highestbid) {
 					highestbid=bid;
 					highestbidvol=bidarray.getDouble(1);
 					highestbidex = realexchange;
+					highestbidexstring = exchange;
 				}
 				if (ask<lowestask) {
 					lowestask=ask;
 					lowestaskvol=askarray.getDouble(1);
 					lowestaskex = realexchange;
+					lowestaskexstring = exchange;
 				}
 			}
 			firstrun=false;
 		}
-		person.addOrderData("\nHighest Bid: " + highestbid + " with volume " + highestbidvol + " on exchange " + highestbidex.toString());
-		person.addOrderData("\nLowest Ask: " + lowestask + " with volume " + lowestaskvol + " on exchange " + lowestaskex.toString());
+		person.addOrderData("\n\nHighest Bid: " + highestbid + " with volume " + highestbidvol + " on exchange " + highestbidexstring);
+		person.addOrderData("\nLowest Ask: " + lowestask + " with volume " + lowestaskvol + " on exchange " + lowestaskexstring);
 		if ((highestbid/lowestask)>minarb) {
 			person.addOrderData("\nArbitrage is " + (highestbid/lowestask) + " which is higher than the minimum " + minarb + ". Executing Trade");
 			ArrayList<Thread> balanceThreads = new ArrayList<Thread>();
@@ -178,7 +186,7 @@ public class ArbitrageOrder implements Runnable{
 	    	person.addOrderData("Placed orders!");
 			
 		} else {
-			person.addOrderData("Arbitrage is " + (highestbid/lowestask) + " which is lower than the required " + minarb);
+			person.addOrderData("\nArbitrage is " + (highestbid/lowestask) + " which is lower than the required " + minarb);
 		}
 	}
 	

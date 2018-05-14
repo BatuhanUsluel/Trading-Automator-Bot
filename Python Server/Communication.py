@@ -280,11 +280,14 @@ def main():
 
     def sendArbitragetoclient(connection, y):
         data4send = json.loads(y)
+        print (data4send)
         coin = data4send['alt']
         data4send["Returned"]={}
         for a in data4send['Exchanges']:
-            data4send["Returned"][a] = {}
-            data4send["Returned"][a] = returnedar.get(coin).get(x)
+            data4send["Returned"][a] = ""
+           #print ("Returnedar: " + returnedar.get(coin).get(a))
+            #print ("Exchange: " + a)
+            data4send["Returned"][a] = returnedar.get(coin).get(a)
         print()
         sendMessage = (json.dumps(data4send) + "\r\n")
         connection.send(sendMessage.encode('UTF-8'))
