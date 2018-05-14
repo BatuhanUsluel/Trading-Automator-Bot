@@ -244,14 +244,14 @@ public class MarketMaking implements Runnable {
 						if (BuyVolume.doubleValue()>0.0001) {
 							person.addOrderData("\nBid1: " + bid1 + " Bid2: " + bid2 + "\nPlacing buy order @ " + BuyPrice + "with volume: " + BuyVolume);
 							prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
-							prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
+							//prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
 						} else {
 							person.addOrderData("\nOrder size for buy too low");
 						}
 						if (SellVolume.doubleValue()>0.0001) {
 							person.addOrderData("\nAsk1: " + ask1 + " Ask2: " + ask2 + "\nPlacing sell order @ " + SellPrice  + "with volume: " + SellVolume);
 							prevaskorderlimit  = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
-							prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
+							//prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
 						} else {
 							person.addOrderData("\nOrder size for sell too low");
 						}
@@ -300,7 +300,7 @@ public class MarketMaking implements Runnable {
 							if (BuyVolume.doubleValue()>0.0001) {
 								prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
 								person.addOrderData("Placed buy order @ " + BuyPrice + "for volume: " + BuyVolume);
-								prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
+								//prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
 							} else {
 								person.addOrderData("Order size for buy too low");
 							}
@@ -312,7 +312,7 @@ public class MarketMaking implements Runnable {
 							if (BuyVolume.doubleValue()>0.0001) {
 								prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, new BigDecimal(bid1+distancefrombest));
 								person.addOrderData("\nPlaced buy order @ " + BuyPrice + "for volume: " + BuyVolume);
-								prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
+								//prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
 							} else {
 								person.addOrderData("Order size for buy too low");
 							}
@@ -328,7 +328,7 @@ public class MarketMaking implements Runnable {
 							if (SellVolume.doubleValue()>0.0001) {
 								prevaskorderlimit = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
 								person.addOrderData("\nPlaced sell order @ " + SellPrice + "for volume: " + SellVolume);
-								prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
+								//prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
 							} else {
 								person.addOrderData("Order size for sell too low");
 							}
@@ -340,7 +340,7 @@ public class MarketMaking implements Runnable {
 							if (SellVolume.doubleValue()>0.0001) {
 								prevaskorderlimit = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
 								person.addOrderData("\nPlaced sell order @ " + SellPrice + "for volume: " + SellVolume);
-								prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
+								//prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
 							} else {
 								person.addOrderData("Order size for sell too low");
 							}
@@ -379,7 +379,7 @@ public class MarketMaking implements Runnable {
     	TradeService exchange = Exchanges.exchangemap.get("poloniex").getTradeService();
     	TimeUnit.SECONDS.sleep(10);
     	LimitOrder buyingorder = new LimitOrder((OrderType.BID), new BigDecimal(0.1), new CurrencyPair("ETH","BTC"), null, null, new BigDecimal(0.06));
-    	String prevbidorder2 = exchange.placeLimitOrder(buyingorder);
+    	//String prevbidorder2 = exchange.placeLimitOrder(buyingorder);
     	System.out.println("Placed order!");
     	System.out.println("Status: " + buyingorder.getStatus());
     	TimeUnit.SECONDS.sleep(10);
@@ -387,7 +387,7 @@ public class MarketMaking implements Runnable {
     	TimeUnit.SECONDS.sleep(20);
     	System.out.println("Canceling order!");
     	System.out.println("Status: " + buyingorder.getStatus());
-    	exchange.cancelOrder(prevbidorder2);
+    	//exchange.cancelOrder(prevbidorder2);
     	System.out.println("Status: " + buyingorder.getStatus());
     }
     

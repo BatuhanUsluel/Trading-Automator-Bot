@@ -33,7 +33,8 @@ public class ArbitrageOrder implements Runnable{
 	private CurrencyPair pair;
 	private int exchangesize;
 	private Person person;
-	public ArbitrageOrder(String base, String alt, String minarb, List<Exchange> exchanges, JSONObject json) throws JSONException {
+	private String[] exchangestotal;
+	public ArbitrageOrder(String base, String alt, String minarb, List<Exchange> exchanges, JSONObject json, String[] exchangestotal) throws JSONException {
 		this.base= new Currency(base);
 		this.alt= new Currency(alt);
 		this.pair= new CurrencyPair(alt,base);
@@ -41,6 +42,7 @@ public class ArbitrageOrder implements Runnable{
 		this.exchanges=exchanges;
 		this.json=json;
 		this.exchangesize = exchanges.size();
+		this.exchangestotal = exchangestotal;
 	}
 	   
 	@Override
@@ -76,8 +78,9 @@ public class ArbitrageOrder implements Runnable{
 		Exchange highestbidex = null;
 		Exchange lowestaskex = null;
 		boolean firstrun=true;
-		for (Exchange exchange : exchanges) {
-			JSONObject object2 = object.getJSONObject(exchange.toString());
+		for (String exchange : exchangestotal) {
+			Exchange realexchange = Exchanges.exchangemap.get(exchange);
+			JSONObject object2 = (JSONObject) object.get(exchange);
 			JSONArray bidarray = object2.getJSONArray("bid");
 			double bid = bidarray.getDouble(0);
 			JSONArray askarray = object2.getJSONArray("bid");
@@ -85,21 +88,21 @@ public class ArbitrageOrder implements Runnable{
 			if (firstrun==true) {
 				highestbid=bid;
 				highestbidvol=bidarray.getDouble(1);
-				highestbidex = exchange;
+				highestbidex = realexchange;
 				
 				lowestask=bid;
 				lowestaskvol=askarray.getDouble(1);
-				lowestaskex = exchange;
+				lowestaskex = realexchange;
 			} else {
 				if (bid>highestbid) {
 					highestbid=bid;
 					highestbidvol=bidarray.getDouble(1);
-					highestbidex = exchange;
+					highestbidex = realexchange;
 				}
 				if (ask<lowestask) {
 					lowestask=ask;
 					lowestaskvol=askarray.getDouble(1);
-					lowestaskex = exchange;
+					lowestaskex = realexchange;
 				}
 			}
 			firstrun=false;

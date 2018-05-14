@@ -160,11 +160,11 @@ def main():
                 print('value already exists in this loop, no need to get it again')
             else:
                 print('Added specific exchange to return')
-                returnedmm[currency][exchange] = order_book_json
+                returnedmm[currency][d['Exchanges']] = order_book_json
         else:
             print('Added currency to return')
             returnedmm[currency] = {}
-            returnedmm[currency][exchange] = order_book_json
+            returnedmm[currency][d['Exchanges']] = order_book_json
 
     def arbitrageOrder(data):
         d = json.loads(data)
@@ -278,19 +278,16 @@ def main():
                 print("Something else happened!")
                 raise
 
-    def sendArbitragetoclient(x, y):
+    def sendArbitragetoclient(connection, y):
         data4send = json.loads(y)
         coin = data4send['alt']
-        y = y.rstrip()[:-1]
         data4send["Returned"]={}
-        for x in data4send['Exchanges']:
-            data4send["Returned"][x] = {}
-            data4send["Returned"][x] = returnedar.get(coin).get(x)
-        print ("y: ")
-        print (data4send)
-        print("json: ")
-        print(json.dumps(data4send))
-        #sendMessage = (y + ",\"Returned\": " + str(returnedmm.get(coin).get(data4send['Exchanges'])) + "}\r\n")
+        for a in data4send['Exchanges']:
+            data4send["Returned"][a] = {}
+            data4send["Returned"][a] = returnedar.get(coin).get(x)
+        print()
+        sendMessage = (json.dumps(data4send) + "\r\n")
+        connection.send(sendMessage.encode('UTF-8'))
 
     # Bind socket to local host and port
     try:

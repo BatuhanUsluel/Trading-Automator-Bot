@@ -72,7 +72,6 @@ public class SocketCommunication {
 												if ((key.getString("base").equals(jsonmessage.getString("base")))
 													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
 													&& (key.getString("MinArbitrage").equals(jsonmessage.getString("MinArbitrage")))
-													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
 													&& (key.getString("request").equals(jsonmessage.getString("request")))
 													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
 													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))

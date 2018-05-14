@@ -102,7 +102,7 @@ public class ArbitrageController {
 	    	arbitrageJSON.put("running","True");
 	    	arbitrageJSON.put("cancel","False");
 			System.out.println(arbitrageJSON);
-	    	ArbitrageOrder arbit = new ArbitrageOrder(base,alt,MinArbitrage,exchange,arbitrageJSON);
+	    	ArbitrageOrder arbit = new ArbitrageOrder(base,alt,MinArbitrage,exchange,arbitrageJSON,exchangestotal);
 	    	ArbitrageOrderMap.put(arbitrageJSON, arbit);
 	    	Thread t = new Thread(arbit);
 	    	t.start();
