@@ -2,6 +2,7 @@ package application;
 
 import org.json.JSONException;
 
+import controllers.ArbitrageController;
 import controllers.AveragetradingController;
 import controllers.DashboardController;
 import controllers.MarketController;
@@ -21,7 +22,7 @@ public class RemoveOrder {
 		} else if(ordertype.equals("marketMaking")) {
 			MarketController.cancelMarketOrder(person.getOrderID());
 		} else if(ordertype.equals("arbitrage")) {
-			
+			ArbitrageController.cancelArbitrageOrder(person.getOrderID());
 		} else if(ordertype.equals("technical")) {
 			
 		}

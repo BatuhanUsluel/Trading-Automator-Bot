@@ -77,7 +77,6 @@ public class PendingOrder implements Runnable {
 		}
 		
         try {
-			//int loop = Integer.parseInt(message.getString("loop"));
             while (orderplaced!=true && ordercanceled!=true) {
             	person.addOrderData("\nRequesting price\n");
             		JSONObject jsonrun = this.json;

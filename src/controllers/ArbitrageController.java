@@ -28,6 +28,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import java.util.Map;
 
 public class ArbitrageController {
 	
@@ -47,10 +48,7 @@ public class ArbitrageController {
 		     strings.add(Exchanges.list.get(i));
 		 }
 		 System.out.println("Strings: " + strings);
-		 // Create the CheckComboBox with the data 
 		 ArbitrageExchange.getItems().addAll(strings);
-		 // and listen to the relevant events (e.g. when the selected indices or 
-		 // selected items change).
 		 ArbitrageExchange.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
 		     public void onChanged(ListChangeListener.Change<? extends String> c) {
 		         System.out.println(ArbitrageExchange.getCheckModel().getCheckedItems());
@@ -110,5 +108,21 @@ public class ArbitrageController {
 			String finalString = stringBuilder.toString();
 			FxDialogs.showError(null, finalString);
 		}
+	}
+	
+	public static void cancelArbitrageOrder(String orderid) {
+		System.out.println("Cancel market order");
+		for (Map.Entry<JSONObject, ArbitrageOrder> entry : ArbitrageOrderMap.entrySet()) {
+		    JSONObject key = entry.getKey();
+			try {
+				if (key.getInt("orderid") == java.lang.Integer.parseInt(orderid)) {
+					ArbitrageOrder value = entry.getValue();
+					value.stopOrder();
+				}
+			} catch (java.lang.Exception e) {
+				e.printStackTrace();
+			}
+
+	}
 	}
 }

@@ -29,7 +29,7 @@ public class ArbitrageOrder implements Runnable{
 	private double minarb;
 	private List<Exchange> exchanges;
 	private JSONObject json;
-	private boolean ordercanceled;
+	private boolean ordercanceled=false;
 	private CurrencyPair pair;
 	private int exchangesize;
 	private Person person;
@@ -62,16 +62,11 @@ public class ArbitrageOrder implements Runnable{
 		}
     	SocketCommunication.out.print(json);
     	SocketCommunication.out.flush();
-	    BigDecimal[] baseBalances = new BigDecimal[exchangesize];
-	    BigDecimal[] altBalances = new BigDecimal[exchangesize];
 		}
 	
-	public void cancelArbitrageOrder() {
-		System.out.println("cancelPendingOrder!!");
-		this.ordercanceled = true;
-	}
-	
 	public void recievedArbitrageOrder(JSONObject message) throws JSONException, IOException, InterruptedException {
+		if (ordercanceled!=true) {
+		//ADD CHECK FOR SAME EXCHANGES AS ORDER!!!
 		System.out.println(message.toString());
 		JSONObject object = message.getJSONObject("Returned");
 		System.out.println(object.toString());
@@ -188,6 +183,7 @@ public class ArbitrageOrder implements Runnable{
 		} else {
 			person.addOrderData("\nArbitrage is " + (highestbid/lowestask) + " which is lower than the required " + minarb);
 		}
+		}
 	}
 	
     private static class balancesClass {
@@ -195,4 +191,16 @@ public class ArbitrageOrder implements Runnable{
         public static BigDecimal altBalance;
     }
     
+	public void stopOrder() {
+		person.addOrderData("\nArbitrage Order has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Arbitrage Bot.");
+		this.ordercanceled = true;
+		JSONObject jsoncancel = this.json;
+		try {
+			jsoncancel.put("cancel","True");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+    	SocketCommunication.out.print(jsoncancel);
+    	SocketCommunication.out.flush();
+	}
 }
