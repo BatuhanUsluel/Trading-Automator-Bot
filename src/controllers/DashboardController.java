@@ -39,7 +39,6 @@ public class DashboardController {
 	@FXML private TableView<Person> tableView = new TableView<Person>();
     @FXML private MasterDetailPane pane;
 	public static ObservableList<Person> data =  FXCollections.observableArrayList();
-	//TableFilter<Person> filter;
 	@FXML
     public void initialize(){
 		
@@ -183,7 +182,11 @@ public class DashboardController {
 	   	selectedrow.start();
 	   	
         //filter = new TableFilter<Person>(tableView);
-
+	   	try {
+	   		TableFilter.forTableView(tableView).apply();
+	   	} catch (NoSuchMethodError e) {
+	   		
+	   	}
 	}
     
     public static class Person {

@@ -56,7 +56,7 @@ public class SocketCommunication {
 					try {
 						
 						message = stdIn.readLine();
-				    	Thread t = new Thread(new Runnable() {
+				    	Thread t = new Thread(new java.lang.Runnable() {
 				            public void run() {
 				            	try {
 									JSONObject jsonmessage = new JSONObject(message);

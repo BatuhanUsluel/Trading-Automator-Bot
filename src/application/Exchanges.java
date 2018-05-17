@@ -27,15 +27,14 @@ public class Exchanges {
 		 *  Then you can just get the marketdataservice, etc. from that object
 		 */
 		
-		exchangecodemap.put("Binance", "org.knowm.xchange.binance.BinanceExchange");
-		exchangecodemap.put("Bitbay", "org.knowm.xchange.bitbay.BitbayExchange");
-		
-		exchangecodemap.put("Bitfinexv1", "org.knowm.xchange.bitfinex.v1.BitfinexExchange");
-		exchangecodemap.put("Bitmarket", "org.knowm.xchange.bitmarket.BitMarketExchange");
-		exchangecodemap.put("Bitstamp", "org.knowm.xchange.bitstamp.BitstampExchange");
+		exchangecodemap.put("binance", "org.knowm.xchange.binance.BinanceExchange");
+		exchangecodemap.put("bitbay", "org.knowm.xchange.bitbay.BitbayExchange");
+		exchangecodemap.put("bitfinexv1", "org.knowm.xchange.bitfinex.v1.BitfinexExchange");
+		exchangecodemap.put("bitmarket", "org.knowm.xchange.bitmarket.BitMarketExchange");
+		exchangecodemap.put("bitstamp", "org.knowm.xchange.bitstamp.BitstampExchange");
 		exchangecodemap.put("bittrex", "org.knowm.xchange.bittrex.BittrexExchange");
-		exchangecodemap.put("BleuTrade", "org.knowm.xchange.bleutrade.BleutradeExchange");
-		exchangecodemap.put("Btcmarkets", "org.knowm.xchange.btcmarkets.BTCMarketsExchange");
+		exchangecodemap.put("bleuTrade", "org.knowm.xchange.bleutrade.BleutradeExchange");
+		exchangecodemap.put("btcmarkets", "org.knowm.xchange.btcmarkets.BTCMarketsExchange");
 		exchangecodemap.put("ccex", "org.knowm.xchange.ccex.CCEXExchange");
 		exchangecodemap.put("cexio", "org.knowm.xchange.cexio.CexIOExchange");
 		exchangecodemap.put("coinbase", "org.knowm.xchange.coinbase.CoinbaseExchange");
@@ -67,8 +66,9 @@ public class Exchanges {
 		}
 		JSONObject jsonmessage = new JSONObject(everything);
 		Iterator<?> keys = jsonmessage.keys();
-		while( keys.hasNext() ) {
+		while(keys.hasNext()) {
 			String key = (String)keys.next();
+			key = key.toLowerCase();
 			//System.out.println(jsonmessage.get(key));
 			System.out.println(key);
 			

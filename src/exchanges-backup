@@ -1,37 +1,37 @@
 {  
-    "Binance":{  
+    "binance":{  
       "apikey":"Insert_Api_Key",
       "apisecret":"Insert_Api_Secret"
     },
-    "Bitbay":{  
+    "bitbay":{  
       "apikey":"Insert_Api_Key",
       "apisecret":"Insert_Api_Secret"
     },
-    "Bitcoinde":{  
+    "bitcoinde":{  
       "apikey":"Insert_Api_Key",
       "apisecret":"Insert_Api_Secret"
     },
-    "Bitfinexv1":{  
+    "bitfinexv1":{  
       "apikey":"Insert_Api_Key",
       "apisecret":"Insert_Api_Secret"
     },
-    "Bitmarket":{  
+    "bitmarket":{  
       "apikey":"Insert_Api_Key",
       "apisecret":"Insert_Api_Secret"
     },
-    "Bitstamp":{  
+    "bitstamp":{  
       "apikey":"Insert_Api_Key",
       "apisecret":"Insert_Api_Secret"
     },
-    "Bittrex":{  
+    "bittrex":{  
       "apikey":"Insert_Api_Key",
       "apisecret":"Insert_Api_Secret"
     },
-    "BleuTrade":{  
+    "bleuTrade":{  
       "apikey":"Insert_Api_Key",
       "apisecret":"Insert_Api_Secret"
     },
-    "Btcmarkets":{  
+    "btcmarkets":{  
       "apikey":"Insert_Api_Key",
       "apisecret":"Insert_Api_Secret"
     },
