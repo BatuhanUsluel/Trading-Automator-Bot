@@ -1,10 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXHamburger?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" >
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LiveController" >
    <children>
-      <JFXHamburger layoutX="96.0" layoutY="67.0" />
+      <Separator fx:id="sepVertical" layoutX="565.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="14.0" style="-fx-opacity: 0.8;" />
+      <TableView layoutX="32.0" layoutY="46.0" prefHeight="240.0" prefWidth="509.0" />
+      <TableView layoutX="32.0" layoutY="336.0" prefHeight="240.0" prefWidth="509.0" />
+      <Label layoutX="32.0" layoutY="4.0" prefHeight="42.0" prefWidth="159.0" text="Entry Rules:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <Label layoutX="32.0" layoutY="294.0" prefHeight="42.0" prefWidth="159.0" text="Exit Rules:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <JFXButton fx:id="RunTStop" layoutX="750.0" layoutY="505.0" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Start" textFill="WHITE">
+         <font>
+            <Font size="33.0" />
+         </font>
+      </JFXButton>
+      <Label layoutX="609.0" layoutY="234.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <JFXComboBox fx:id="LiveExchange" editable="true" focusColor="#8397d3" layoutX="613.0" layoutY="272.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <Label layoutX="609.0" layoutY="46.0" prefHeight="42.0" prefWidth="115.0" text="Base Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="LiveBase" layoutX="599.0" layoutY="81.0" prefHeight="42.0" prefWidth="67.0" promptText="BTC" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="613.0" layoutY="113.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="609.0" layoutY="141.0" prefHeight="42.0" prefWidth="94.0" text="Alt Pair:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="LiveAlt" layoutX="599.0" layoutY="177.0" prefHeight="42.0" prefWidth="67.0" promptText="ETH" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="613.0" layoutY="209.0" prefHeight="9.0" prefWidth="38.0" />
+      <Label layoutX="609.0" layoutY="315.0" prefHeight="42.0" prefWidth="159.0" text="Base Volume:" textFill="#3592dd">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="LiveBase" layoutX="599.0" layoutY="351.0" prefHeight="44.0" prefWidth="94.0" promptText="0.005" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <Separator layoutX="613.0" layoutY="383.0" prefHeight="9.0" prefWidth="67.0" />
    </children>
 </AnchorPane>

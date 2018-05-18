@@ -31,7 +31,7 @@ public class QuickbuyController {
 
 	@FXML
     public void quickPrice(ActionEvent event) {
-      	 System.out.println("running quickPrice");
+      	System.out.println("running quickPrice");
       	String base = qBase.getText();
       	String alt = qAlt.getText();
       	String volume =qVolume.getText();

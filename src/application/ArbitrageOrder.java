@@ -66,7 +66,6 @@ public class ArbitrageOrder implements Runnable{
 	
 	public void recievedArbitrageOrder(JSONObject message) throws JSONException, IOException, InterruptedException {
 		if (ordercanceled!=true) {
-		//ADD CHECK FOR SAME EXCHANGES AS ORDER!!!
 		System.out.println(message.toString());
 		JSONObject object = message.getJSONObject("Returned");
 		System.out.println(object.toString());

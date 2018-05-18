@@ -374,23 +374,6 @@ public class MarketMaking implements Runnable {
         public static BigDecimal altBalance;
     }
     
-    public static void testCancelOrder() throws NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException, InterruptedException {
-    	System.out.println("testCancelOrder!");
-    	TradeService exchange = Exchanges.exchangemap.get("poloniex").getTradeService();
-    	TimeUnit.SECONDS.sleep(10);
-    	LimitOrder buyingorder = new LimitOrder((OrderType.BID), new BigDecimal(0.1), new CurrencyPair("ETH","BTC"), null, null, new BigDecimal(0.06));
-    	//String prevbidorder2 = exchange.placeLimitOrder(buyingorder);
-    	System.out.println("Placed order!");
-    	System.out.println("Status: " + buyingorder.getStatus());
-    	TimeUnit.SECONDS.sleep(10);
-    	System.out.println("Status: " + buyingorder.getStatus());
-    	TimeUnit.SECONDS.sleep(20);
-    	System.out.println("Canceling order!");
-    	System.out.println("Status: " + buyingorder.getStatus());
-    	//exchange.cancelOrder(prevbidorder2);
-    	System.out.println("Status: " + buyingorder.getStatus());
-    }
-    
 	public void stopOrder() {
 		System.out.println("cancel Market Making order!!!");
 		person.addOrderData("\nMarket Making has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Market Making.");

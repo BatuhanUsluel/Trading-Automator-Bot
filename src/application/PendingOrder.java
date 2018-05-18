@@ -141,7 +141,5 @@ public class PendingOrder implements Runnable {
 		System.out.println("cancelPendingOrder!!");
 		person.addOrderData("\nPending order has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Pending Order.");
 		this.ordercanceled = true;
-	}
-	
-	
+	}	
 }
