@@ -273,7 +273,7 @@ public class MarketMaking implements Runnable {
 						if (bid2+distancefrombest<(prevbuyprice.doubleValue()) || (bid2+distancefrombest>(prevbuyprice.doubleValue()))) {
 							try {
 								tradeExchange.cancelOrder(prevbidorder);
-							} catch (Exception e) {
+							} catch (java.lang.Exception e) {
 								System.out.println("Exception!");
 							}
 							wait=true;
@@ -281,7 +281,7 @@ public class MarketMaking implements Runnable {
 						if((ask2-distancefrombest>(prevsellprice.doubleValue())) || (ask2-distancefrombest<(prevsellprice.doubleValue()))) {
 							try {
 								tradeExchange.cancelOrder(prevaskorder);
-							} catch (Exception e) {
+							} catch (java.lang.Exception e) {
 								System.out.println("Exception!");
 							}
 							wait=true;
