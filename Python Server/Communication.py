@@ -130,6 +130,12 @@ def main():
                     pendingOrder_thread.setDaemon(True)
                     pendingOrder_thread.start()
 
+                elif (request=="livetrading"):
+                    ex = getattr(ccxt, d['Exchanges'])
+                    exchange = ex()
+                    livetrading_thread = Thread(target=live_trading, args=(exchange, d, conn, data))
+                    livetrading_thread.setDaemon(True)
+                    livetrading_thread.start()
             except socket.error as error:
                 if error.errno == errno.WSAECONNRESET:
                     print('Connection no longer valid, closing thread!')
@@ -205,12 +211,11 @@ def main():
             returnedar[currency] = {}
             returnedar[currency][exchangeraw] = order_book
 
-
     def fetch_historical_price(d, conn, data):
         # Implement Historical Price Function
         ex = getattr(ccxt, d['Exchanges'])
         exchange = ex()
-        symbol = d['Coin'] + '/BTC'
+        symbol = d['Coin'] + "/" + d['base']
         starttime = d['Historic']['StartTime']
         timeframe = d['Historic']['Timeframe']
         index = d['Historic']['Index']
@@ -261,6 +266,9 @@ def main():
         print(sendMessage)
         conn.send(sendMessage.encode('UTF-8'))
 
+    def live_trading(exchange, d, conn, data):
+        print('In live trading order thread')
+        fetched_ticker = exchange.fetch_ticker(d['alt'] + "/" + d['base'])
     def sendMarkettoclient(x, y):
         try:
             data4send = json.loads(y)

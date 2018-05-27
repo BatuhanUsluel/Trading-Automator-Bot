@@ -1,0 +1,70 @@
+package controllers;
+
+public enum Indicators {
+	 
+		AccelerationDecelerationIndicator("Accel", "AccelerationDecelerationIndicator")
+		, AroonDownIndicator("AroonDown", "AroonDownIndicator")
+		, AroonOscillatorIndicator("AroonOscil","AroonOscillatorIndicator")
+		, AroonUpIndicator("ArronUp", "AroonUpIndicator")
+		, ATRIndicator("ATR", "ATRIndicator")
+		, AwesomeOscillatorIndicator("AWS", "AwesomeOscillatorIndicator")
+		, CCIIndicator("CCI", "CCIIndicator")
+		, ChandelierExitLongIndicator("CELI", "ChandelierExitLongIndicator")
+		, ChandelierExitShortIndicator("CESI", "ChandelierExitShortIndicator")
+		, CMOIndicator("CMO", "CMOIndicator")
+		, CoppockCurveIndicator("CoCI", "CoppockCurveIndicator")
+		, DoubleEMAIndicator("DEI", "DoubleEMAIndicator")
+		, DPOIndicator("DPO", "DPOIndicator")
+		, EMAIndicator("EMA", "EMAIndicator")
+		, FisherIndicator("FI", "FisherIndicator")
+		, HMAIndicator("HMA", "HMAIndicator")
+		, KAMAIndicator("KAMA", "KAMAIndicator")
+		, MACDIndicator("MACD", "MACDIndicator")
+		, MMAIndicator("MMA", "MMAIndicator")
+		, ParabolicSarIndicator("PSI", "ParabolicSarIndicator")
+		, PPOIndicator("PPO", "PPOIndicator")
+		, RandomWalkIndexHighIndicator("RWIHI", "RandomWalkIndexHighIndicator")
+		, RandomWalkIndexLowIndicator("RWILI", "RandomWalkIndexLowIndicator")
+		, RAVIIndicator("RAVI", "RAVIIndicator")
+		, ROCIndicator("ROCI", "ROCIndicator")
+		, RSIIndicator("RSI", "RSIIndicator")
+		, SMAIndicator("SMA", "SMAIndicator")
+		, StochasticOscillatorDIndicator("SODI", "StochasticOscillatorDIndicator")
+		, StochasticOscillatorKIndicator("SOKI", "StochasticOscillatorKIndicator")
+		, StochasticRSIIndicator("SRI", "StochasticRSIIndicator")
+		, TripleEMAIndicator("TEI", "TripleEMAIndicator")
+		, UlcerIndexIndicator("UII", "UlcerIndexIndicator")
+		, WilliamsRIndicator("WRI", "WilliamsRIndicator")
+		, WMAIndicator("WMA", "WMAIndicator")
+		, ZLEMAIndicator("ZLEMA", "ZLEMAIndicator");
+	   private String code;
+	   private String text;
+	 
+	   private Indicators(String code, String text) {
+	       this.code = code;
+	       this.text = text;
+	   }
+	 
+	   public String getCode() {
+	       return code;
+	   }
+	 
+	   public String getText() {
+	       return text;
+	   }
+	 
+	   public static Indicators getByCode(String indicatorCode) {
+	       for (Indicators g : Indicators.values()) {
+	           if (g.code.equals(indicatorCode)) {
+	               return g;
+	           }
+	       }
+	       return null;
+	   }
+	 
+	   @Override
+	   public String toString() {
+	       return this.text;
+	   }
+	 
+	}
