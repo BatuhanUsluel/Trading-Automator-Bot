@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 	public static Stage primaryStage;
 	
-	public static void main(String[] args) {
+	public static void main(java.lang.String[] args) {
 		launch(args);
 	}
 	
@@ -24,8 +24,8 @@ public class Main extends Application {
 	        primaryStage.setOpacity(0.99);
 	        primaryStage.show();
 	        primaryStage.setResizable(false);
-	        this.primaryStage = primaryStage;
-		} catch(Exception e) {
+	        Main.primaryStage = primaryStage;
+		} catch(java.lang.Exception e) {
 			e.printStackTrace();
 		}
 	}

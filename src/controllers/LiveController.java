@@ -1,6 +1,7 @@
 package controllers;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 import org.ta4j.core.Rule;
 import org.ta4j.core.indicators.EMAIndicator;
@@ -61,10 +62,19 @@ public class LiveController {
     @FXML private TableView<Person> ExitTable = new TableView<Person>();
     public static ObservableList<Person> dataentry =  FXCollections.observableArrayList();
     public static ObservableList<Person> dataexit =  FXCollections.observableArrayList();
+    HashMap<String, String[]> indicatorparameters = new HashMap<String, String[]>();
+
 	@SuppressWarnings("unchecked")
 	@FXML
     public void initialize() throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{		 
-		 // Editable
+		indicatorparameters.put("Accel", new String[]{"timeFrameSma1","timeFrameSma2"});
+		indicatorparameters.put("AroonDown", new String[]{"timeFrame"});
+		indicatorparameters.put("AroonOscil", new String[]{"timeFrame"});
+		indicatorparameters.put("ArronUp", new String[]{"timeFrame"});
+		indicatorparameters.put("ATR", new String[]{"timeFrame"});
+		indicatorparameters.put("AWS", new String[]{});
+		indicatorparameters.put("CCI", new String[]{});
+		// Editable
 		EntryTable.setEditable(true);
         TableColumn<Person, Indicators> Indicator1//
                 = new TableColumn<Person, Indicators>("Indicator1");

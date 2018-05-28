@@ -24,7 +24,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <JFXButton fx:id="RunTStop" layoutX="750.0" layoutY="505.0" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Start" textFill="WHITE">
+      <JFXButton fx:id="StartLive" layoutX="750.0" layoutY="505.0" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Start" textFill="WHITE">
          <font>
             <Font size="33.0" />
          </font>

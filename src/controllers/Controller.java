@@ -20,9 +20,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 public class Controller {
-
+	public static Scene scene;
     //Main
 		 @FXML private PasswordField Pass;
 		 @FXML private TextField Email;
@@ -75,6 +76,7 @@ public class Controller {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
         AnchorPane rootLayout = loader.load(); 
         Scene scene = new Scene(rootLayout);
+        this.scene=scene;
         Main.primaryStage.setScene(scene);
         Main.primaryStage.show();
         Exchanges ex = new Exchanges();
