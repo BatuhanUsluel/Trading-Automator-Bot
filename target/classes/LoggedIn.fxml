@@ -64,7 +64,7 @@
                   <Font size="26.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="settings" layoutX="67.0" layoutY="541.0" onAction="#handleChangeView" prefHeight="67.0" prefWidth="173.0" style="-fx-background-color: #60646b; -fx-border-color: #60646b;" text="Settings" textFill="#c9c9c9">
+            <JFXButton fx:id="Portifolio" layoutX="67.0" layoutY="541.0" onAction="#handleChangeView" prefHeight="67.0" prefWidth="173.0" style="-fx-background-color: #60646b; -fx-border-color: #60646b;" text="Portifolio" textFill="#c9c9c9">
                <font>
                   <Font size="19.0" />
                </font>

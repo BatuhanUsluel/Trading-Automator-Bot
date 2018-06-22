@@ -62,6 +62,14 @@ public enum Indicators {
 	       return null;
 	   }
 	 
+	   public static String getByString(String indicatortext) {
+		   for(Indicators g : Indicators.values()) {
+			   if (g.text.equals(indicatortext)) {
+				   return g.code;
+			   }
+		   }
+		   return null;
+	   }
 	   @Override
 	   public String toString() {
 	       return this.text;

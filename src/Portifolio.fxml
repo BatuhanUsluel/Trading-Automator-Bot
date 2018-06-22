@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PortifolioController">
+   <children>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="84.0" layoutX="35.0" layoutY="22.0" stroke="#757e8d" width="240.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="86.0" layoutX="341.0" layoutY="23.0" stroke="#757e8d" width="240.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="192.0" layoutX="646.0" layoutY="22.0" stroke="#757e8d" width="241.0" />
+      <TableView layoutX="25.0" layoutY="295.0" prefHeight="297.0" prefWidth="386.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="363.0" layoutX="432.0" layoutY="229.0" stroke="BLACK" strokeType="INSIDE" width="466.0" />
+      <Label fx:id="balance" alignment="CENTER_RIGHT" layoutX="42.0" layoutY="28.0" prefHeight="39.0" prefWidth="221.0" text="0.528732  BTC" textFill="#37d6eb">
+         <font>
+            <Font name="Arial Bold" size="25.0" />
+         </font>
+      </Label>
+      <Label fx:id="usdbalance" alignment="CENTER_RIGHT" layoutX="41.0" layoutY="58.0" prefHeight="39.0" prefWidth="221.0" text="USD Value: $5235" textFill="#22b9c9">
+         <font>
+            <Font name="Arial" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="btcusdchange" alignment="CENTER_RIGHT" layoutX="454.0" layoutY="58.0" prefHeight="30.0" prefWidth="123.0" text="(+1.8%)" textFill="#a7e81d">
+         <font>
+            <Font name="Arial" size="21.0" />
+         </font>
+      </Label>
+      <Label layoutX="502.0" layoutY="77.0" prefHeight="39.0" prefWidth="78.0" text="BTC/USD" textFill="#ebac24">
+         <font>
+            <Font name="Arial" size="17.0" />
+         </font>
+      </Label>
+      <Label layoutX="660.0" layoutY="24.0" prefHeight="39.0" prefWidth="89.0" text="Market Cap" textFill="#1cd067">
+         <font>
+            <Font name="Arial Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="660.0" layoutY="84.0" prefHeight="39.0" prefWidth="123.0" text="24 Hour Volume" textFill="#1cd067">
+         <font>
+            <Font name="Arial Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="marketcap" layoutX="669.0" layoutY="44.0" prefHeight="39.0" prefWidth="204.0" text="\$252,523,523,523 USD" textFill="#b8c1c3">
+         <font>
+            <Font name="Arial" size="19.0" />
+         </font>
+      </Label>
+      <Label fx:id="Volume" layoutX="669.0" layoutY="104.0" prefHeight="39.0" prefWidth="204.0" text="17,136,112,531 USD" textFill="#b8c1c3">
+         <font>
+            <Font name="Arial" size="21.0" />
+         </font>
+      </Label>
+      <Label layoutX="514.0" layoutY="295.0" text="TradingView Chart">
+         <font>
+            <Font size="36.0" />
+         </font>
+      </Label>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="136.0" layoutX="34.0" layoutY="130.0" stroke="#757e8d" width="242.0" />
+      <Label layoutX="43.0" layoutY="131.0" prefHeight="39.0" prefWidth="137.0" text="BTC Change" textFill="#e1905a">
+         <font>
+            <Font name="Arial Bold" size="22.0" />
+         </font>
+      </Label>
+      <Label layoutX="44.0" layoutY="165.0" prefHeight="39.0" prefWidth="37.0" text="1H:" textFill="#d7ca19">
+         <font>
+            <Font name="Arial" size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="44.0" layoutY="193.0" prefHeight="39.0" prefWidth="45.0" text="24H:" textFill="#d7ca19">
+         <font>
+            <Font name="Arial" size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="44.0" layoutY="221.0" prefHeight="39.0" prefWidth="45.0" text="7D:" textFill="#d7ca19">
+         <font>
+            <Font name="Arial" size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="660.0" layoutY="144.0" prefHeight="39.0" prefWidth="183.0" text="Bitcoin % of market cap" textFill="#1cd067">
+         <font>
+            <Font name="Arial Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="Percent" layoutX="669.0" layoutY="164.0" prefHeight="39.0" prefWidth="45.0" text="24%" textFill="#b8c1c3">
+         <font>
+            <Font name="Arial" size="21.0" />
+         </font>
+      </Label>
+      <Label fx:id="HourChange" layoutX="97.0" layoutY="165.0" prefHeight="39.0" prefWidth="137.0" text="+1.52 %" textFill="#42b914">
+         <font>
+            <Font name="Arial" size="19.0" />
+         </font>
+      </Label>
+      <Label fx:id="DayChange" layoutX="97.0" layoutY="193.0" prefHeight="39.0" prefWidth="137.0" text="-5.34 %" textFill="#dd5115">
+         <font>
+            <Font name="Arial" size="19.0" />
+         </font>
+      </Label>
+      <Label fx:id="WeekChange" layoutX="97.0" layoutY="221.0" prefHeight="39.0" prefWidth="137.0" text="+3.21 %" textFill="#42b914">
+         <font>
+            <Font name="Arial" size="19.0" />
+         </font>
+      </Label>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="85.0" layoutX="341.0" layoutY="127.0" stroke="#757e8d" width="240.0" />
+      <Label fx:id="ETHUSD" alignment="CENTER_RIGHT" layoutX="465.0" layoutY="125.0" prefHeight="39.0" prefWidth="111.0" text="\$432" textFill="#a69d9a">
+         <font>
+            <Font name="Arial Bold" size="33.0" />
+         </font>
+      </Label>
+      <Label layoutX="504.0" layoutY="179.0" prefHeight="39.0" prefWidth="78.0" text="ETH/USD" textFill="#d0c7c7">
+         <font>
+            <Font name="Arial" size="17.0" />
+         </font>
+      </Label>
+      <Label fx:id="ETHUSDChange" alignment="CENTER_RIGHT" layoutX="455.0" layoutY="156.0" prefHeight="39.0" prefWidth="123.0" text="(-1.4%)" textFill="#d05b5b">
+         <font>
+            <Font name="Arial" size="21.0" />
+         </font>
+      </Label>
+      <Label fx:id="btcusd" alignment="CENTER_RIGHT" layoutX="446.0" layoutY="26.0" prefHeight="39.0" prefWidth="129.0" text="\$7032" textFill="#da9b14">
+         <font>
+            <Font name="Arial Bold" size="33.0" />
+         </font>
+      </Label>
+      <ImageView fitHeight="73.0" fitWidth="69.0" layoutX="348.0" layoutY="133.0">
+         <image>
+            <Image url="/1027.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="73.0" fitWidth="78.0" layoutX="348.0" layoutY="28.0">
+         <image>
+            <Image url="/btc.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>

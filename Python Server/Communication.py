@@ -215,10 +215,10 @@ def main():
         # Implement Historical Price Function
         ex = getattr(ccxt, d['Exchanges'])
         exchange = ex()
-        symbol = d['Coin'] + "/" + d['base']
-        starttime = d['Historic']['StartTime']
-        timeframe = d['Historic']['Timeframe']
-        index = d['Historic']['Index']
+        symbol = d['alt'] + "/" + d['base']
+        starttime = d['StartTime']
+        timeframe = d['Timeframe']
+        index = d['Index']
         height = 20
         length = 200
         from_timestamp = exchange.parse8601(starttime)

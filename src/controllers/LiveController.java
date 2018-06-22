@@ -72,8 +72,6 @@ public class LiveController {
 		indicatorparameters.put("AroonOscil", new String[]{"timeFrame"});
 		indicatorparameters.put("ArronUp", new String[]{"timeFrame"});
 		indicatorparameters.put("ATR", new String[]{"timeFrame"});
-		indicatorparameters.put("AWS", new String[]{});
-		indicatorparameters.put("CCI", new String[]{});
 		// Editable
 		EntryTable.setEditable(true);
         TableColumn<Person, Indicators> Indicator1//

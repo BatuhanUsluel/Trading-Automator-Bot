@@ -38,14 +38,7 @@ public class SocketCommunication {
         listen();
         System.out.println("Done");
     }
-    
-	//Not done
-    public static void sendHistoricalRequest(String coin, String exchange, String starttime, String timeframe, int index) {
-    	String historicalrequest = ("{\"Coin\":\"" + coin + "\",\"Exchanges\":\"" + exchange + "\",\"request\":\"Historic\",\"licenceKey\":\"" + licencekey + "\", \"Historic\":{\"StartTime\": \"" + starttime + "\", \"Timeframe\":\"" + timeframe + "\", \"Index\":" + index + "}}");
-    	out.print(historicalrequest);
-        out.flush();
-    }
-    
+
     public static void listen() throws IOException {
     	Thread t = new Thread(new java.lang.Runnable() {
             @Override

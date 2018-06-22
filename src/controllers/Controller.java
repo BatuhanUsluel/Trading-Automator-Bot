@@ -43,7 +43,7 @@ public class Controller {
 		 @FXML private JFXButton porder;
 		 @FXML private JFXButton tstop;
 		 @FXML private JFXButton fobook;
-		 @FXML private JFXButton settings;
+		 @FXML private JFXButton Portifolio;
 
 	@FXML
     private void handleChangeView(ActionEvent event) {

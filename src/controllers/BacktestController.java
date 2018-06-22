@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 
 import application.Main;
+import application.SocketCommunication;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,13 +18,14 @@ import controllers.Person;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.ta4j.core.Rule;
 import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.trading.rules.*;
-
+import org.json.JSONObject;
 import org.ta4j.core.Decimal;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -84,8 +86,14 @@ public class BacktestController {
     @FXML private JFXDatePicker endtime;
     public static ObservableList<Person> Backdataentry =  FXCollections.observableArrayList();
     public static ObservableList<Person> Backdataexit =  FXCollections.observableArrayList();
+    HashMap<String, String[]> indicatorparameters = new HashMap<String, String[]>();
 	@FXML
     public void initialize(){
+		indicatorparameters.put("Accel", new String[]{"timeFrameSma1","timeFrameSma2"});
+		indicatorparameters.put("AroonDown", new String[]{"timeFrame"});
+		indicatorparameters.put("AroonOscil", new String[]{"timeFrame"});
+		indicatorparameters.put("ArronUp", new String[]{"timeFrame"});
+		indicatorparameters.put("ATR", new String[]{"timeFrame"});
 		String css = this.getClass().getResource("/assets/datepicker.css").toExternalForm();
 		Controller.scene.getStylesheets().add(css);;
 		setUpEntryTable();
@@ -112,6 +120,53 @@ public class BacktestController {
     void runBackTest(ActionEvent event) {
     	int EntrySize = BackEntryTable.getItems().size();
     	int ExitSize = BackExitTable.getItems().size();
+    	for (Person person : BackEntryTable.getItems()) {
+    		String indicator1 = person.getIndicator1();
+    		String indicator2 = person.getIndicator2();
+    		String entryRule = person.getTradingRule();
+    		boolean andor = person.isSingle();
+    		String indic1code = Indicators.getByString(indicator1);
+    		String indic2code = Indicators.getByString(indicator2);
+    		
+    		/*
+    		 * ClosePriceIndicator closePrice = new ClosePriceIndicator(null);
+        EMAIndicator shortEma = new EMAIndicator(closePrice, 9);
+        EMAIndicator longEma = new EMAIndicator(closePrice, 26);
+        System.out.println(shortEma.toString());
+        
+        Rule entryRule = new CrossedUpIndicatorRule(shortEma, longEma);
+        Rule test = new IsFallingRule(shortEma, 1,2);
+        Class myClass = Class.forName("org.ta4j.core.indicators.EMAIndicator");
+        Constructor constructor = myClass.getConstructor(Indicator.class, int.class);
+
+        Object[] parameters = {closePrice, 10};
+        Object instanceOfMyClass = constructor.newInstance(parameters);
+        System.out.println(instanceOfMyClass.toString());
+    		 */
+    	}
+    	for (Person person : BackExitTable.getItems()) {
+    		
+    	}
+
+    	JSONObject backtestJSON = new JSONObject();
+    	try {
+			backtestJSON.put("base", BackBase.getText());
+	    	backtestJSON.put("alt", BackAlt.getText());
+	    	backtestJSON.put("request", "Historic");
+	    	backtestJSON.put("TimeFrame", "1d");
+	    	LocalDate ld = starttime.getValue();
+	    	Calendar c =  Calendar.getInstance();
+	    	c.set(ld.getYear(), ld.getMonthValue() - 1, ld.getDayOfMonth());
+	    	Date date = c.getTime();
+	    	backtestJSON.put("StartTime", starttime.getValue());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	//String historicalrequest = ("{\"Coin\":\"" + coin + "\",\"Exchanges\":\"" + exchange + "\",\"request\":\"Historic\",\"licenceKey\":\"" + licencekey + "\", \"Historic\":{\"StartTime\": \"" + starttime + "\", \"Timeframe\":\"" + timeframe + "\", \"Index\":" + index + "}}");
+    	SocketCommunication.out.print(backtestJSON.toString());
+    	SocketCommunication.out.flush();
+    	
     }
     
     void setUpEntryTable() {
