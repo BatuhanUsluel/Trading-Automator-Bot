@@ -2,6 +2,8 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
@@ -125,17 +127,15 @@
             <Font name="Arial Bold" size="33.0" />
          </font>
       </Label>
-       <!--
-      <ImageView fitHeight="73.0" fitWidth="69.0" layoutX="348.0" layoutY="133.0">
-         <image>
-            <Image url="/1027.png" />
-         </image>
-      </ImageView>
-      <ImageView fitHeight="73.0" fitWidth="78.0" layoutX="348.0" layoutY="28.0">
+      <ImageView fitHeight="73.0" fitWidth="73.0" layoutX="348.0" layoutY="28.0">
          <image>
             <Image url="/btc.png" />
          </image>
       </ImageView>
-       -->
+      <ImageView fitHeight="73.0" fitWidth="73.0" layoutX="348.0" layoutY="133.0">
+         <image>
+            <Image url="/1027.png" />
+         </image>
+      </ImageView>  
    </children>
 </AnchorPane>

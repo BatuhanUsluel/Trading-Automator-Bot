@@ -4,12 +4,16 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.json.*;
@@ -20,11 +24,15 @@ import org.knowm.xchange.ExchangeSpecification;
 import org.knowm.xchange.coinmarketcap.CoinMarketCapExchange;
 import org.knowm.xchange.coinmarketcap.dto.marketdata.CoinMarketCapTicker;
 import org.knowm.xchange.coinmarketcap.service.CoinMarketCapMarketDataService;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
+import org.knowm.xchange.dto.account.Balance;
 import org.knowm.xchange.service.marketdata.MarketDataService;
 
 import com.google.gson.JsonParser;
 
+import application.Exchanges;
+import javafx.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
@@ -181,24 +189,25 @@ public class PortifolioController {
 	    }
 		DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 		DecimalFormat percentdecimal = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-		DecimalFormat pricedecimal = new DecimalFormat("$#####.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		DecimalFormat pricedecimal = new DecimalFormat("$#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 		df.setMaximumFractionDigits(340); // 340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
 		Volume.setText("$" + addCommasToNumericString(df.format(GlobalData.volume)));
 		marketcap.setText("$" + addCommasToNumericString(df.format(GlobalData.Dmarketcap)));
 		Percent.setText(percentdecimal.format(GlobalData.percentofmcap) + "%");
 		ETHUSD.setText(pricedecimal.format(ETHValues.price));
+		Color CustomRed = Color.valueOf("#d05b5b");
 		 if (ETHValues.daychange>0) {
 			 	ETHUSDChange.setTextFill(Color.GREEN);
 			 	ETHUSDChange.setText("+" + (df.format((ETHValues.daychange))+ "%"));
 			} else {
-				ETHUSDChange.setTextFill(Color.RED);
+				ETHUSDChange.setTextFill(CustomRed);
 				ETHUSDChange.setText(" " + (df.format((ETHValues.daychange))+ "%"));
 			}
 		if (BTCValues.DHourChange>0) {
 			HourChange.setTextFill(Color.GREEN);
 			HourChange.setText("+" + (df.format(BTCValues.DHourChange))+ "%");
 		} else {
-			HourChange.setTextFill(Color.RED);
+			HourChange.setTextFill(CustomRed);
 			HourChange.setText(" " + (df.format(BTCValues.DHourChange))+ "%");
 		}
 		if (BTCValues.DDayChange>0) {
@@ -207,20 +216,54 @@ public class PortifolioController {
 			btcusdchange.setTextFill(Color.GREEN);
 			btcusdchange.setText("+" + df.format(BTCValues.DDayChange) + "%");
 		} else {
-			DayChange.setTextFill(Color.RED);
+			DayChange.setTextFill(CustomRed);
 			DayChange.setText(" " + (df.format(BTCValues.DDayChange))+ "%");
-			btcusdchange.setTextFill(Color.RED);
+			btcusdchange.setTextFill(CustomRed);
 			btcusdchange.setText(df.format(BTCValues.DDayChange)+ "%");
 		}
 		if (BTCValues.DWeekChange>0) {
 			WeekChange.setTextFill(Color.GREEN);
 			WeekChange.setText("+" + (df.format(BTCValues.DWeekChange))+ "%");
 		} else {
-			WeekChange.setTextFill(Color.RED);
+			WeekChange.setTextFill(CustomRed);
 			WeekChange.setText(" " + (df.format(BTCValues.DWeekChange))+ "%");
 		}
 		
 		Sbtcusd.setText((pricedecimal.format(BTCValues.Dbtcusdprice)));
+		
+		//Get balances from each exchanges for all currencies and add them to hashmap, with currency being the key and the btc worth being the value(double)
+		HashMap<Currency, Double> balanceperexchange = new HashMap<Currency, Double>();
+		for (Entry<String, Exchange> entry : Exchanges.exchangemap.entrySet()) {
+		    String ExchangeString = entry.getKey();
+		    Exchange Exchange = entry.getValue();
+		    Map<Currency, Balance> balancemap = Exchange.getAccountService().getAccountInfo().getWallet().getBalances();
+		    for (Entry<Currency, Balance> entry2 : balancemap.entrySet()) {
+		    	Balance balance = entry2.getValue();
+		    	if (balance.getTotal().doubleValue()>0) {
+			    	Currency currency = entry2.getKey();
+			    	BigDecimal btcbalance;
+			    	if (currency.toString()!="BTC") {
+			    		BigDecimal last = Exchange.getMarketDataService().getTicker(new CurrencyPair(currency.toString(), "BTC")).getLast();
+						btcbalance = last.multiply(balance.getTotal());
+			    	} else {
+			    		btcbalance = balance.getTotal();
+			    	}
+					System.out.println(currency + ": " + balance + "btcworth" + btcbalance);
+					if (balanceperexchange.get(currency) != null) {
+						balanceperexchange.put(currency, (balanceperexchange.get(currency)+btcbalance.doubleValue()));
+					} else {
+						balanceperexchange.put(currency, btcbalance.doubleValue());
+					}
+		    	}
+		    }
+		}
+		double total=0;
+		for (double value : balanceperexchange.values()) {
+		    total+=value;
+		}
+		DecimalFormat btcbalancedf = new DecimalFormat("###########.######## BTC", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		balance.setText(btcbalancedf.format(total));
+		usdbalance.setText("USD: " + pricedecimal.format(BTCValues.Dbtcusdprice*total));
 	}
 	private String addCommasToNumericString (String digits)
 	{
