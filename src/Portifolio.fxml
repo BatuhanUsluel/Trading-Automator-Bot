@@ -2,8 +2,6 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
@@ -86,7 +84,7 @@
             <Font name="Arial Bold" size="15.0" />
          </font>
       </Label>
-      <Label fx:id="Percent" layoutX="669.0" layoutY="164.0" prefHeight="39.0" prefWidth="45.0" text="24%" textFill="#b8c1c3">
+      <Label fx:id="Percent" layoutX="669.0" layoutY="164.0" prefHeight="39.0" prefWidth="78.0" text="24%" textFill="#b8c1c3">
          <font>
             <Font name="Arial" size="21.0" />
          </font>
@@ -107,7 +105,7 @@
          </font>
       </Label>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="85.0" layoutX="341.0" layoutY="127.0" stroke="#757e8d" width="240.0" />
-      <Label fx:id="ETHUSD" alignment="CENTER_RIGHT" layoutX="465.0" layoutY="125.0" prefHeight="39.0" prefWidth="111.0" text="\$432" textFill="#a69d9a">
+      <Label fx:id="ETHUSD" alignment="CENTER_RIGHT" layoutX="419.0" layoutY="125.0" prefHeight="39.0" prefWidth="157.0" text="\$432" textFill="#a69d9a">
          <font>
             <Font name="Arial Bold" size="33.0" />
          </font>
@@ -122,11 +120,12 @@
             <Font name="Arial" size="21.0" />
          </font>
       </Label>
-      <Label fx:id="Sbtcusd" alignment="CENTER_RIGHT" layoutX="446.0" layoutY="26.0" prefHeight="39.0" prefWidth="129.0" text="\$7032" textFill="#da9b14">
+      <Label fx:id="Sbtcusd" alignment="CENTER_RIGHT" layoutX="427.0" layoutY="26.0" prefHeight="39.0" prefWidth="148.0" text="\$7032" textFill="#da9b14">
          <font>
             <Font name="Arial Bold" size="33.0" />
          </font>
       </Label>
+       <!--
       <ImageView fitHeight="73.0" fitWidth="69.0" layoutX="348.0" layoutY="133.0">
          <image>
             <Image url="/1027.png" />
@@ -137,5 +136,6 @@
             <Image url="/btc.png" />
          </image>
       </ImageView>
+       -->
    </children>
 </AnchorPane>

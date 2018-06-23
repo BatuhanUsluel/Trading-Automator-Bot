@@ -6,6 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 import org.json.*;
 
 import org.knowm.xchange.Exchange;
@@ -37,69 +43,200 @@ public class PortifolioController {
     @FXML private Label ETHUSDChange;
     @FXML private Label Sbtcusd;
 
-
+    private static class BTCValues {
+        public static double Dbtcusdprice;
+        public static double DHourChange;
+        public static double DDayChange;
+        public static double DWeekChange;
+    }
+    private static class ETHValues {
+        public static double price;
+        public static double daychange;
+    }
+    private static class GlobalData {
+        public static double percentofmcap;
+        public static double Dmarketcap;
+        public static double volume;
+    }
 	@FXML
-	public void initialize() throws IOException, JSONException{
-		/*ExchangeSpecification exSpec = new ExchangeSpecification(CoinMarketCapExchange.class.getName());
-		Exchange ex = ExchangeFactory.INSTANCE.createExchange(exSpec);
-		CoinMarketCapMarketDataService market = (CoinMarketCapMarketDataService) ex.getMarketDataService();
-		CoinMarketCapTicker ticker = market.getCoinMarketCapTicker(CurrencyPair.BTC_USD);
-		*/
-		URL url = new URL("https://api.coinmarketcap.com/v2/ticker/1");
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestMethod("GET");
-
-con.setDoOutput(true);
-		DataOutputStream out = new DataOutputStream(con.getOutputStream());
-		out.flush();
-		out.close();
-		con.setConnectTimeout(5000);
-		con.setReadTimeout(5000);
-		int status = con.getResponseCode();
-		BufferedReader in = new BufferedReader(
-		new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer content = new StringBuffer();
-		while ((inputLine = in.readLine()) != null) {
-		    content.append(inputLine);
-		}
-		System.out.println(content);
-		in.close();
-		con.disconnect();
-		JsonParser parser = new JsonParser();
-		Object obj = parser.parse(content.toString());
-		JSONObject objJsonObject = new JSONObject(obj.toString());
-		JSONObject btcusd = objJsonObject.getJSONObject("data").getJSONObject("quotes").getJSONObject("USD");
-		double Dbtcusdprice = btcusd.getDouble("price");
-		double DHourChange = btcusd.getDouble("percent_change_1h");
-		double DDayChange = btcusd.getDouble("percent_change_24h");
-		double DWeekChange = btcusd.getDouble("percent_change_7d");
-		if (DHourChange>0) {
+	public void initialize() throws IOException, JSONException, InterruptedException{
+		ArrayList<Thread> threads = new ArrayList<Thread>();
+		//BTC TICKER
+		int test = 1;
+	    Thread btcticker = new Thread(new Runnable() {
+	        public void run()
+	        {
+	        	try {
+	        		int xd = test;
+		        	URL url = new URL("https://api.coinmarketcap.com/v2/ticker/1");
+		    		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		    		con.getResponseCode();
+		    		BufferedReader in;
+					in = new BufferedReader(
+					new InputStreamReader(con.getInputStream()));
+		    		String inputLine;
+		    		StringBuffer content = new StringBuffer();
+		    		while ((inputLine = in.readLine()) != null) {
+		    		    content.append(inputLine);
+		    		}
+		    		System.out.println(content);
+		    		in.close();
+		    		con.disconnect();
+		    		JsonParser parser = new JsonParser();
+		    		Object obj = parser.parse(content.toString());
+		    		JSONObject objJsonObject = new JSONObject(obj.toString());
+		    		JSONObject btcusd = objJsonObject.getJSONObject("data").getJSONObject("quotes").getJSONObject("USD");
+		    		BTCValues.Dbtcusdprice = btcusd.getDouble("price");
+		    		BTCValues.DHourChange = btcusd.getDouble("percent_change_1h");
+		    		BTCValues.DDayChange = btcusd.getDouble("percent_change_24h");
+		    		BTCValues.DWeekChange = btcusd.getDouble("percent_change_7d");
+		    		
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	    });  
+	    btcticker.start();
+	    threads.add(btcticker);
+	    //ETH TICKER
+	  	    Thread ethticker = new Thread(new Runnable() {
+	  	        public void run()
+	  	        {
+	  	        	try {
+	  	        		int xd = test;
+	  		        	URL url = new URL("https://api.coinmarketcap.com/v2/ticker/1027");
+	  		    		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+	  		    		con.getResponseCode();
+	  		    		BufferedReader in;
+	  					in = new BufferedReader(
+	  					new InputStreamReader(con.getInputStream()));
+	  		    		String inputLine;
+	  		    		StringBuffer content = new StringBuffer();
+	  		    		while ((inputLine = in.readLine()) != null) {
+	  		    		    content.append(inputLine);
+	  		    		}
+	  		    		System.out.println(content);
+	  		    		in.close();
+	  		    		con.disconnect();
+	  		    		JsonParser parser = new JsonParser();
+	  		    		Object obj = parser.parse(content.toString());
+	  		    		JSONObject objJsonObject = new JSONObject(obj.toString());
+	  		    		JSONObject ethusd = objJsonObject.getJSONObject("data").getJSONObject("quotes").getJSONObject("USD");
+	  		    		ETHValues.price = ethusd.getDouble("price");
+	  		    		ETHValues.daychange = ethusd.getDouble("percent_change_24h");
+	  		    		
+	  				} catch (IOException e) {
+	  					// TODO Auto-generated catch block
+	  					e.printStackTrace();
+	  				} catch (JSONException e) {
+	  					// TODO Auto-generated catch block
+	  					e.printStackTrace();
+	  				}
+	  	        }
+	  	    });  
+	  	  ethticker.start();
+	  	  threads.add(ethticker);
+		//GLOBAL DATA
+	    Thread globaldata = new Thread(new Runnable() {
+	        public void run()
+	        {
+	        	try {
+					URL url = new URL("https://api.coinmarketcap.com/v2/global/");
+					HttpURLConnection con = (HttpURLConnection) url.openConnection();
+					con.setDoOutput(true);
+					int responseCode = con.getResponseCode();
+					BufferedReader in = new BufferedReader(
+					new InputStreamReader(con.getInputStream()));
+					String inputLine;
+					StringBuffer content = new StringBuffer();
+					while ((inputLine = in.readLine()) != null) {
+					    content.append(inputLine);
+					}
+					System.out.println(content);
+					in.close();
+					con.disconnect();
+					JsonParser parser = new JsonParser();
+					Object obj = parser.parse(content.toString());
+					JSONObject objJsonObject = new JSONObject(obj.toString());
+					GlobalData.percentofmcap = objJsonObject.getJSONObject("data").getDouble("bitcoin_percentage_of_market_cap");
+					GlobalData.Dmarketcap = objJsonObject.getJSONObject("data").getJSONObject("quotes").getJSONObject("USD").getDouble("total_market_cap");
+					GlobalData.volume = objJsonObject.getJSONObject("data").getJSONObject("quotes").getJSONObject("USD").getDouble("total_volume_24h");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	    });
+	    globaldata.start();
+	    threads.add(globaldata);
+	    for (Thread thread : threads) {
+	        thread.join();
+	    }
+		DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		DecimalFormat percentdecimal = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		DecimalFormat pricedecimal = new DecimalFormat("$#####.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		df.setMaximumFractionDigits(340); // 340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
+		Volume.setText("$" + addCommasToNumericString(df.format(GlobalData.volume)));
+		marketcap.setText("$" + addCommasToNumericString(df.format(GlobalData.Dmarketcap)));
+		Percent.setText(percentdecimal.format(GlobalData.percentofmcap) + "%");
+		ETHUSD.setText(pricedecimal.format(ETHValues.price));
+		 if (ETHValues.daychange>0) {
+			 	ETHUSDChange.setTextFill(Color.GREEN);
+			 	ETHUSDChange.setText("+" + (df.format((ETHValues.daychange))+ "%"));
+			} else {
+				ETHUSDChange.setTextFill(Color.RED);
+				ETHUSDChange.setText(" " + (df.format((ETHValues.daychange))+ "%"));
+			}
+		if (BTCValues.DHourChange>0) {
 			HourChange.setTextFill(Color.GREEN);
-			HourChange.setText("+" + (Double.toString(DHourChange))+ "%");
+			HourChange.setText("+" + (df.format(BTCValues.DHourChange))+ "%");
 		} else {
 			HourChange.setTextFill(Color.RED);
-			HourChange.setText(" " + (Double.toString(DHourChange))+ "%");
+			HourChange.setText(" " + (df.format(BTCValues.DHourChange))+ "%");
 		}
-		if (DDayChange>0) {
+		if (BTCValues.DDayChange>0) {
 			DayChange.setTextFill(Color.GREEN);
-			DayChange.setText("+" + (Double.toString(DDayChange))+ "%");
+			DayChange.setText("+" + (df.format(BTCValues.DDayChange))+ "%");
 			btcusdchange.setTextFill(Color.GREEN);
-			btcusdchange.setText("+" + Double.toString(DDayChange) + "%");
+			btcusdchange.setText("+" + df.format(BTCValues.DDayChange) + "%");
 		} else {
 			DayChange.setTextFill(Color.RED);
-			DayChange.setText(" " + (Double.toString(DDayChange))+ "%");
+			DayChange.setText(" " + (df.format(BTCValues.DDayChange))+ "%");
 			btcusdchange.setTextFill(Color.RED);
-			btcusdchange.setText(Double.toString(DDayChange)+ "%");
+			btcusdchange.setText(df.format(BTCValues.DDayChange)+ "%");
 		}
-		if (DWeekChange>0) {
+		if (BTCValues.DWeekChange>0) {
 			WeekChange.setTextFill(Color.GREEN);
-			WeekChange.setText("+" + (Double.toString(DWeekChange))+ "%");
+			WeekChange.setText("+" + (df.format(BTCValues.DWeekChange))+ "%");
 		} else {
 			WeekChange.setTextFill(Color.RED);
-			WeekChange.setText(" " + (Double.toString(DWeekChange))+ "%");
+			WeekChange.setText(" " + (df.format(BTCValues.DWeekChange))+ "%");
 		}
 		
-		Sbtcusd.setText("$" + (Double.toString(Dbtcusdprice)));
+		Sbtcusd.setText((pricedecimal.format(BTCValues.Dbtcusdprice)));
+	}
+	private String addCommasToNumericString (String digits)
+	{
+	    String result = "";
+	    int len = digits.length();
+	    int nDigits = 0;
+
+	    for (int i = len - 1; i >= 0; i--)                      
+	    {
+	        result = digits.charAt(i) + result;                 
+	        nDigits++;                                          
+	        if (((nDigits % 3) == 0) && (i > 0))                
+	        {
+	            result = "," + result;
+	        }
+	    }
+	    return (result);
 	}
 }
