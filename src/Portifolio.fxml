@@ -13,7 +13,7 @@
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="84.0" layoutX="35.0" layoutY="22.0" stroke="#757e8d" width="240.0" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="86.0" layoutX="341.0" layoutY="23.0" stroke="#757e8d" width="240.0" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="192.0" layoutX="646.0" layoutY="22.0" stroke="#757e8d" width="241.0" />
-      <TableView layoutX="25.0" layoutY="295.0" prefHeight="297.0" prefWidth="386.0" />
+      <TableView fx:id="tablebalance" layoutX="25.0" layoutY="295.0" prefHeight="297.0" prefWidth="386.0" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="363.0" layoutX="432.0" layoutY="229.0" stroke="BLACK" strokeType="INSIDE" width="466.0" />
       <Label fx:id="balance" alignment="CENTER_RIGHT" layoutX="42.0" layoutY="28.0" prefHeight="39.0" prefWidth="221.0" text="0.528732  BTC" textFill="#37d6eb">
          <font>

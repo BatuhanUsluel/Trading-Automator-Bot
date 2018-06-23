@@ -32,12 +32,21 @@ import org.knowm.xchange.service.marketdata.MarketDataService;
 import com.google.gson.JsonParser;
 
 import application.Exchanges;
+import controllers.DashboardController.Person;
 import javafx.*;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 
 public class PortifolioController {
+	
+	@FXML private TableView<controllers.PortifolioController.Person> tablebalance;
     @FXML private Label balance;
     @FXML private Label usdbalance;
     @FXML private Label btcusdchange;
@@ -66,8 +75,10 @@ public class PortifolioController {
         public static double Dmarketcap;
         public static double volume;
     }
+	@SuppressWarnings("unchecked")
 	@FXML
 	public void initialize() throws IOException, JSONException, InterruptedException{
+		ObservableList<Person> data =  FXCollections.observableArrayList();
 		ArrayList<Thread> threads = new ArrayList<Thread>();
 		//BTC TICKER
 		int test = 1;
@@ -258,12 +269,41 @@ public class PortifolioController {
 		    }
 		}
 		double total=0;
+		
 		for (double value : balanceperexchange.values()) {
-		    total+=value;
+			 total+=value;
 		}
-		DecimalFormat btcbalancedf = new DecimalFormat("###########.######## BTC", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-		balance.setText(btcbalancedf.format(total));
+		DecimalFormat btcbalancedf = new DecimalFormat("###########.########", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		balance.setText(btcbalancedf.format(total) + " BTC");
 		usdbalance.setText("USD: " + pricedecimal.format(BTCValues.Dbtcusdprice*total));
+		
+		for (Entry<Currency, Double> entry : balanceperexchange.entrySet()) {
+			Currency Currency = entry.getKey();
+			Double value = entry.getValue();
+			data.add(new Person(Currency.toString(), btcbalancedf.format(value), pricedecimal.format(value*BTCValues.Dbtcusdprice), percentdecimal.format((value/total)*100),"1"));
+		}
+
+		
+		TableColumn<Person, String> CurrencyCol = new TableColumn<Person, String>("Currency");
+		CurrencyCol.setCellValueFactory(new PropertyValueFactory<>("Currency"));
+        
+        TableColumn<Person, String> BTCWorthCol = new TableColumn<Person, String>("BTC Worth");
+        BTCWorthCol.setCellValueFactory(new PropertyValueFactory<>("BTCWorth"));
+
+        TableColumn<Person, String> USDWorthCol = new TableColumn<Person, String>("USD Worth");
+        USDWorthCol.setCellValueFactory(new PropertyValueFactory<>("USDWorth"));
+        
+        TableColumn<Person, String> PercentCol = new TableColumn<Person, String>("% Of Balance");
+        PercentCol.setCellValueFactory(new PropertyValueFactory<>("Percent"));
+        
+        TableColumn<Person, String> ChangeCol = new TableColumn<Person, String>("24H Change");
+        ChangeCol.setCellValueFactory(new PropertyValueFactory<>("Change"));
+        String css = this.getClass().getResource("/assets/tableview.css").toExternalForm();
+        tablebalance.getStylesheets().setAll(css);
+        tablebalance.setItems(data);
+        BTCWorthCol.setSortType(TableColumn.SortType.ASCENDING);
+        tablebalance.getSortOrder().setAll(BTCWorthCol);
+        tablebalance.getColumns().addAll(CurrencyCol,BTCWorthCol, USDWorthCol, PercentCol,ChangeCol);
 	}
 	private String addCommasToNumericString (String digits)
 	{
@@ -281,5 +321,36 @@ public class PortifolioController {
 	        }
 	    }
 	    return (result);
+	}
+	
+	public static class Person {
+		private final SimpleStringProperty Currency;
+    	private final SimpleStringProperty BTCWorth;
+    	private final SimpleStringProperty USDWorth;
+    	private final SimpleStringProperty Percent;
+    	private final SimpleStringProperty Change;
+    	private Person(String Currency,String BTCWorth,String USDWorth, String Percent, String Change) {
+    		this.Currency = new SimpleStringProperty(Currency);
+			this.BTCWorth  = new SimpleStringProperty(BTCWorth);
+			this.USDWorth = new SimpleStringProperty(USDWorth);
+			this.Percent = new SimpleStringProperty(Percent);
+			this.Change = new SimpleStringProperty(Change);
+    	}
+    	
+    	 public String getCurrency() {
+             return Currency.get();
+         }
+    	 public String getBTCWorth() {
+             return BTCWorth.get();
+         }
+    	 public String getUSDWorth() {
+             return USDWorth.get();
+         }
+    	 public String getPercent() {
+             return Percent.get();
+         }
+    	 public String getChange() {
+             return Change.get();
+         }
 	}
 }
