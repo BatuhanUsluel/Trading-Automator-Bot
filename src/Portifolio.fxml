@@ -122,7 +122,7 @@
             <Font name="Arial" size="21.0" />
          </font>
       </Label>
-      <Label fx:id="btcusd" alignment="CENTER_RIGHT" layoutX="446.0" layoutY="26.0" prefHeight="39.0" prefWidth="129.0" text="\$7032" textFill="#da9b14">
+      <Label fx:id="Sbtcusd" alignment="CENTER_RIGHT" layoutX="446.0" layoutY="26.0" prefHeight="39.0" prefWidth="129.0" text="\$7032" textFill="#da9b14">
          <font>
             <Font name="Arial Bold" size="33.0" />
          </font>
