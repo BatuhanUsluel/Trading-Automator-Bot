@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
-
+<?import javafx.scene.image.Image?>
 <AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PortifolioController">
    <children>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="84.0" layoutX="35.0" layoutY="22.0" stroke="#757e8d" width="240.0" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="86.0" layoutX="341.0" layoutY="23.0" stroke="#757e8d" width="240.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="192.0" layoutX="646.0" layoutY="22.0" stroke="#757e8d" width="241.0" />
-      <TableView fx:id="tablebalance" layoutX="25.0" layoutY="295.0" prefHeight="297.0" prefWidth="386.0" />
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="363.0" layoutX="432.0" layoutY="229.0" stroke="BLACK" strokeType="INSIDE" width="466.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="192.0" layoutX="649.0" layoutY="35.0" stroke="#757e8d" width="241.0" />
+      <TableView fx:id="tablebalance" layoutX="25.0" layoutY="290.0" prefHeight="302.0" prefWidth="866.0" />
       <Label fx:id="balance" alignment="CENTER_RIGHT" layoutX="42.0" layoutY="28.0" prefHeight="39.0" prefWidth="221.0" text="0.528732  BTC" textFill="#37d6eb">
          <font>
             <Font name="Arial Bold" size="25.0" />
@@ -35,29 +32,24 @@
             <Font name="Arial" size="17.0" />
          </font>
       </Label>
-      <Label layoutX="660.0" layoutY="24.0" prefHeight="39.0" prefWidth="89.0" text="Market Cap" textFill="#1cd067">
+      <Label layoutX="663.0" layoutY="37.0" prefHeight="39.0" prefWidth="89.0" text="Market Cap" textFill="#1cd067">
          <font>
             <Font name="Arial Bold" size="15.0" />
          </font>
       </Label>
-      <Label layoutX="660.0" layoutY="84.0" prefHeight="39.0" prefWidth="123.0" text="24 Hour Volume" textFill="#1cd067">
+      <Label layoutX="663.0" layoutY="97.0" prefHeight="39.0" prefWidth="123.0" text="24 Hour Volume" textFill="#1cd067">
          <font>
             <Font name="Arial Bold" size="15.0" />
          </font>
       </Label>
-      <Label fx:id="marketcap" layoutX="669.0" layoutY="44.0" prefHeight="39.0" prefWidth="204.0" text="\$252,523,523,523 USD" textFill="#b8c1c3">
+      <Label fx:id="marketcap" layoutX="672.0" layoutY="57.0" prefHeight="39.0" prefWidth="204.0" text="\$252,523,523,523 USD" textFill="#b8c1c3">
          <font>
             <Font name="Arial" size="19.0" />
          </font>
       </Label>
-      <Label fx:id="Volume" layoutX="669.0" layoutY="104.0" prefHeight="39.0" prefWidth="204.0" text="17,136,112,531 USD" textFill="#b8c1c3">
+      <Label fx:id="Volume" layoutX="672.0" layoutY="117.0" prefHeight="39.0" prefWidth="204.0" text="17,136,112,531 USD" textFill="#b8c1c3">
          <font>
             <Font name="Arial" size="21.0" />
-         </font>
-      </Label>
-      <Label layoutX="514.0" layoutY="295.0" text="TradingView Chart">
-         <font>
-            <Font size="36.0" />
          </font>
       </Label>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="136.0" layoutX="34.0" layoutY="130.0" stroke="#757e8d" width="242.0" />
@@ -81,12 +73,12 @@
             <Font name="Arial" size="20.0" />
          </font>
       </Label>
-      <Label layoutX="660.0" layoutY="144.0" prefHeight="39.0" prefWidth="183.0" text="Bitcoin % of market cap" textFill="#1cd067">
+      <Label layoutX="663.0" layoutY="157.0" prefHeight="39.0" prefWidth="183.0" text="Bitcoin % of market cap" textFill="#1cd067">
          <font>
             <Font name="Arial Bold" size="15.0" />
          </font>
       </Label>
-      <Label fx:id="Percent" layoutX="669.0" layoutY="164.0" prefHeight="39.0" prefWidth="78.0" text="24%" textFill="#b8c1c3">
+      <Label fx:id="Percent" layoutX="672.0" layoutY="177.0" prefHeight="39.0" prefWidth="78.0" text="24%" textFill="#b8c1c3">
          <font>
             <Font name="Arial" size="21.0" />
          </font>
@@ -106,18 +98,18 @@
             <Font name="Arial" size="19.0" />
          </font>
       </Label>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="85.0" layoutX="341.0" layoutY="127.0" stroke="#757e8d" width="240.0" />
-      <Label fx:id="ETHUSD" alignment="CENTER_RIGHT" layoutX="419.0" layoutY="125.0" prefHeight="39.0" prefWidth="157.0" text="\$432" textFill="#a69d9a">
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#525968" height="87.0" layoutX="340.0" layoutY="159.0" stroke="#757e8d" width="241.0" />
+      <Label fx:id="ETHUSD" alignment="CENTER_RIGHT" layoutX="418.0" layoutY="158.0" prefHeight="39.0" prefWidth="157.0" text="\$432" textFill="#a69d9a">
          <font>
             <Font name="Arial Bold" size="33.0" />
          </font>
       </Label>
-      <Label layoutX="504.0" layoutY="179.0" prefHeight="39.0" prefWidth="78.0" text="ETH/USD" textFill="#d0c7c7">
+      <Label layoutX="503.0" layoutY="212.0" prefHeight="39.0" prefWidth="78.0" text="ETH/USD" textFill="#d0c7c7">
          <font>
             <Font name="Arial" size="17.0" />
          </font>
       </Label>
-      <Label fx:id="ETHUSDChange" alignment="CENTER_RIGHT" layoutX="455.0" layoutY="156.0" prefHeight="39.0" prefWidth="123.0" text="(-1.4%)" textFill="#d05b5b">
+      <Label fx:id="ETHUSDChange" alignment="CENTER_RIGHT" layoutX="454.0" layoutY="189.0" prefHeight="39.0" prefWidth="123.0" text="(-1.4%)" textFill="#d05b5b">
          <font>
             <Font name="Arial" size="21.0" />
          </font>
@@ -127,15 +119,17 @@
             <Font name="Arial Bold" size="33.0" />
          </font>
       </Label>
+       
       <ImageView fitHeight="73.0" fitWidth="73.0" layoutX="348.0" layoutY="28.0">
          <image>
             <Image url="/btc.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="73.0" fitWidth="73.0" layoutX="348.0" layoutY="133.0">
+      <ImageView fitHeight="73.0" fitWidth="73.0" layoutX="348.0" layoutY="166.0">
          <image>
             <Image url="/1027.png" />
          </image>
       </ImageView>  
+      
    </children>
 </AnchorPane>

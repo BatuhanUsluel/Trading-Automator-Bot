@@ -195,7 +195,7 @@ public class PortifolioController {
 	    });
 	    globaldata.start();
 	    threads.add(globaldata);
-	    for (Thread thread : threads) {
+        for (Thread thread : threads) {
 	        thread.join();
 	    }
 		DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
@@ -246,16 +246,24 @@ public class PortifolioController {
 		HashMap<Currency, Double> balanceperexchange = new HashMap<Currency, Double>();
 		for (Entry<String, Exchange> entry : Exchanges.exchangemap.entrySet()) {
 		    String ExchangeString = entry.getKey();
+		    System.out.println("Looping for exchange: " + ExchangeString);
 		    Exchange Exchange = entry.getValue();
 		    Map<Currency, Balance> balancemap = Exchange.getAccountService().getAccountInfo().getWallet().getBalances();
 		    for (Entry<Currency, Balance> entry2 : balancemap.entrySet()) {
 		    	Balance balance = entry2.getValue();
 		    	if (balance.getTotal().doubleValue()>0) {
 			    	Currency currency = entry2.getKey();
-			    	BigDecimal btcbalance;
+			    	BigDecimal btcbalance = null;
 			    	if (currency.toString()!="BTC") {
-			    		BigDecimal last = Exchange.getMarketDataService().getTicker(new CurrencyPair(currency.toString(), "BTC")).getLast();
-						btcbalance = last.multiply(balance.getTotal());
+			    		BigDecimal last;
+						try {
+							last = Exchange.getMarketDataService().getTicker(new CurrencyPair(currency.toString(), "BTC")).getLast();
+							btcbalance = last.multiply(balance.getTotal());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
 			    	} else {
 			    		btcbalance = balance.getTotal();
 			    	}
@@ -304,6 +312,7 @@ public class PortifolioController {
         BTCWorthCol.setSortType(TableColumn.SortType.ASCENDING);
         tablebalance.getSortOrder().setAll(BTCWorthCol);
         tablebalance.getColumns().addAll(CurrencyCol,BTCWorthCol, USDWorthCol, PercentCol,ChangeCol);
+	    System.out.println("DONE!");
 	}
 	private String addCommasToNumericString (String digits)
 	{
