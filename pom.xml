@@ -25,12 +25,13 @@
   </build>
   <dependencies>
   
-	<dependency>
-    	<groupId>org.knowm.xchange</groupId>
-    	<artifactId>xchange-core</artifactId>
-    	<version>4.3.4</version>
-	</dependency>
-	
+<!-- https://mvnrepository.com/artifact/org.knowm.xchange/xchange-core -->
+<dependency>
+    <groupId>org.knowm.xchange</groupId>
+    <artifactId>xchange-core</artifactId>
+    <version>4.3.7</version>
+</dependency>
+
 	<dependency>
     	<groupId>javax.json</groupId>
     	<artifactId>javax.json-api</artifactId>
@@ -57,21 +58,9 @@
 	</dependency>
 	
 	<dependency>
-    	<groupId>com.jfoenix</groupId>
-    	<artifactId>jfoenix</artifactId>
-    	<version>9.0.3</version>
-	</dependency>
-	
-	<dependency>
     	<groupId>org.ta4j</groupId>
     	<artifactId>ta4j-core</artifactId>
     	<version>0.10</version>
-	</dependency>
-	
-	<dependency>
-   		<groupId>org.controlsfx</groupId>
-    	<artifactId>controlsfx</artifactId>
-    	<version>9.0.0</version>
 	</dependency>
 	
 	<dependency>
@@ -83,20 +72,19 @@
 	<dependency>
   		<groupId>org.knowm.xchange</groupId>
   		<artifactId>xchange-poloniex</artifactId>
-  		<version>4.3.4</version>
+  		<version>4.3.7</version>
 	</dependency>
 	
 		<dependency>
   		<groupId>org.knowm.xchange</groupId>
   		<artifactId>xchange-coinmarketcap</artifactId>
-  		<version>4.3.4</version>
+  		<version>4.3.7</version>
 	</dependency>
-	
 	
 	<dependency>
   		<groupId>org.knowm.xchange</groupId>
   		<artifactId>xchange-bittrex</artifactId>
-  		<version>4.3.4</version>
+  		<version>4.3.7</version>
 	</dependency>
 	
 	<dependency>
@@ -104,6 +92,32 @@
     	<artifactId>jfoenix</artifactId>
     	<version>9.0.4</version>
 	</dependency>
+<!-- https://mvnrepository.com/artifact/org.json/json -->
+<dependency>
+    <groupId>org.json</groupId>
+    <artifactId>json</artifactId>
+    <version>20180130</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
+<dependency>
+    <groupId>org.controlsfx</groupId>
+    <artifactId>controlsfx</artifactId>
+    <version>9.0.0</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>3.7</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.9.5</version>
+</dependency>
+
+
 
   </dependencies>
 </project>
