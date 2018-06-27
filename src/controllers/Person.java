@@ -2,27 +2,18 @@ package controllers;
 
 public class Person {
     
-    private String fullName;
     private String Indicator1;
     private String Indicator2;
     private String TradingRule;
-    private boolean single;
+    private boolean or;
  
-    public Person(String fullName, String Indicator1, boolean single, String Indicator2, String TradingRule) {
-        this.fullName = fullName;
+    public Person(String Indicator1, boolean or, String Indicator2, String TradingRule) {
         this.Indicator1 = Indicator1;
-        this.single = single;
+        this.or = or;
         this.Indicator2 = Indicator2;
         this.TradingRule = TradingRule;
     }
- 
-    public String getFullName() {
-        return fullName;
-    }
- 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+
  
     public String getIndicator1() {
         return Indicator1;
@@ -50,11 +41,11 @@ public class Person {
         this.TradingRule = TradingRule;
     }
 
-    public boolean isSingle() {
-        return single;
+    public boolean isor() {
+        return or;
     }
  
-    public void setSingle(boolean single) {
-        this.single = single;
+    public void setor(boolean single) {
+        this.or = single;
     }
 }

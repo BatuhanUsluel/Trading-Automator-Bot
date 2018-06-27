@@ -18,6 +18,8 @@ import controllers.Person;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -102,7 +104,7 @@ public class BacktestController {
 	
     @FXML
     void addEntryRow(ActionEvent event) {
-	    Person person = new Person("Susan Smith", Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode());
+	    Person person = new Person(Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode());
 	    Backdataentry.add(person);
 	    BackEntryTable.setItems(Backdataentry);
 	    BackEntryTable.refresh();
@@ -110,7 +112,7 @@ public class BacktestController {
 
     @FXML
     void addExitRow(ActionEvent event) {
-	    Person person = new Person("Susan Smith", Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode());
+	    Person person = new Person(Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode());
 	    Backdataexit.add(person);
 	    BackExitTable.setItems(Backdataexit);
 	    BackExitTable.refresh();
@@ -124,7 +126,7 @@ public class BacktestController {
     		String indicator1 = person.getIndicator1();
     		String indicator2 = person.getIndicator2();
     		String entryRule = person.getTradingRule();
-    		boolean andor = person.isSingle();
+    		boolean andor = person.isor();
     		String indic1code = Indicators.getByString(indicator1);
     		String indic2code = Indicators.getByString(indicator2);
     		
@@ -283,7 +285,7 @@ public class BacktestController {
     	            public ObservableValue<java.lang.Boolean> call(CellDataFeatures<Person, java.lang.Boolean> param) {
     	                Person person = param.getValue();
     	 
-    	                SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(person.isSingle());
+    	                SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(person.isor());
     	 
     	                // Note: singleCol.setOnEditCommit(): Not work for
     	                // CheckBoxTableCell.
@@ -294,7 +296,7 @@ public class BacktestController {
     	                    @Override
     	                    public void changed(ObservableValue<? extends java.lang.Boolean> observable, java.lang.Boolean oldValue,
     	                    		java.lang.Boolean newValue) {
-    	                        person.setSingle(newValue);
+    	                        person.setor(newValue);
     	                    }
     	                });
     	                return booleanProp;
@@ -431,7 +433,7 @@ public class BacktestController {
             public ObservableValue<java.lang.Boolean> call(CellDataFeatures<Person, java.lang.Boolean> param) {
                 Person person = param.getValue();
  
-                SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(person.isSingle());
+                SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(person.isor());
  
                 // Note: singleCol.setOnEditCommit(): Not work for
                 // CheckBoxTableCell.
@@ -442,7 +444,7 @@ public class BacktestController {
                     @Override
                     public void changed(ObservableValue<? extends java.lang.Boolean> observable, java.lang.Boolean oldValue,
                     		java.lang.Boolean newValue) {
-                        person.setSingle(newValue);
+                        person.setor(newValue);
                     }
                 });
                 return booleanProp;

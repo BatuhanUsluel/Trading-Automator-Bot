@@ -68,7 +68,7 @@
          </font>
       </TextField>
       <Separator layoutX="613.0" layoutY="383.0" prefHeight="9.0" prefWidth="67.0" />
-      <JFXButton fx:id="AddExitRow" layoutX="157.0" layoutY="303.0" prefHeight="25.0" prefWidth="66.0" style="-fx-background-color: #2c87cc;" text="Add Row" textFill="#ffffffec">
+      <JFXButton fx:id="AddExitRow" layoutX="157.0" layoutY="303.0" onAction="#addExitRow" prefHeight="25.0" prefWidth="66.0" style="-fx-background-color: #2c87cc;" text="Add Row" textFill="#ffffffec">
          <font>
             <Font size="11.0" />
          </font>
