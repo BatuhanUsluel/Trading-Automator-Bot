@@ -18,6 +18,7 @@ import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
 import controllers.ArbitrageController;
 import controllers.AveragetradingController;
+import controllers.BacktestController;
 import controllers.Controller;
 import controllers.MarketController;
 import controllers.PendingController;
@@ -75,6 +76,7 @@ public class SocketCommunication {
 										}
 										break;
 									case "Historic":
+										BacktestController.recievedBackTest(jsonmessage);
 										System.out.println(message);
 										break;
 									case "averageTrading":

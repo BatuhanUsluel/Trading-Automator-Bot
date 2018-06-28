@@ -229,7 +229,7 @@ def main():
             print (entry)
         #series = [x[index] for x in ohlcv]
         #print("\n" + asciichartpy.plot(series[-length:], {'height': height}))  # print the chart
-        sendMessage = data.rstrip()[:-1] + ",\"Return\":\"" + str(ohlcv) + "\"}\r\n"
+        sendMessage = data.rstrip()[:-1] + ",\"Return\":" + json.dumps(ohlcv) + "}\r\n"
         conn.send(sendMessage.encode('UTF-8'))
 
     def fetch_quickprice(exchange, d, conn, data):

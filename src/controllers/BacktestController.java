@@ -20,15 +20,23 @@ import controllers.Person;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.ta4j.core.Rule;
+import org.ta4j.core.Strategy;
+import org.ta4j.core.Tick;
 import org.ta4j.core.TimeSeries;
+import org.ta4j.core.TimeSeriesManager;
+import org.ta4j.core.TradingRecord;
+import org.ta4j.core.analysis.criteria.*;
 import org.ta4j.core.indicators.*;
 import org.ta4j.core.indicators.adx.*;
 import org.ta4j.core.indicators.bollinger.*;
@@ -38,11 +46,16 @@ import org.ta4j.core.indicators.pivotpoints.*;
 import org.ta4j.core.indicators.volume.*;
 import org.ta4j.core.indicators.helpers.*;
 import org.ta4j.core.trading.rules.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.ta4j.core.BaseStrategy;
+import org.ta4j.core.BaseTick;
+import org.ta4j.core.BaseTimeSeries;
+import org.ta4j.core.BaseTimeSeries.*;
 import org.ta4j.core.Decimal;
+
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
-
 import org.ta4j.core.Indicator;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -113,8 +126,11 @@ public class BacktestController {
     HashMap<String, String[]> indicatorparameters = new HashMap<String, String[]>();
     HashMap<String, String> indicatorclasspaths = new HashMap<String, String>();
     HashMap<String, Integer> timeframes = new HashMap<String, Integer>();
+	private static int candles;
+	private static LocalDate timestart;
 	@FXML
     public void initialize(){
+		System.out.println(ZonedDateTime.now());
 		timeframes.put("1m", 1);
 		timeframes.put("5m", 5);
 		timeframes.put("1h", 60);
@@ -190,8 +206,6 @@ public class BacktestController {
 
     @FXML
     void runBackTest(ActionEvent event) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
-        
-        
     	int EntrySize = BackEntryTable.getItems().size();
     	int ExitSize = BackExitTable.getItems().size();
     	for (Person person : BackEntryTable.getItems()) {
@@ -246,11 +260,13 @@ public class BacktestController {
     	try {
     		
     		LocalDate starttime2 = starttime.getValue();
+    		this.timestart=starttime2;
     		LocalDate endtime2 = endtime.getValue();
     		//int timeframe = timeframes.get(Timeframe.getValue().toString());
     		int timeframe = 1440;
     		int days = (int) ChronoUnit.DAYS.between(starttime2, endtime2);
     		int candles = (days*1440)/timeframe;
+    		this.candles=candles;
 			backtestJSON.put("base", BackBase.getText());
 	    	backtestJSON.put("alt", BackAlt.getText());
 	    	backtestJSON.put("request", "Historic");
@@ -267,6 +283,47 @@ public class BacktestController {
     	SocketCommunication.out.print(backtestJSON.toString());
     	SocketCommunication.out.flush();
     	
+    }
+    
+    public static void recievedBackTest(JSONObject jsonmessage) {
+    	JSONArray test = jsonmessage.getJSONArray("Return");
+    	Tick[] ticksarray = new Tick[candles];
+    	ZonedDateTime endTime = timestart.atStartOfDay(ZoneOffset.UTC);
+    	System.out.println(test);
+    	for (int x=0;x<candles;x++) {
+    		JSONArray ohlcv = test.getJSONArray(x);
+    		ticksarray[x] = (new BaseTick(endTime.plusDays(x), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
+    	}
+
+    	List<Tick> ticks = Arrays.asList(ticksarray);
+    	BaseTimeSeries series = new BaseTimeSeries("apple_ticks", ticks);
+    	TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+    	SMAIndicator shortSma = new SMAIndicator(new ClosePriceIndicator(series), 5);
+    	SMAIndicator longSma = new SMAIndicator(new ClosePriceIndicator(series), 10);
+		Strategy myStrategy =  new BaseStrategy(new CrossedUpIndicatorRule(shortSma, longSma), new CrossedDownIndicatorRule(shortSma, longSma));
+		TradingRecord tradingRecord = seriesManager.run(myStrategy);
+		
+		// Total profit
+        TotalProfitCriterion totalProfit = new TotalProfitCriterion();
+        System.out.println("Total profit: " + totalProfit.calculate(series, tradingRecord));
+        // Number of bars
+        System.out.println("Number of bars: " + new NumberOfTicksCriterion().calculate(series, tradingRecord));
+        // Average profit (per bar)
+        System.out.println("Average profit (per bar): " + new AverageProfitCriterion().calculate(series, tradingRecord));
+        // Number of trades
+        System.out.println("Number of trades: " + new NumberOfTradesCriterion().calculate(series, tradingRecord));
+        // Profitable trades ratio
+        System.out.println("Profitable trades ratio: " + new AverageProfitableTradesCriterion().calculate(series, tradingRecord));
+        // Maximum drawdown
+        System.out.println("Maximum drawdown: " + new MaximumDrawdownCriterion().calculate(series, tradingRecord));
+        // Reward-risk ratio
+        System.out.println("Reward-risk ratio: " + new RewardRiskRatioCriterion().calculate(series, tradingRecord));
+        // Total transaction cost
+        System.out.println("Total transaction cost (from $1000): " + new LinearTransactionCostCriterion(1000, 0.005).calculate(series, tradingRecord));
+        // Buy-and-hold
+        System.out.println("Buy-and-hold: " + new BuyAndHoldCriterion().calculate(series, tradingRecord));
+        // Total profit vs buy-and-hold
+        System.out.println("Custom strategy profit vs buy-and-hold strategy profit: " + new VersusBuyAndHoldCriterion(totalProfit).calculate(series, tradingRecord));
     }
     
     void setUpEntryTable() {
@@ -635,8 +692,8 @@ public class BacktestController {
 	        	parametersstring[0] = "";
 	        	parametersstring[1] = "";
 	        	button.setOnAction(e -> {
-	        		AwesomeOscillatorIndicator formedindic = new AwesomeOscillatorIndicator(formedindic, 0, 0);
-	        		person.setfirstindicator(formedindic);
+	        		//AwesomeOscillatorIndicator formedindic = new AwesomeOscillatorIndicator(formedindic, 0, 0);
+	        		//person.setfirstindicator(formedindic);
 					dialog.close();
 	        	});
 	        	break;
@@ -645,7 +702,7 @@ public class BacktestController {
 	        	parametersstring[1] = "";
 	        	button.setOnAction(e -> {
 	        		
-	        		person.setfirstindicator(formedindic);
+	        		//person.setfirstindicator(formedindic);
 					dialog.close();
 	        	});
 	        	break;
