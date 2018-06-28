@@ -25,7 +25,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <JFXButton fx:id="Backtest" layoutX="750.0" layoutY="505.0" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Backtest" textFill="WHITE">
+      <JFXButton fx:id="Backtest" layoutX="750.0" layoutY="505.0" onAction="#runBackTest" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Backtest" textFill="WHITE">
          <font>
             <Font size="27.0" />
          </font>

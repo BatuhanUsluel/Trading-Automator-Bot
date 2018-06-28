@@ -36,7 +36,8 @@ public enum Indicators {
 		, UlcerIndexIndicator("UII", "UlcerIndexIndicator")
 		, WilliamsRIndicator("WRI", "WilliamsRIndicator")
 		, WMAIndicator("WMA", "WMAIndicator")
-		, ZLEMAIndicator("ZLEMA", "ZLEMAIndicator");
+		, ZLEMAIndicator("ZLEMA", "ZLEMAIndicator")
+		, BollingerBandsLowerIndicator("BBLI", "BollingerBandsLowerIndicator");
 	   private String code;
 	   private String text;
 	 
