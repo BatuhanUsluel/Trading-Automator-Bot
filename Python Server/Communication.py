@@ -223,7 +223,10 @@ def main():
         height = 20
         length = 200
         from_timestamp = exchange.parse8601(starttime)
-        ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp, candle)
+        print(candle)
+        ohlcv = exchange.fetch_ohlcv(symbol, "1d", from_timestamp, candle)
+        for entry in ohlcv:
+            print (entry)
         #series = [x[index] for x in ohlcv]
         #print("\n" + asciichartpy.plot(series[-length:], {'height': height}))  # print the chart
         sendMessage = data.rstrip()[:-1] + ",\"Return\":\"" + str(ohlcv) + "\"}\r\n"
