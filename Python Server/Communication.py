@@ -218,13 +218,14 @@ def main():
         symbol = d['alt'] + "/" + d['base']
         starttime = d['StartTime']
         timeframe = d['Timeframe']
-        index = d['Index']
+        candle = d['Candles']
+       # index = d['Index']
         height = 20
         length = 200
         from_timestamp = exchange.parse8601(starttime)
-        ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp)
-        series = [x[index] for x in ohlcv]
-        print("\n" + asciichartpy.plot(series[-length:], {'height': height}))  # print the chart
+        ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp, candle)
+        #series = [x[index] for x in ohlcv]
+        #print("\n" + asciichartpy.plot(series[-length:], {'height': height}))  # print the chart
         sendMessage = data.rstrip()[:-1] + ",\"Return\":\"" + str(ohlcv) + "\"}\r\n"
         conn.send(sendMessage.encode('UTF-8'))
 

@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 
+import application.Exchanges;
 import application.Main;
 import application.SocketCommunication;
 import javafx.collections.ObservableList;
@@ -19,11 +20,14 @@ import controllers.Person;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import org.ta4j.core.Rule;
+import org.ta4j.core.TimeSeries;
 import org.ta4j.core.indicators.*;
 import org.ta4j.core.indicators.adx.*;
 import org.ta4j.core.indicators.bollinger.*;
@@ -94,10 +98,11 @@ public class BacktestController {
     @FXML private TableView<Person> BackEntryTable = new TableView<Person>();
     @FXML private TableView<Person> BackExitTable = new TableView<Person>();
     @FXML private JFXButton Backtest;
-    @FXML private JFXComboBox<?> BackExchange;
+    @FXML private JFXComboBox<String> BackExchange;
     @FXML private TextField BackBase;
     @FXML private TextField BackAlt;
     @FXML private TextField LiveBase;
+    @FXML private JFXComboBox<String> Timeframe;
     @FXML private JFXButton BackAddExitRow;
     @FXML private JFXButton BackAddEntryRow;
     @FXML private JFXDatePicker starttime;
@@ -106,8 +111,15 @@ public class BacktestController {
     public static ObservableList<Person> Backdataexit =  FXCollections.observableArrayList();
     HashMap<String, String[]> indicatorparameters = new HashMap<String, String[]>();
     HashMap<String, String> indicatorclasspaths = new HashMap<String, String>();
+    HashMap<String, Integer> timeframes = new HashMap<String, Integer>();
 	@FXML
     public void initialize(){
+		timeframes.put("1m", 1);
+		timeframes.put("5m", 5);
+		timeframes.put("1h", 60);
+		timeframes.put("4h", 240);
+		timeframes.put("1d", 1440);
+		timeframes.put("1w", 10080);
 		indicatorparameters.put("Accel", new String[]{"timeFrameSma1","timeFrameSma2"});
 		indicatorparameters.put("AroonDown", new String[]{"timeFrame"});
 		indicatorparameters.put("AroonOscil", new String[]{"timeFrame"});
@@ -155,6 +167,8 @@ public class BacktestController {
 		Controller.scene.getStylesheets().add(css);;
 		setUpEntryTable();
 		setUpExitTable();
+        List<String> list = new ArrayList<String>(Exchanges.list);
+        BackExchange.getItems().addAll(list);
     }
 	
     @FXML
@@ -175,7 +189,6 @@ public class BacktestController {
 
     @FXML
     void runBackTest(ActionEvent event) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
-
         
         
     	int EntrySize = BackEntryTable.getItems().size();
@@ -189,7 +202,7 @@ public class BacktestController {
     		String indic2code = Indicators.getByString(indicator2);
     		
     		
-    		  ClosePriceIndicator closePrice = new ClosePriceIndicator(null);
+    	ClosePriceIndicator closePrice = new ClosePriceIndicator(null);
         EMAIndicator shortEma = new EMAIndicator(closePrice, 9);
         EMAIndicator longEma = new EMAIndicator(closePrice, 26);
         System.out.println(shortEma.toString());
@@ -197,7 +210,7 @@ public class BacktestController {
         //Rule entryRule = new CrossedUpIndicatorRule(shortEma, longEma);
         Rule test = new IsFallingRule(shortEma,1);
         //Indicator 1
-        Class myClass = Class.forName(indicatorclasspaths.get(Indicators.getByCode(indicator1)));
+        
         
         //--
         //There are 78 (excluded statistics & helpers) indicators. Could just write switch statement for all of them. Also won't need classpath, or indicator parameter hashmap.
@@ -210,10 +223,7 @@ public class BacktestController {
         //--
         
 
-        Constructor constructor = myClass.getConstructors()[0];
-        Object[] parameters = {closePrice, 10};
-        Object firstindicator = constructor.newInstance(parameters);
-        System.out.println("1: " + firstindicator);
+        /*System.out.println("1: " + firstindicator);
         //Indicator 2
         Class myClass2 = Class.forName("org.ta4j.core.indicators." + indicator2);
         Constructor constructor2 = myClass2.getConstructor(Indicator.class, int.class);
@@ -225,7 +235,7 @@ public class BacktestController {
         Object[] parameters3 = {firstindicator, secondindicator};
         Object ruleentry = constructor.newInstance(parameters);
         
-        System.out.println(ruleentry.toString());
+        System.out.println(ruleentry.toString());*/
     	}
     	for (Person person : BackExitTable.getItems()) {
     		
@@ -233,22 +243,28 @@ public class BacktestController {
 
     	JSONObject backtestJSON = new JSONObject();
     	try {
+    		
+    		LocalDate starttime2 = starttime.getValue();
+    		LocalDate endtime2 = endtime.getValue();
+    		//int timeframe = timeframes.get(Timeframe.getValue().toString());
+    		int timeframe = 60;
+    		int days = starttime2.compareTo(endtime2);
+    		int candles = (days*1440)/timeframe;
 			backtestJSON.put("base", BackBase.getText());
 	    	backtestJSON.put("alt", BackAlt.getText());
 	    	backtestJSON.put("request", "Historic");
-	    	backtestJSON.put("TimeFrame", "1d");
-	    	LocalDate ld = starttime.getValue();
-	    	Calendar c =  Calendar.getInstance();
-	    	//c.set(ld.getYear(), ld.getMonthValue() - 1, ld.getDayOfMonth());
-	    	//Date date = c.getTime();
+	    	backtestJSON.put("Exchanges", BackExchange.getValue().toString());
+	    	backtestJSON.put("Timeframe", Timeframe.getValue().toString());
 	    	backtestJSON.put("StartTime", starttime.getValue());
+	    	backtestJSON.put("Candles", candles);
+	    	backtestJSON.put("licenceKey", SocketCommunication.licencekey);
+	    	backtestJSON.put("millisstart", System.currentTimeMillis());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	//String historicalrequest = ("{\"Coin\":\"" + coin + "\",\"Exchanges\":\"" + exchange + "\",\"request\":\"Historic\",\"licenceKey\":\"" + licencekey + "\", \"Historic\":{\"StartTime\": \"" + starttime + "\", \"Timeframe\":\"" + timeframe + "\", \"Index\":" + index + "}}");
-    	//SocketCommunication.out.print(backtestJSON.toString());
-    	//SocketCommunication.out.flush();
+    	SocketCommunication.out.print(backtestJSON.toString());
+    	SocketCommunication.out.flush();
     	
     }
     
@@ -575,26 +591,62 @@ public class BacktestController {
         hbox.getChildren().addAll(vbox2, vbox);
         String css = this.getClass().getResource("/assets/formgui.css").toExternalForm();
         hbox.getStylesheets().add(css);
-    	
+        
+        JFXButton button = new JFXButton("Done");
         String[] parametersstring = new String[5];
-        Object[] parameters = new Object[5];
+        TextField[] parameters = new TextField[5];
+        TimeSeries series = null;
         switch(indic1code) {
-	        case "Accel":
-	        	Object series = null;
-				parameters[0] = series;
+	        case "Accel":      	
 				parametersstring[0] = "timeFrameSma1";
 				parametersstring[1]	= "timeFrameSma2";
+				button.setOnAction(e -> {
+					AccelerationDecelerationIndicator formedindic = new AccelerationDecelerationIndicator(series, Integer.parseInt(parameters[0].getText()),Integer.parseInt(parameters[1].getText()));
+					person.setfirstindicator(formedindic);
+					dialog.close();
+				});
 	        	break;
 	        case "AroonDown":
-	        	parametersstring[0] = "timeFrame";
+	        	parametersstring[0] = "TimeFrame";
+	        	button.setOnAction(e -> {
+	        		AroonDownIndicator formedindic = new AroonDownIndicator(series, Integer.parseInt(parameters[0].getText()));
+	        		person.setfirstindicator(formedindic);
+					dialog.close();
+	        	});
 	        	break;
 	        case "AroonOscil":
+	        	parametersstring[0] = "TimeFrame";
+	        	button.setOnAction(e -> {
+	        		AroonOscillatorIndicator formedindic = new AroonOscillatorIndicator(series, Integer.parseInt(parameters[0].getText()));
+	        		person.setfirstindicator(formedindic);
+					dialog.close();
+	        	});
 	        	break;
 	        case "ArronUp":
+	        	parametersstring[0] = "TimeFrame";
+	        	button.setOnAction(e -> {
+	        		AroonUpIndicator formedindic = new AroonUpIndicator(series, Integer.parseInt(parameters[0].getText()));
+	        		person.setfirstindicator(formedindic);
+					dialog.close();
+	        	});
 	        	break;
 	        case "ATR":
+	        	parametersstring[0] = "";
+	        	parametersstring[1] = "";
+	        	button.setOnAction(e -> {
+	        		AwesomeOscillatorIndicator formedindic = new AwesomeOscillatorIndicator(formedindic, 0, 0);
+	        		person.setfirstindicator(formedindic);
+					dialog.close();
+	        	});
 	        	break;
 	        case "AWS":
+	        	parametersstring[0] = "";
+	        	parametersstring[1] = "";
+	        	button.setOnAction(e -> {
+	        		
+	        		person.setfirstindicator(formedindic);
+					dialog.close();
+	        	});
 	        	break;
 	        case "CCI":
 	        	break;
@@ -656,13 +708,16 @@ public class BacktestController {
 	        	System.out.println("def: " + indic1code);
 	        	break;
         	}
-        	createSpecificGui(parametersstring,parameters,1,vbox.getChildren(),vbox2.getChildren());
+        	createSpecificGui(parametersstring,parameters,vbox.getChildren(),vbox2.getChildren());
+        	
+        	vbox2.getChildren().add(button);
             Scene dialogScene = new Scene(hbox, 400, 300);
             dialog.setScene(dialogScene);
             dialog.show();
         }
 
-	private void createSpecificGui(String[] parametersstring, Object[] parameters, int i,ObservableList<Node> observableList, ObservableList<Node> observableList2) {
+	private void createSpecificGui(String[] parametersstring, Object[] parameters,ObservableList<Node> observableList, ObservableList<Node> observableList2) {
+		int i=0;
 		for (String x : parametersstring) {
 			if (x!=null) {
 				TextField textfield = new TextField();

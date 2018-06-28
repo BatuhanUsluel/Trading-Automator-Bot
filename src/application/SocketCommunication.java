@@ -75,7 +75,7 @@ public class SocketCommunication {
 										}
 										break;
 									case "Historic":
-										
+										System.out.println(message);
 										break;
 									case "averageTrading":
 										System.out.println("Recieved AVERAGE");										
