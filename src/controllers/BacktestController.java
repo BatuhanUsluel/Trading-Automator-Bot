@@ -17,11 +17,14 @@ import org.json.JSONObject;
 import org.ta4j.core.BaseStrategy;
 import org.ta4j.core.BaseTick;
 import org.ta4j.core.BaseTimeSeries;
+import org.ta4j.core.Decimal;
 import org.ta4j.core.Indicator;
+import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.Tick;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.TimeSeriesManager;
+import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.analysis.criteria.AverageProfitCriterion;
 import org.ta4j.core.analysis.criteria.AverageProfitableTradesCriterion;
@@ -38,8 +41,14 @@ import org.ta4j.core.indicators.StochasticOscillatorDIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
+import org.ta4j.core.trading.rules.AndRule;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
+import org.ta4j.core.trading.rules.IsEqualRule;
+import org.ta4j.core.trading.rules.OverIndicatorRule;
+import org.ta4j.core.trading.rules.StopGainRule;
+import org.ta4j.core.trading.rules.StopLossRule;
+import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -242,7 +251,7 @@ public class BacktestController {
 	    	backtestJSON.put("alt", BackAlt.getText());
 	    	backtestJSON.put("request", "Historic");
 	    	backtestJSON.put("Exchanges", BackExchange.getValue().toString());
-	    	backtestJSON.put("Timeframe", "1d");
+	    	backtestJSON.put("Timeframe", "1h");
 	    	backtestJSON.put("StartTime", starttime.getValue() + " 00:00:00");
 	    	backtestJSON.put("Candles", candles);
 	    	backtestJSON.put("licenceKey", SocketCommunication.licencekey);
@@ -260,7 +269,7 @@ public class BacktestController {
     	JSONArray test = jsonmessage.getJSONArray("Return");
     	Tick[] ticksarray = new Tick[candles];
     	ZonedDateTime endTime = timestart.atStartOfDay(ZoneOffset.UTC);
-    	System.out.println(test);
+    	System.out.println(candles);
     	for (int x=0;x<candles;x++) {
     		JSONArray ohlcv = test.getJSONArray(x);
     		ticksarray[x] = (new BaseTick(endTime.plusDays(x), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
@@ -268,8 +277,11 @@ public class BacktestController {
     	List<Tick> ticks = Arrays.asList(ticksarray);
     	TimeSeries series = new BaseTimeSeries("series",ticks);
     	System.out.println("Sclass: " + series.getClass());
-    	TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+    	
     	ClosePriceIndicator closeprice = new ClosePriceIndicator(series);
+        ArrayList<Rule> entryrules = new ArrayList<Rule>();
+        boolean first = true;
+        Rule andentryrule = null;
     	for (Person entryrow : Backdataentry) { 		
     		//1
     		String indicatorname1 = Indicators.getByCode(entryrow.getIndicator1()).toString();
@@ -281,8 +293,56 @@ public class BacktestController {
     		Object[] parameters2 = entryrow.getIndic2Param();
     		Indicator indicator2 = createindicator(entryrow, indicatorname2, parameters2, series, closeprice);
             entryrow.setsecondindicator(indicator2);
+            //Rule
+            String entryrulestring = TradingRules.getByCode(entryrow.getTradingRule()).toString();
+            Rule entryrule = null;
+            String test2 = "IsEqual" + "Rule";
+            if (test2.equals("IsEqualRule")) {
+            	System.out.println("equal");
+            } else {
+            	System.out.println("not");
+            }
+            switch(entryrulestring) {
+            	case "IsEqualRule":
+            		entryrule = new IsEqualRule(indicator, indicator2);
+            		break;
+            	case "CrossedDownIndicatorRule":
+            		entryrule = new CrossedDownIndicatorRule(indicator, indicator2);
+            		break;
+            	case "CrossedUpIndicatorRule":
+            		entryrule = new CrossedUpIndicatorRule(indicator, indicator2);
+            		break;
+            	case "OverIndicatorRule":
+            		entryrule = new OverIndicatorRule(indicator, indicator2);
+            		break;
+            	case "UnderIndicatorRule":
+            		entryrule = new UnderIndicatorRule(indicator, indicator2);
+            		break;
+            	default:
+            		System.out.println("Error");
+            }
+            
+            if (entryrow.isor()==false) { //And
+            	if (first) {
+            		andentryrule = entryrule;
+            	} else {
+            		andentryrule = andentryrule.and(entryrule);
+            	}
+            } else { //Or
+            	entryrules.add(andentryrule);
+            	andentryrule = entryrule;
+            }
+            
     	}
+    	entryrules.add(andentryrule);
     	
+    	Rule totalentryrule = entryrules.get(0);
+    	for (int i=1;i<entryrules.size();i++) {
+    		totalentryrule = totalentryrule.or(entryrules.get(i));
+    	}
+    	ArrayList<Rule> exitrules = new ArrayList<Rule>();
+        first = true;
+        Rule andexitrule = null;
     	for (Person exitrow : Backdataexit) {
     		//1
     		String indicatorname1 = Indicators.getByCode(exitrow.getIndicator1()).toString();
@@ -294,13 +354,55 @@ public class BacktestController {
     		Object[] parameters2 = exitrow.getIndic2Param();
     		Indicator indicator2 = createindicator(exitrow, indicatorname2, parameters2, series, closeprice);
     		exitrow.setsecondindicator(indicator2);
+    		//Rule
+            String exitrulestring = TradingRules.getByCode(exitrow.getTradingRule()).toString();
+            Rule exitrule = null;
+            switch(exitrulestring) {
+            	case "IsEqualRule":
+            		exitrule = new IsEqualRule(indicator, indicator2);
+            		break;
+            	case "CrossedDownIndicatorRule":
+            		exitrule = new CrossedDownIndicatorRule(indicator, indicator2);
+            		break;
+            	case "CrossedUpIndicatorRule":
+            		exitrule = new CrossedUpIndicatorRule(indicator, indicator2);
+            		break;
+            	case "OverIndicatorRule":
+            		exitrule = new OverIndicatorRule(indicator, indicator2);
+            		break;
+            	case "UnderIndicatorRule":
+            		exitrule = new UnderIndicatorRule(indicator, indicator2);
+            		break;
+            	default:
+            		System.out.println("Error");
+            		break;
+            }
+            
+            if (exitrow.isor()==false) { //And
+            	if (first) {
+            		andexitrule = exitrule;
+            	} else {
+            		andexitrule = andexitrule.and(exitrule);
+            	}
+            } else { //Or
+            	exitrules.add(andexitrule);
+            	andexitrule = exitrule;
+            }
+            
     	}
-    	
-    	SMAIndicator shortSma = new SMAIndicator(new ClosePriceIndicator(series), 5);
-    	SMAIndicator longSma = new SMAIndicator(new ClosePriceIndicator(series), 10);
-		Strategy myStrategy =  new BaseStrategy(new CrossedUpIndicatorRule(shortSma, longSma), new CrossedDownIndicatorRule(shortSma, longSma));
-		TradingRecord tradingRecord = seriesManager.run(myStrategy);
-		
+    	exitrules.add(andexitrule);
+    	Rule totalexitrule = exitrules.get(0);
+    	for (int i=1;i<exitrules.size();i++) {
+    		totalexitrule = totalexitrule.or(exitrules.get(i));
+    	}
+    	System.out.println(totalentryrule.toString());
+    	Strategy tradingstrategy =  new BaseStrategy(totalentryrule,totalexitrule);
+    	TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+		TradingRecord tradingRecord = seriesManager.run(tradingstrategy);
+		System.out.println("TC: " + tradingRecord.getTradeCount() + "GT:  " + series.getTickCount());
+		for (Trade trade : tradingRecord.getTrades()) {
+			System.out.println(trade.toString());
+		}
 		// Total profit
         TotalProfitCriterion totalProfit = new TotalProfitCriterion();
         System.out.println("Total profit: " + totalProfit.calculate(series, tradingRecord));
@@ -329,9 +431,8 @@ public class BacktestController {
 		System.out.println(series);
 		String[] requiredparam = indicatorparameters.get(indicatorname);
 		for (String x : requiredparam) {
-			System.out.println("looping");
 			if (x=="closeprice") {
-				parameters[i] = closeprice;
+				parameters[i] = (Indicator) closeprice;
 			} else if (x=="series") {
 				parameters[i] = series;
 			} else if (x=="MedianPriceIndicator") {
@@ -351,6 +452,10 @@ public class BacktestController {
 				 classes[ii] =  TimeSeries.class;
 			} else if (parameters[ii].getClass() == Integer.class) {
 				classes[ii] = int.class;
+			} else if (parameters[ii].getClass() == ClosePriceIndicator.class) {
+				classes[ii] = Indicator.class;
+			} else if (parameters[ii].getClass() == MedianPriceIndicator.class) {
+				classes[ii] = Indicator.class;
 			} else {
 				classes[ii] = parameters[ii].getClass();
 			}

@@ -224,7 +224,7 @@ def main():
         length = 200
         from_timestamp = exchange.parse8601(starttime)
         print(candle)
-        ohlcv = exchange.fetch_ohlcv(symbol, "1d", from_timestamp, candle)
+        ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp, candle)
         for entry in ohlcv:
             print (entry)
         #series = [x[index] for x in ohlcv]
