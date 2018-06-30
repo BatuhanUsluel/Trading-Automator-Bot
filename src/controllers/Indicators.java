@@ -6,7 +6,6 @@ public enum Indicators {
 		, AroonDownIndicator("AroonDown", "AroonDownIndicator")
 		, AroonOscillatorIndicator("AroonOscil","AroonOscillatorIndicator")
 		, AroonUpIndicator("ArronUp", "AroonUpIndicator")
-		, ATRIndicator("ATR", "ATRIndicator")
 		, AwesomeOscillatorIndicator("AWS", "AwesomeOscillatorIndicator")
 		, CCIIndicator("CCI", "CCIIndicator")
 		, ChandelierExitLongIndicator("CELI", "ChandelierExitLongIndicator")

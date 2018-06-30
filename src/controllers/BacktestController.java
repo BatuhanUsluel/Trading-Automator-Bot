@@ -1,22 +1,5 @@
 package controllers;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDatePicker;
-
-import application.Exchanges;
-import application.Main;
-import application.SocketCommunication;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.collections.FXCollections;
-import controllers.Person;
-
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
@@ -25,53 +8,59 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.ta4j.core.Rule;
-import org.ta4j.core.Strategy;
-import org.ta4j.core.Tick;
-import org.ta4j.core.TimeSeries;
-import org.ta4j.core.TimeSeriesManager;
-import org.ta4j.core.TradingRecord;
-import org.ta4j.core.analysis.criteria.*;
-import org.ta4j.core.indicators.*;
-import org.ta4j.core.indicators.adx.*;
-import org.ta4j.core.indicators.bollinger.*;
-import org.ta4j.core.indicators.candles.*;
-import org.ta4j.core.indicators.ichimoku.*;
-import org.ta4j.core.indicators.pivotpoints.*;
-import org.ta4j.core.indicators.volume.*;
-import org.ta4j.core.indicators.helpers.*;
-import org.ta4j.core.trading.rules.*;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.ta4j.core.BaseStrategy;
 import org.ta4j.core.BaseTick;
 import org.ta4j.core.BaseTimeSeries;
-import org.ta4j.core.BaseTimeSeries.*;
-import org.ta4j.core.Decimal;
+import org.ta4j.core.Indicator;
+import org.ta4j.core.Strategy;
+import org.ta4j.core.Tick;
+import org.ta4j.core.TimeSeries;
+import org.ta4j.core.TimeSeriesManager;
+import org.ta4j.core.TradingRecord;
+import org.ta4j.core.analysis.criteria.AverageProfitCriterion;
+import org.ta4j.core.analysis.criteria.AverageProfitableTradesCriterion;
+import org.ta4j.core.analysis.criteria.BuyAndHoldCriterion;
+import org.ta4j.core.analysis.criteria.LinearTransactionCostCriterion;
+import org.ta4j.core.analysis.criteria.MaximumDrawdownCriterion;
+import org.ta4j.core.analysis.criteria.NumberOfTicksCriterion;
+import org.ta4j.core.analysis.criteria.NumberOfTradesCriterion;
+import org.ta4j.core.analysis.criteria.RewardRiskRatioCriterion;
+import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
+import org.ta4j.core.analysis.criteria.VersusBuyAndHoldCriterion;
+import org.ta4j.core.indicators.SMAIndicator;
+import org.ta4j.core.indicators.StochasticOscillatorDIndicator;
+import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
+import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
+import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
+import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
-import org.ta4j.core.Indicator;
+import com.jfoenix.controls.JFXDatePicker;
+
+import application.Exchanges;
+import application.Main;
+import application.SocketCommunication;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.util.StringConverter;
-import javafx.util.converter.DefaultStringConverter;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -79,34 +68,16 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.ComboBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
-import javafx.scene.Node;
-import javafx.beans.binding.Bindings;
-
-
-import javafx.application.Application;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import controllers.Indicators;
-import controllers.Person;
+import javafx.util.Callback;
 
 
 public class BacktestController {
@@ -142,22 +113,21 @@ public class BacktestController {
 		indicatorparameters.put("AroonDownIndicator",  new String[]{"series","timeFrame"});
 		indicatorparameters.put("AroonOscillatorIndicator", new String[]{"series","timeFrame"});
 		indicatorparameters.put("AroonUpIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("ATRIndicator", new String[]{"series","timeFrame"});//??
 		indicatorparameters.put("AwesomeOscillatorIndicator", new String[]{"closeprice","timeFrameSma1", "timeFrameSma2"});
 		indicatorparameters.put("CCIIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("ChandelierExitLongIndicator", new String[]{"series","timeFrame","K multiplier"});
-		indicatorparameters.put("ChandelierExitShortIndicator", new String[]{"series","timeFrame","K multiplier"});
+		indicatorparameters.put("ChandelierExitLongIndicator", new String[]{"series","timeFrame","K multiplier"}); //K - Decimal
+		indicatorparameters.put("ChandelierExitShortIndicator", new String[]{"series","timeFrame","K multiplier"}); //K - Decimal
 		indicatorparameters.put("CMOIndicator", new String[]{"closeprice","timeFrame"});
 		indicatorparameters.put("CoppockCurveIndicator", new String[]{"closeprice","longRoCTimeFrame", "shortRoCTimeFrame", "wmaTimeFrame"});
 		indicatorparameters.put("DoubleEMAIndicator", new String[]{"closeprice","timeFrame"});
 		indicatorparameters.put("DPOIndicator", new String[]{"closeprice","timeFrame"});
 		indicatorparameters.put("EMAIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("FisherIndicator", new String[]{"MedianPriceIndicator","timeFrame", "alpha","beta"});///
+		indicatorparameters.put("FisherIndicator", new String[]{"MedianPriceIndicator","timeFrame", "alpha","beta"}); // a - Decimal, b - Decimal
 		indicatorparameters.put("HMAIndicator", new String[]{"closeprice","timeFrame"});
 		indicatorparameters.put("KAMAIndicator", new String[]{"closeprice","timeFrameEffectiveRatio", "timeFrameFast", "timeFrameSlow"});
 		indicatorparameters.put("MACDIndicator", new String[]{"closeprice","shortTimeFrame", "longTimeFrame"});
 		indicatorparameters.put("MMAIndicator", new String[]{"series","timeFrame"});//???
-		indicatorparameters.put("ParabolicSarIndicator", new String[]{"series","Acceleration factor", "Max Acceleration", "Acceleration Increment"});
+		indicatorparameters.put("ParabolicSarIndicator", new String[]{"series","Acceleration factor", "Max Acceleration", "Acceleration Increment"}); //Decimal,Decimal,Decimal
 		indicatorparameters.put("PPOIndicator", new String[]{"closeprice","shortTimeFrame", "longTimeFrame"});
 		indicatorparameters.put("RandomWalkIndexHighIndicator", new String[]{"series","timeFrame"});
 		indicatorparameters.put("RandomWalkIndexLowIndicator", new String[]{"series","timeFrame"});
@@ -166,7 +136,7 @@ public class BacktestController {
 		indicatorparameters.put("RSIIndicator", new String[]{"closeprice","timeFrame"});
 		indicatorparameters.put("SMAIndicator", new String[]{"closeprice","timeFrame"});
 		//?
-		indicatorparameters.put("StochasticOscillatorDIndicator", new String[]{"series","timeFrame"}); //?
+		indicatorparameters.put("StochasticOscillatorDIndicator", new String[]{"StochasticOscillatorKIndicator","series","timeFrame"});
 		indicatorparameters.put("StochasticOscillatorKIndicator", new String[]{"series","timeFrame"});
 		indicatorparameters.put("StochasticRSIIndicator", new String[]{"series","timeFrame"});
 		indicatorparameters.put("TripleEMAIndicator", new String[]{"closeprice","timeFrame"});
@@ -180,7 +150,6 @@ public class BacktestController {
 		indicatorclasspaths.put("AroonDownIndicator", "org.ta4j.core.indicators.AroonDownIndicator");
 		indicatorclasspaths.put("AroonOscillatorIndicator", "org.ta4j.core.indicators.AroonOscillatorIndicator");
 		indicatorclasspaths.put("AroonUpIndicator", "org.ta4j.core.indicators.AroonUpIndicator");
-		indicatorclasspaths.put("ATRIndicator", "org.ta4j.core.indicators.ATRIndicator");
 		indicatorclasspaths.put("AwesomeOscillatorIndicator", "org.ta4j.core.indicators.AwesomeOscillatorIndicator");
 		indicatorclasspaths.put("CCIIndicator", "org.ta4j.core.indicators.CCIIndicator");
 		indicatorclasspaths.put("ChandelierExitLongIndicator", "org.ta4j.core.indicators.ChandelierExitLongIndicator");
@@ -297,84 +266,34 @@ public class BacktestController {
     		ticksarray[x] = (new BaseTick(endTime.plusDays(x), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
     	}
     	List<Tick> ticks = Arrays.asList(ticksarray);
-    	BaseTimeSeries series = new BaseTimeSeries("ticks", ticks);
+    	TimeSeries series = new BaseTimeSeries("series",ticks);
+    	System.out.println("Sclass: " + series.getClass());
     	TimeSeriesManager seriesManager = new TimeSeriesManager(series);
     	ClosePriceIndicator closeprice = new ClosePriceIndicator(series);
-    	for (Person row : Backdataentry) {
+    	for (Person entryrow : Backdataentry) { 		
     		//1
-    		String indicatorname1 = Indicators.getByCode(row.getIndicator1()).toString();
-    		System.out.println("Indic1 name: " + indicatorname1);
-    		String[] requiredparam1 = indicatorparameters.get(indicatorname1);
-    		Object[] parameters1 = row.getIndic1Param();
-    		int i = 0;
-    		for (String x : requiredparam1) {
-    			if (x=="closeprice") {
-    				parameters1[i] = closeprice;
-    			} else if (x=="series") {
-    				parameters1[i] = series;
-    			} else if (x=="MedianPriceIndicator") {
-    				parameters1[i] = new MedianPriceIndicator(series);
-    			} else {
-    			}
-    			i++;
-    		}
-    		try {
-    		Class myClass1 = Class.forName(indicatorclasspaths.get(indicatorname1));
-            Constructor constructor1;	
-            System.out.println("Class: " + parameters1[0].getClass());
-			constructor1 = myClass1.getConstructor();
-            Object firstindicator = constructor1.newInstance(parameters1);
-            row.setfirstindicator(firstindicator);
-            System.out.println("Create  " + firstindicator.toString());
-			} catch (NoSuchMethodException | SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    		String indicatorname1 = Indicators.getByCode(entryrow.getIndicator1()).toString();
+    		Object[] parameters1 = entryrow.getIndic1Param();
+    		Indicator indicator = createindicator(entryrow, indicatorname1, parameters1, series, closeprice);
+            entryrow.setfirstindicator(indicator);
     		//2
-    		String indicatorname2 =Indicators.getByCode(row.getIndicator2()).toString();
-    		System.out.println("Indic2 name: " + indicatorname2);
-    		String[] requiredparam2 = indicatorparameters.get(indicatorname2);
-    		Object[] parameters2 = row.getIndic2Param();
-    		i = 0;
-    		for (String x : requiredparam2) {
-    			if (x=="closeprice") {
-    				parameters2[i] = closeprice;
-    			} else if (x=="series") {
-    				parameters2[i] = series;
-    			} else if (x=="MedianPriceIndicator") {
-    				parameters2[i] = new MedianPriceIndicator(series);
-    			} else {
-    				System.out.println("????");
-    			}
-    			i++;
-    		}
-			try {
-			Class myClass2 = Class.forName(indicatorclasspaths.get(indicatorname2));
-            Constructor constructor2 = myClass2.getConstructor();
-            Object secondindicator = constructor2.newInstance(parameters2);
-            row.setsecondindicator(secondindicator);
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    		String indicatorname2 =Indicators.getByCode(entryrow.getIndicator2()).toString();
+    		Object[] parameters2 = entryrow.getIndic2Param();
+    		Indicator indicator2 = createindicator(entryrow, indicatorname2, parameters2, series, closeprice);
+            entryrow.setsecondindicator(indicator2);
     	}
-    	for (Person row2 : Backdataexit) {
-    		
+    	
+    	for (Person exitrow : Backdataexit) {
+    		//1
+    		String indicatorname1 = Indicators.getByCode(exitrow.getIndicator1()).toString();
+    		Object[] parameters1 = exitrow.getIndic1Param();
+    		Indicator indicator = createindicator(exitrow, indicatorname1, parameters1, series, closeprice);
+    		exitrow.setfirstindicator(indicator);
+    		//2
+    		String indicatorname2 =Indicators.getByCode(exitrow.getIndicator2()).toString();
+    		Object[] parameters2 = exitrow.getIndic2Param();
+    		Indicator indicator2 = createindicator(exitrow, indicatorname2, parameters2, series, closeprice);
+    		exitrow.setsecondindicator(indicator2);
     	}
     	
     	SMAIndicator shortSma = new SMAIndicator(new ClosePriceIndicator(series), 5);
@@ -403,6 +322,50 @@ public class BacktestController {
         System.out.println("Buy-and-hold: " + new BuyAndHoldCriterion().calculate(series, tradingRecord));
         // Total profit vs buy-and-hold
         System.out.println("Custom strategy profit vs buy-and-hold strategy profit: " + new VersusBuyAndHoldCriterion(totalProfit).calculate(series, tradingRecord));
+    }
+
+    private static Indicator createindicator(Person entryrow, String indicatorname, Object[] parameters, TimeSeries series, ClosePriceIndicator closeprice) {
+		int i = 0;
+		System.out.println(series);
+		String[] requiredparam = indicatorparameters.get(indicatorname);
+		for (String x : requiredparam) {
+			System.out.println("looping");
+			if (x=="closeprice") {
+				parameters[i] = closeprice;
+			} else if (x=="series") {
+				parameters[i] = series;
+			} else if (x=="MedianPriceIndicator") {
+				parameters[i] = new MedianPriceIndicator(series);
+			} else if (x=="StochasticOscillatorKIndicator"){
+				int timeframe = (int) parameters[2];
+				parameters = new Object[1];
+				parameters[i] = new StochasticOscillatorKIndicator(series, timeframe);
+				break;
+			}
+			i++;
+		}
+		try {
+		Class<?>[] classes = new Class<?>[parameters.length];
+		for (int ii = 0; ii < parameters.length; ++ii) {
+			if (parameters[ii].getClass() == BaseTimeSeries.class) {
+				 classes[ii] =  TimeSeries.class;
+			} else if (parameters[ii].getClass() == Integer.class) {
+				classes[ii] = int.class;
+			} else {
+				classes[ii] = parameters[ii].getClass();
+			}
+		}
+
+		Class myClass = Class.forName(indicatorclasspaths.get(indicatorname));
+        Constructor constructor = myClass.getDeclaredConstructor(classes);
+        Object indicator = constructor.newInstance(parameters);
+        System.out.println("Create  " + indicator.toString());
+        return (Indicator) indicator; 
+		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 return null;
     }
     
     void setUpEntryTable() {
@@ -706,7 +669,12 @@ public class BacktestController {
     }
     
     public void createFormGUI(Person person, int i) {
-    	String indic1code = person.getIndicator1();
+    	String indiccode;
+    	if (i==1) {
+    	indiccode = person.getIndicator1();
+    	} else {
+    	indiccode = person.getIndicator2();
+    	}
     	final Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.initOwner(Main.primaryStage);
@@ -718,7 +686,7 @@ public class BacktestController {
         vbox.setSpacing(15);
         vbox.setStyle("-fx-background-color: #3e4047;");
         vbox.setPadding(new Insets(10));
-        Label label = new Label(Indicators.getByCode(indic1code).toString());
+        Label label = new Label(Indicators.getByCode(indiccode).toString());
         label.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
         label.setAlignment(Pos.TOP_CENTER);
         label.setTextFill(Color.WHITE);
@@ -732,158 +700,44 @@ public class BacktestController {
         hbox.getStylesheets().add(css);
         
         JFXButton button = new JFXButton("Done");
-        String[] parametersstring = indicatorparameters.get(Indicators.getByCode(indic1code).toString());
+        String[] parametersstring = indicatorparameters.get(Indicators.getByCode(indiccode).toString());
         TextField[] TextFields = new TextField[parametersstring.length];
-        
-        //Just noticed this can't work. We create the indicators, that requires a series, before we even get the data or press run. It should get the parameters here, then do a switch case later in order to create the indicators
-        //In order to get the parameters, use a hashmap that has its keys being the indicator codes and its values being a string array that has the parameters names
-        //Loop for this array, create the gui. Then when the button is pressed get the values by looping trough the textboxes, create an array with them, and store them in the person object.
-        //Later on, when looping for each person, you can just get the indicators given parameters. Then switch case the indicator, and fill in the other values.
-        //To make the case switch smaller. Have the parameters required include stuff like series, closedata, etc. If it requires special(bollinger), then also have that. When creating dynamic gui ignore those values
-        //Then later on, when switch casing, do the special things on their own. Then run a default value, and in there check if the parameter is series, closeprice, etc. and input that.
-        /*switch(indic1code) {
-	        case "Accel":      	
-				parametersstring[0] = "timeFrameSma1";
-				parametersstring[1]	= "timeFrameSma2";
-				button.setOnAction(e -> {
-					AccelerationDecelerationIndicator formedindic = new AccelerationDecelerationIndicator(series, Integer.parseInt(parameters[0].getText()),Integer.parseInt(parameters[1].getText()));
-					person.setfirstindicator(formedindic);
-					dialog.close();
-				});
-	        	break;
-	        case "AroonDown":
-	        	parametersstring[0] = "TimeFrame";
-	        	button.setOnAction(e -> {
-	        		AroonDownIndicator formedindic = new AroonDownIndicator(series, Integer.parseInt(parameters[0].getText()));
-	        		setindicator(person, formedindic, i, dialog);
-	        	});
-	        	break;
-	        case "AroonOscil":
-	        	parametersstring[0] = "TimeFrame";
-	        	button.setOnAction(e -> {
-	        		AroonOscillatorIndicator formedindic = new AroonOscillatorIndicator(series, Integer.parseInt(parameters[0].getText()));
-	        		setindicator(person, formedindic, i, dialog);
-	        	});
-	        	break;
-	        case "ArronUp":
-	        	parametersstring[0] = "TimeFrame";
-	        	button.setOnAction(e -> {
-	        		AroonUpIndicator formedindic = new AroonUpIndicator(series, Integer.parseInt(parameters[0].getText()));
-	        		setindicator(person, formedindic, i, dialog);
-	        	});
-	        	break;
-	        case "ATR":
-	        	parametersstring[0] = "";
-	        	parametersstring[1] = "";
-	        	button.setOnAction(e -> {
-	        		//AwesomeOscillatorIndicator formedindic = new AwesomeOscillatorIndicator(formedindic, 0, 0);
-	        		//setindicator(person, formedindic, i, dialog);
-	        	});
-	        	break;
-	        case "AWS":
-	        	parametersstring[0] = "";
-	        	parametersstring[1] = "";
-	        	button.setOnAction(e -> {
-	        		
-	        		//person.setfirstindicator(formedindic);
-					dialog.close();
-	        	});
-	        	break;
-	        case "CCI":
-	        	break;
-	        case "CELI":
-	        	break;
-	        case "CESI":
-	        	break;
-	        case "CMO":
-	        	break;
-	        case "CoCI":
-	        	break;
-	        case "DEI":
-	        	break;
-	        case "DPO":
-	        	break;
-	        case "EMA":
-	        	break;
-	        case "FI":
-	        	break;
-	        case "HMA":
-	        	break;
-	        case "KAMA":
-	        	break;
-	        case "MACD":
-	        	break;
-	        case "MMA":
-	        	break;
-	        case "PSI":
-	        	break;
-	        case "PPO":
-	        	break;
-	        case "RWIHI":
-	        	break;
-	        case "RWILI":
-	        	break;
-	        case "RAVI":
-	        	break;
-	        case "ROCI":
-	        	break;
-	        case "RSI":
-	        	break;
-	        case "SMA":
-	        	break;
-	        case "SODI":
-	        	break;
-	        case "SOKI":
-	        	break;
-	        case "SRI":
-	        	break;
-	        case "TEI":
-	        	break;
-	        case "UII":
-	        	break;
-	        case "ZLEMA":
-	        	break;
-	        case "BBLI":
-	        	break;
-	        default:
-	        	System.out.println("def: " + indic1code);
-	        	break;
-        	}*/
-        	createSpecificGui(parametersstring,TextFields,vbox.getChildren(),vbox2.getChildren());
-        	
-        	vbox2.getChildren().add(button);
-            Scene dialogScene = new Scene(hbox, 400, 300);
-            dialog.setScene(dialogScene);
-            dialog.show();
-        	button.setOnAction(e -> {
-        		Object[] parameters = new Object[TextFields.length];
-        		int x=0;
-        		for (TextField text : TextFields) {	
-        			if (text!=null) {
-        				String stringtext = text.getText();
-        				if(!NumberUtils.isCreatable(stringtext)) {
-        					
-        				} else {
-        					parameters[x] = stringtext;
-        				}
-        			}
-        			x++;
-        		}
-        		if (i==1) {
-        			person.setIndic1Param(parameters);
-        		} else if (i==2) {
-        			person.setIndic2Param(parameters);
-        		} else {
-        			//error
-        		}
-        		dialog.close();
-        	});
-        }
+    	createSpecificGui(parametersstring,TextFields,vbox.getChildren(),vbox2.getChildren());
+    	
+    	vbox2.getChildren().add(button);
+        Scene dialogScene = new Scene(hbox, 400, 300);
+        dialog.setScene(dialogScene);
+        dialog.show();
+    	button.setOnAction(e -> {
+    		Object[] parameters = new Object[TextFields.length];
+    		int x=0;
+    		for (TextField text : TextFields) {	
+    			if (text!=null) {
+    				String stringtext = text.getText();
+    				if(!NumberUtils.isCreatable(stringtext)) {
+    					//Number is not creatable, create error message
+    				} else {
+    					//Also have if/else to parse some inputs into decimal.
+    					parameters[x] = Integer.parseInt(stringtext);
+    				}
+    			}
+    			x++;
+    		}
+    		if (i==1) {
+    			person.setIndic1Param(parameters);
+    		} else if (i==2) {
+    			person.setIndic2Param(parameters);
+    		} else {
+    			//error
+    		}
+    		dialog.close();
+    	});
+    }
 
 	private void createSpecificGui(String[] parametersstring, Object[] TextFields,ObservableList<Node> observableList, ObservableList<Node> observableList2) {
 		int i=0;
 		for (String x : parametersstring) {
-			if (x!=null && x!="closeprice" && x!="series" && x!="MedianPriceIndicator") {
+			if (x!=null && x!="closeprice" && x!="series" && x!="MedianPriceIndicator" && x!="StochasticOscillatorKIndicator") {
 				TextField textfield = new TextField();
 				observableList.add(textfield);
 				Label label = new Label(x);
