@@ -46,6 +46,7 @@ import org.ta4j.core.indicators.pivotpoints.*;
 import org.ta4j.core.indicators.volume.*;
 import org.ta4j.core.indicators.helpers.*;
 import org.ta4j.core.trading.rules.*;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.ta4j.core.BaseStrategy;
@@ -123,8 +124,8 @@ public class BacktestController {
     @FXML private JFXDatePicker endtime;
     public static ObservableList<Person> Backdataentry =  FXCollections.observableArrayList();
     public static ObservableList<Person> Backdataexit =  FXCollections.observableArrayList();
-    HashMap<String, String[]> indicatorparameters = new HashMap<String, String[]>();
-    HashMap<String, String> indicatorclasspaths = new HashMap<String, String>();
+    static HashMap<String, String[]> indicatorparameters = new HashMap<String, String[]>();
+    static HashMap<String, String> indicatorclasspaths = new HashMap<String, String>();
     HashMap<String, Integer> timeframes = new HashMap<String, Integer>();
 	private static int candles;
 	private static LocalDate timestart;
@@ -137,12 +138,43 @@ public class BacktestController {
 		timeframes.put("4h", 240);
 		timeframes.put("1d", 1440);
 		timeframes.put("1w", 10080);
-		indicatorparameters.put("Accel", new String[]{"timeFrameSma1","timeFrameSma2"});
-		indicatorparameters.put("AroonDown", new String[]{"timeFrame"});
-		indicatorparameters.put("AroonOscil", new String[]{"timeFrame"});
-		indicatorparameters.put("ArronUp", new String[]{"timeFrame"});
-		indicatorparameters.put("ATR", new String[]{"timeFrame"});
-		indicatorparameters.put("EMA", new String[]{"timeFrame"});
+		indicatorparameters.put("AccelerationDecelerationIndicator",  new String[]{"series","timeFrameSma1" , "timeFrameSma2"});
+		indicatorparameters.put("AroonDownIndicator",  new String[]{"series","timeFrame"});
+		indicatorparameters.put("AroonOscillatorIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("AroonUpIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("ATRIndicator", new String[]{"series","timeFrame"});//??
+		indicatorparameters.put("AwesomeOscillatorIndicator", new String[]{"closeprice","timeFrameSma1", "timeFrameSma2"});
+		indicatorparameters.put("CCIIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("ChandelierExitLongIndicator", new String[]{"series","timeFrame","K multiplier"});
+		indicatorparameters.put("ChandelierExitShortIndicator", new String[]{"series","timeFrame","K multiplier"});
+		indicatorparameters.put("CMOIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("CoppockCurveIndicator", new String[]{"closeprice","longRoCTimeFrame", "shortRoCTimeFrame", "wmaTimeFrame"});
+		indicatorparameters.put("DoubleEMAIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("DPOIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("EMAIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("FisherIndicator", new String[]{"MedianPriceIndicator","timeFrame", "alpha","beta"});///
+		indicatorparameters.put("HMAIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("KAMAIndicator", new String[]{"closeprice","timeFrameEffectiveRatio", "timeFrameFast", "timeFrameSlow"});
+		indicatorparameters.put("MACDIndicator", new String[]{"closeprice","shortTimeFrame", "longTimeFrame"});
+		indicatorparameters.put("MMAIndicator", new String[]{"series","timeFrame"});//???
+		indicatorparameters.put("ParabolicSarIndicator", new String[]{"series","Acceleration factor", "Max Acceleration", "Acceleration Increment"});
+		indicatorparameters.put("PPOIndicator", new String[]{"closeprice","shortTimeFrame", "longTimeFrame"});
+		indicatorparameters.put("RandomWalkIndexHighIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("RandomWalkIndexLowIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("RAVIIndicator", new String[]{"closeprice","shortSmaTimeFrame" , "longSmaTimeFrame"});
+		indicatorparameters.put("ROCIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("RSIIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("SMAIndicator", new String[]{"closeprice","timeFrame"});
+		//?
+		indicatorparameters.put("StochasticOscillatorDIndicator", new String[]{"series","timeFrame"}); //?
+		indicatorparameters.put("StochasticOscillatorKIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("StochasticRSIIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("TripleEMAIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("UlcerIndexIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("WilliamsRIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("WMAIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("ZLEMAIndicator", new String[]{"closeprice","timeFrame"});
+		
 		
 		indicatorclasspaths.put("AccelerationDecelerationIndicator", "org.ta4j.core.indicators.AccelerationDecelerationIndicator");
 		indicatorclasspaths.put("AroonDownIndicator", "org.ta4j.core.indicators.AroonDownIndicator");
@@ -190,7 +222,7 @@ public class BacktestController {
 	
     @FXML
     void addEntryRow(ActionEvent event) {
-	    Person person = new Person(Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode(), null, null);
+	    Person person = new Person(Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode(), null, null, null, null);
 	    Backdataentry.add(person);
 	    BackEntryTable.setItems(Backdataentry);
 	    BackEntryTable.refresh();
@@ -198,7 +230,7 @@ public class BacktestController {
 
     @FXML
     void addExitRow(ActionEvent event) {
-	    Person person = new Person(Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode(), null,null);
+	    Person person = new Person(Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode(), null,null, null, null);
 	    Backdataexit.add(person);
 	    BackExitTable.setItems(Backdataexit);
 	    BackExitTable.refresh();
@@ -206,51 +238,21 @@ public class BacktestController {
 
     @FXML
     void runBackTest(ActionEvent event) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
-    	int EntrySize = BackEntryTable.getItems().size();
-    	int ExitSize = BackExitTable.getItems().size();
     	for (Person person : BackEntryTable.getItems()) {
     		String indicator1 = person.getIndicator1();
     		String indicator2 = person.getIndicator2();
-    		String entryRule = person.getTradingRule();
-    		boolean andor = person.isor();
-    		String indic1code = Indicators.getByString(indicator1);
-    		String indic2code = Indicators.getByString(indicator2);
-    		
-    		
-    	ClosePriceIndicator closePrice = new ClosePriceIndicator(null);
-        EMAIndicator shortEma = new EMAIndicator(closePrice, 9);
-        EMAIndicator longEma = new EMAIndicator(closePrice, 26);
-        System.out.println(shortEma.toString());
-        BollingerBandsMiddleIndicator bol = new BollingerBandsMiddleIndicator(null);
-        //Rule entryRule = new CrossedUpIndicatorRule(shortEma, longEma);
-        Rule test = new IsFallingRule(shortEma,1);
-        //Indicator 1
-        
-        
-        //--
-        //There are 78 (excluded statistics & helpers) indicators. Could just write switch statement for all of them. Also won't need classpath, or indicator parameter hashmap.
-        //Have it get the values in the switch. Store it in string array. Later on create the parameters from that like before, and still use classpath, to create indicator.
-        //Also have code for custom ones, such as bolinger bands.
-        //In the Indicators.java, maybe instead of doing the current code/string thing which is useless, have it be strings and their classpaths, so you can also use other folders.
-        //Also have an hashmap(indicatorparamters) that lists the required parameters of each indicator. If it is something like closeprice or price list, don't ask user.
-        //If not, ask the user in a dynamic array, with the values in the array string(in hashmap value) being the input parameters.
-        //Do a similar thing for the rules, as there is just a few it won't be a problem. Pay atention to the constructors, as there can be multiple.
-        //--
-        
 
-        /*System.out.println("1: " + firstindicator);
-        //Indicator 2
-        Class myClass2 = Class.forName("org.ta4j.core.indicators." + indicator2);
-        Constructor constructor2 = myClass2.getConstructor(Indicator.class, int.class);
-        Object[] parameters2 = {closePrice, 10};
-        Object secondindicator = constructor.newInstance(parameters);
-        //Entry Rule
-        Class myClass3 = Class.forName("org.ta4j.core.trading.rules." + entryRule);
-        Constructor constructor3 = myClass3.getConstructor();
-        Object[] parameters3 = {firstindicator, secondindicator};
-        Object ruleentry = constructor.newInstance(parameters);
+        //There are 78 (excluded statistics & helpers) indicators.
+        //Todo:
+        	//Create all indicators with dynamic form
+        	//Store them in the person object
+        	//Figure out how and/or works in ta4j
+        	//Create strategies from the indicators
+        		//Loop for each person, get the two indicators, switch case for the rule, create new rule with that
+        		//Combine them with and/or
+        		//Do this for both entry and exit
+        		//Create overall strategy, and run it
         
-        System.out.println(ruleentry.toString());*/
     	}
     	for (Person person : BackExitTable.getItems()) {
     		
@@ -285,7 +287,7 @@ public class BacktestController {
     	
     }
     
-    public static void recievedBackTest(JSONObject jsonmessage) {
+    public static void recievedBackTest(JSONObject jsonmessage){
     	JSONArray test = jsonmessage.getJSONArray("Return");
     	Tick[] ticksarray = new Tick[candles];
     	ZonedDateTime endTime = timestart.atStartOfDay(ZoneOffset.UTC);
@@ -294,10 +296,87 @@ public class BacktestController {
     		JSONArray ohlcv = test.getJSONArray(x);
     		ticksarray[x] = (new BaseTick(endTime.plusDays(x), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
     	}
-
     	List<Tick> ticks = Arrays.asList(ticksarray);
-    	BaseTimeSeries series = new BaseTimeSeries("apple_ticks", ticks);
+    	BaseTimeSeries series = new BaseTimeSeries("ticks", ticks);
     	TimeSeriesManager seriesManager = new TimeSeriesManager(series);
+    	ClosePriceIndicator closeprice = new ClosePriceIndicator(series);
+    	for (Person row : Backdataentry) {
+    		//1
+    		String indicatorname1 = Indicators.getByCode(row.getIndicator1()).toString();
+    		System.out.println("Indic1 name: " + indicatorname1);
+    		String[] requiredparam1 = indicatorparameters.get(indicatorname1);
+    		Object[] parameters1 = row.getIndic1Param();
+    		int i = 0;
+    		for (String x : requiredparam1) {
+    			if (x=="closeprice") {
+    				parameters1[i] = closeprice;
+    			} else if (x=="series") {
+    				parameters1[i] = series;
+    			} else if (x=="MedianPriceIndicator") {
+    				parameters1[i] = new MedianPriceIndicator(series);
+    			} else {
+    			}
+    			i++;
+    		}
+    		try {
+    		Class myClass1 = Class.forName(indicatorclasspaths.get(indicatorname1));
+            Constructor constructor1;	
+            System.out.println("Class: " + parameters1[0].getClass());
+			constructor1 = myClass1.getConstructor();
+            Object firstindicator = constructor1.newInstance(parameters1);
+            row.setfirstindicator(firstindicator);
+            System.out.println("Create  " + firstindicator.toString());
+			} catch (NoSuchMethodException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		//2
+    		String indicatorname2 =Indicators.getByCode(row.getIndicator2()).toString();
+    		System.out.println("Indic2 name: " + indicatorname2);
+    		String[] requiredparam2 = indicatorparameters.get(indicatorname2);
+    		Object[] parameters2 = row.getIndic2Param();
+    		i = 0;
+    		for (String x : requiredparam2) {
+    			if (x=="closeprice") {
+    				parameters2[i] = closeprice;
+    			} else if (x=="series") {
+    				parameters2[i] = series;
+    			} else if (x=="MedianPriceIndicator") {
+    				parameters2[i] = new MedianPriceIndicator(series);
+    			} else {
+    				System.out.println("????");
+    			}
+    			i++;
+    		}
+			try {
+			Class myClass2 = Class.forName(indicatorclasspaths.get(indicatorname2));
+            Constructor constructor2 = myClass2.getConstructor();
+            Object secondindicator = constructor2.newInstance(parameters2);
+            row.setsecondindicator(secondindicator);
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	for (Person row2 : Backdataexit) {
+    		
+    	}
+    	
     	SMAIndicator shortSma = new SMAIndicator(new ClosePriceIndicator(series), 5);
     	SMAIndicator longSma = new SMAIndicator(new ClosePriceIndicator(series), 10);
 		Strategy myStrategy =  new BaseStrategy(new CrossedUpIndicatorRule(shortSma, longSma), new CrossedDownIndicatorRule(shortSma, longSma));
@@ -368,7 +447,7 @@ public class BacktestController {
     	            Person person = event.getTableView().getItems().get(row);
     	 
     	            person.setIndicator1(newIndicator1.getCode());
-    	            createFormGUI(person);
+    	            createFormGUI(person,1);
     	        });
     	 
     	        Indicator1.setMinWidth(120);
@@ -400,6 +479,7 @@ public class BacktestController {
     	            Person person = event.getTableView().getItems().get(row);
     	 
     	            person.setIndicator2(newIndicator2.getCode());
+    	            createFormGUI(person,2);
     	        });
     	 
     	        Indicator2.setMinWidth(120);
@@ -512,12 +592,12 @@ public class BacktestController {
             TablePosition<Person, Indicators> pos = event.getTablePosition();
            
             Indicators newIndicator1 = event.getNewValue();
- 
+            
             int row = pos.getRow();
             Person person = event.getTableView().getItems().get(row);
  
             person.setIndicator1(newIndicator1.getCode());
-            createFormGUI(person);
+            createFormGUI(person,1);
         });
  
         Indicator1.setMinWidth(120);
@@ -549,6 +629,7 @@ public class BacktestController {
             Person person = event.getTableView().getItems().get(row);
  
             person.setIndicator2(newIndicator2.getCode());
+            createFormGUI(person,2);
         });
  
         Indicator2.setMinWidth(120);
@@ -624,7 +705,7 @@ public class BacktestController {
         String css = this.getClass().getResource("/assets/tableview.css").toExternalForm();
     }
     
-    public void createFormGUI(Person person) {
+    public void createFormGUI(Person person, int i) {
     	String indic1code = person.getIndicator1();
     	final Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -651,10 +732,16 @@ public class BacktestController {
         hbox.getStylesheets().add(css);
         
         JFXButton button = new JFXButton("Done");
-        String[] parametersstring = new String[5];
-        TextField[] parameters = new TextField[5];
-        TimeSeries series = null;
-        switch(indic1code) {
+        String[] parametersstring = indicatorparameters.get(Indicators.getByCode(indic1code).toString());
+        TextField[] TextFields = new TextField[parametersstring.length];
+        
+        //Just noticed this can't work. We create the indicators, that requires a series, before we even get the data or press run. It should get the parameters here, then do a switch case later in order to create the indicators
+        //In order to get the parameters, use a hashmap that has its keys being the indicator codes and its values being a string array that has the parameters names
+        //Loop for this array, create the gui. Then when the button is pressed get the values by looping trough the textboxes, create an array with them, and store them in the person object.
+        //Later on, when looping for each person, you can just get the indicators given parameters. Then switch case the indicator, and fill in the other values.
+        //To make the case switch smaller. Have the parameters required include stuff like series, closedata, etc. If it requires special(bollinger), then also have that. When creating dynamic gui ignore those values
+        //Then later on, when switch casing, do the special things on their own. Then run a default value, and in there check if the parameter is series, closeprice, etc. and input that.
+        /*switch(indic1code) {
 	        case "Accel":      	
 				parametersstring[0] = "timeFrameSma1";
 				parametersstring[1]	= "timeFrameSma2";
@@ -668,24 +755,21 @@ public class BacktestController {
 	        	parametersstring[0] = "TimeFrame";
 	        	button.setOnAction(e -> {
 	        		AroonDownIndicator formedindic = new AroonDownIndicator(series, Integer.parseInt(parameters[0].getText()));
-	        		person.setfirstindicator(formedindic);
-					dialog.close();
+	        		setindicator(person, formedindic, i, dialog);
 	        	});
 	        	break;
 	        case "AroonOscil":
 	        	parametersstring[0] = "TimeFrame";
 	        	button.setOnAction(e -> {
 	        		AroonOscillatorIndicator formedindic = new AroonOscillatorIndicator(series, Integer.parseInt(parameters[0].getText()));
-	        		person.setfirstindicator(formedindic);
-					dialog.close();
+	        		setindicator(person, formedindic, i, dialog);
 	        	});
 	        	break;
 	        case "ArronUp":
 	        	parametersstring[0] = "TimeFrame";
 	        	button.setOnAction(e -> {
 	        		AroonUpIndicator formedindic = new AroonUpIndicator(series, Integer.parseInt(parameters[0].getText()));
-	        		person.setfirstindicator(formedindic);
-					dialog.close();
+	        		setindicator(person, formedindic, i, dialog);
 	        	});
 	        	break;
 	        case "ATR":
@@ -693,8 +777,7 @@ public class BacktestController {
 	        	parametersstring[1] = "";
 	        	button.setOnAction(e -> {
 	        		//AwesomeOscillatorIndicator formedindic = new AwesomeOscillatorIndicator(formedindic, 0, 0);
-	        		//person.setfirstindicator(formedindic);
-					dialog.close();
+	        		//setindicator(person, formedindic, i, dialog);
 	        	});
 	        	break;
 	        case "AWS":
@@ -765,26 +848,49 @@ public class BacktestController {
 	        default:
 	        	System.out.println("def: " + indic1code);
 	        	break;
-        	}
-        	createSpecificGui(parametersstring,parameters,vbox.getChildren(),vbox2.getChildren());
+        	}*/
+        	createSpecificGui(parametersstring,TextFields,vbox.getChildren(),vbox2.getChildren());
         	
         	vbox2.getChildren().add(button);
             Scene dialogScene = new Scene(hbox, 400, 300);
             dialog.setScene(dialogScene);
             dialog.show();
+        	button.setOnAction(e -> {
+        		Object[] parameters = new Object[TextFields.length];
+        		int x=0;
+        		for (TextField text : TextFields) {	
+        			if (text!=null) {
+        				String stringtext = text.getText();
+        				if(!NumberUtils.isCreatable(stringtext)) {
+        					
+        				} else {
+        					parameters[x] = stringtext;
+        				}
+        			}
+        			x++;
+        		}
+        		if (i==1) {
+        			person.setIndic1Param(parameters);
+        		} else if (i==2) {
+        			person.setIndic2Param(parameters);
+        		} else {
+        			//error
+        		}
+        		dialog.close();
+        	});
         }
 
-	private void createSpecificGui(String[] parametersstring, Object[] parameters,ObservableList<Node> observableList, ObservableList<Node> observableList2) {
+	private void createSpecificGui(String[] parametersstring, Object[] TextFields,ObservableList<Node> observableList, ObservableList<Node> observableList2) {
 		int i=0;
 		for (String x : parametersstring) {
-			if (x!=null) {
+			if (x!=null && x!="closeprice" && x!="series" && x!="MedianPriceIndicator") {
 				TextField textfield = new TextField();
 				observableList.add(textfield);
 				Label label = new Label(x);
 				observableList2.add(label);
-				parameters[i] = textfield;
-				i++;
+				TextFields[i] = textfield;
 			}
+			i++;
 		}
 	}
 }
