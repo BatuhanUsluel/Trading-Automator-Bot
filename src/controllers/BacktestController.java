@@ -14,6 +14,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JFrame;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -69,6 +71,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 
 import application.Exchanges;
+import application.FxDialogs;
 import application.Main;
 import application.SocketCommunication;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -111,7 +114,6 @@ public class BacktestController {
     @FXML private JFXComboBox<String> BackExchange;
     @FXML private TextField BackBase;
     @FXML private TextField BackAlt;
-    @FXML private TextField LiveBase;
     @FXML private JFXComboBox<String> Timeframe;
     @FXML private JFXButton BackAddExitRow;
     @FXML private JFXButton BackAddEntryRow;
@@ -218,7 +220,7 @@ public class BacktestController {
 	
     @FXML
     void addEntryRow(ActionEvent event) {
-	    Person person = new Person(Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode(), null, null, null, null);
+	    Person person = new Person(Indicators.Select.getCode(), false, Indicators.Select.getCode(), TradingRules.CrossedUpIndicatorRule.getCode(), null, null, null, null);
 	    Backdataentry.add(person);
 	    BackEntryTable.setItems(Backdataentry);
 	    BackEntryTable.refresh();
@@ -226,7 +228,7 @@ public class BacktestController {
 
     @FXML
     void addExitRow(ActionEvent event) {
-	    Person person = new Person(Indicators.PPOIndicator.getCode(), true, Indicators.CCIIndicator.getCode(), TradingRules.IsEqualRule.getCode(), null,null, null, null);
+	    Person person = new Person(Indicators.Select.getCode(), false, Indicators.Select.getCode(), TradingRules.CrossedDownIndicatorRule.getCode(), null,null, null, null);
 	    Backdataexit.add(person);
 	    BackExitTable.setItems(Backdataexit);
 	    BackExitTable.refresh();
@@ -234,26 +236,59 @@ public class BacktestController {
 
     @FXML
     void runBackTest(ActionEvent event) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
+
+    	
+    	String base = BackBase.getText();
+    	String alt = BackAlt.getText();
+    	boolean noerror = true;
+		StringBuilder stringBuilder = new StringBuilder();
     	for (Person person : BackEntryTable.getItems()) {
     		String indicator1 = person.getIndicator1();
     		String indicator2 = person.getIndicator2();
-
-        //There are 78 (excluded statistics & helpers) indicators.
-        //Todo:
-        	//Create all indicators with dynamic form
-        	//Store them in the person object
-        	//Figure out how and/or works in ta4j
-        	//Create strategies from the indicators
-        		//Loop for each person, get the two indicators, switch case for the rule, create new rule with that
-        		//Combine them with and/or
-        		//Do this for both entry and exit
-        		//Create overall strategy, and run it
-        
+    		if (indicator1.equals("Select") || indicator2.equals("Select")) {
+    			noerror=false;
+    			stringBuilder.append("Please select an indicator. Indicator can't be 'Select'\n");
+    		}
     	}
     	for (Person person : BackExitTable.getItems()) {
-    		
+    		String indicator1 = person.getIndicator1();
+    		String indicator2 = person.getIndicator2();
+    		if (indicator1.equals("Select") || indicator2.equals("Select")) {
+    			noerror=false;
+    			stringBuilder.append("Please select an indicator. Indicator can't be 'Select'\n");
+    		}
     	}
-
+		boolean noexchange = false;
+    	String exchange = "";
+     	
+    	try {
+    		exchange = BackExchange.getValue().toString();
+    	} catch (NullPointerException e) {
+    		noerror=false;
+    		noexchange=true;
+    		stringBuilder.append("Please enter a exchange\n");
+    	}
+    	if (!Exchanges.list.contains(exchange) && noexchange!=true) {
+    		noerror=false;
+    		stringBuilder.append(exchange + " is not a valid exchange.\n");
+    	}
+    	if(base==null) {
+    		noerror=false;
+    		stringBuilder.append("Base can not be empty\n");
+    	}
+    	if (alt==null) {
+    		noerror=false;
+    		stringBuilder.append("Alt can not be empty\n");
+    	}
+    	if (Backdataentry.get(0).isor()==true) {
+    		noerror=false;
+    		stringBuilder.append("First row in entry can not have 'or?' enabled\n");
+    	}
+    	if (Backdataexit.get(0).isor()==true) {
+    		noerror=false;
+    		stringBuilder.append("First row in exitcan not have 'or?' enabled\n");
+    	}
+    	if (noerror==true) {
     	JSONObject backtestJSON = new JSONObject();
     	try {
     		
@@ -284,16 +319,20 @@ public class BacktestController {
 		}
     	SocketCommunication.out.print(backtestJSON.toString());
     	SocketCommunication.out.flush();
+    	} else {
+    		String finalString = stringBuilder.toString();
+	    	FxDialogs.showError(null, finalString);
+    	}
     	
     }
     
     public static void recievedBackTest(JSONObject jsonmessage){
-    	JSONArray test = jsonmessage.getJSONArray("Return");
+    	JSONArray returned = jsonmessage.getJSONArray("Return");
     	Tick[] ticksarray = new Tick[candles];
     	ZonedDateTime endTime = timestart.atStartOfDay(ZoneOffset.UTC);
     	System.out.println(candles);
     	for (int x=0;x<candles;x++) {
-    		JSONArray ohlcv = test.getJSONArray(x);
+    		JSONArray ohlcv = returned.getJSONArray(x);
     		ticksarray[x] = (new BaseTick(endTime.plusDays(x), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
     	}
     	List<Tick> ticks = Arrays.asList(ticksarray);
@@ -429,7 +468,7 @@ public class BacktestController {
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 		dataset.addSeries(buildChartTimeSeries(series, new ClosePriceIndicator(series), exchange  + " - "+ base + "/" + alt));
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                "Bitstamp BTC", // title
+                "Backtesting Chart", // title
                 "Date", // x-axis label
                 "Price", // y-axis label
                 dataset, // data
@@ -439,6 +478,13 @@ public class BacktestController {
                 );
         XYPlot plot = (XYPlot) chart.getPlot();
         DateAxis axis = (DateAxis) plot.getDomainAxis();
+        
+        Date startdate = new Date(Long.parseLong(returned.getJSONArray(0).get(0).toString()));
+        System.out.println("S: " + startdate);
+        int retlen = returned.length();
+        Date enddate = new Date(Long.parseLong(returned.getJSONArray(retlen-1).get(0).toString()));
+        System.out.println("E: " + enddate);
+        axis.setRange(startdate, enddate);
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
         for (Trade trade : tradingRecord.getTrades()) {
         	System.out.println(trade.toString());
@@ -462,7 +508,7 @@ public class BacktestController {
         panel.setMouseWheelEnabled(true);
         panel.setPreferredSize(new Dimension(1024, 400));
         // Application frame
-        ApplicationFrame frame = new ApplicationFrame("Backtest price chart");
+        JFrame frame = new JFrame("Backtest chart");
         frame.setContentPane(panel);
         frame.pack();
         RefineryUtilities.centerFrameOnScreen(frame);
@@ -588,9 +634,8 @@ public class BacktestController {
     	 
     	            int row = pos.getRow();
     	            Person person = event.getTableView().getItems().get(row);
-    	 
-    	            person.setIndicator1(newIndicator1.getCode());
-    	            createFormGUI(person,1);
+    	            createFormGUI(person,1, newIndicator1.getCode());
+    	           
     	        });
     	 
     	        Indicator1.setMinWidth(120);
@@ -620,9 +665,7 @@ public class BacktestController {
     	 
     	            int row = pos.getRow();
     	            Person person = event.getTableView().getItems().get(row);
-    	 
-    	            person.setIndicator2(newIndicator2.getCode());
-    	            createFormGUI(person,2);
+    	            createFormGUI(person,2, newIndicator2.getCode());
     	        });
     	 
     	        Indicator2.setMinWidth(120);
@@ -657,7 +700,7 @@ public class BacktestController {
     	 
     	        TradingRule.setMinWidth(120);
     	 
-    	        // ==== SINGLE? (CHECH BOX) ===
+    	        //Check Box
     	        andor.setCellValueFactory(new Callback<CellDataFeatures<Person, java.lang.Boolean>, ObservableValue<java.lang.Boolean>>() {
     	 
     	            @Override
@@ -665,11 +708,6 @@ public class BacktestController {
     	                Person person = param.getValue();
     	 
     	                SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(person.isor());
-    	 
-    	                // Note: singleCol.setOnEditCommit(): Not work for
-    	                // CheckBoxTableCell.
-    	 
-    	                // When "Single?" column change.
     	                booleanProp.addListener(new ChangeListener<java.lang.Boolean>() {
     	 
     	                    @Override
@@ -738,9 +776,7 @@ public class BacktestController {
             
             int row = pos.getRow();
             Person person = event.getTableView().getItems().get(row);
- 
-            person.setIndicator1(newIndicator1.getCode());
-            createFormGUI(person,1);
+            createFormGUI(person,1,newIndicator1.getCode());
         });
  
         Indicator1.setMinWidth(120);
@@ -770,9 +806,7 @@ public class BacktestController {
  
             int row = pos.getRow();
             Person person = event.getTableView().getItems().get(row);
- 
-            person.setIndicator2(newIndicator2.getCode());
-            createFormGUI(person,2);
+            createFormGUI(person,2,newIndicator2.getCode());
         });
  
         Indicator2.setMinWidth(120);
@@ -807,7 +841,7 @@ public class BacktestController {
  
         TradingRule.setMinWidth(120);
  
-        // ==== SINGLE? (CHECH BOX) ===
+        //Check Box
         andor.setCellValueFactory(new Callback<CellDataFeatures<Person, java.lang.Boolean>, ObservableValue<java.lang.Boolean>>() {
  
             @Override
@@ -815,11 +849,6 @@ public class BacktestController {
                 Person person = param.getValue();
  
                 SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(person.isor());
- 
-                // Note: singleCol.setOnEditCommit(): Not work for
-                // CheckBoxTableCell.
- 
-                // When "Single?" column change.
                 booleanProp.addListener(new ChangeListener<java.lang.Boolean>() {
  
                     @Override
@@ -848,13 +877,19 @@ public class BacktestController {
         String css = this.getClass().getResource("/assets/tableview.css").toExternalForm();
     }
     
-    public void createFormGUI(Person person, int i) {
+    public void createFormGUI(Person person, int i, String code) {
     	String indiccode;
     	if (i==1) {
-    	indiccode = person.getIndicator1();
+    		person.setfirstindicator(code);
+    		indiccode = person.getIndicator1();
     	} else {
-    	indiccode = person.getIndicator2();
+    		person.setsecondindicator(code);
+    		indiccode = person.getIndicator2();
     	}
+    	if (code=="Select") {
+    		return;
+    	}
+    	String indicstring = Indicators.getByCode(code).toString();
     	final Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.initOwner(Main.primaryStage);
@@ -866,7 +901,7 @@ public class BacktestController {
         vbox.setSpacing(15);
         vbox.setStyle("-fx-background-color: #3e4047;");
         vbox.setPadding(new Insets(10));
-        Label label = new Label(Indicators.getByCode(indiccode).toString());
+        Label label = new Label(indicstring);
         label.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
         label.setAlignment(Pos.TOP_CENTER);
         label.setTextFill(Color.WHITE);
@@ -880,7 +915,7 @@ public class BacktestController {
         hbox.getStylesheets().add(css);
         
         JFXButton button = new JFXButton("Done");
-        String[] parametersstring = indicatorparameters.get(Indicators.getByCode(indiccode).toString());
+        String[] parametersstring = indicatorparameters.get(indicstring);
         TextField[] TextFields = new TextField[parametersstring.length];
     	createSpecificGui(parametersstring,TextFields,vbox.getChildren(),vbox2.getChildren());
     	
@@ -888,29 +923,44 @@ public class BacktestController {
         Scene dialogScene = new Scene(hbox, 400, 300);
         dialog.setScene(dialogScene);
         dialog.show();
+       
+		StringBuilder stringBuilder = new StringBuilder();
     	button.setOnAction(e -> {
+    		boolean noerror = true;
     		Object[] parameters = new Object[TextFields.length];
     		int x=0;
     		for (TextField text : TextFields) {	
     			if (text!=null) {
     				String stringtext = text.getText();
     				if(!NumberUtils.isCreatable(stringtext)) {
-    					//Number is not creatable, create error message
+    					stringBuilder.append(stringtext + " is not a valid number.\n");
+    					noerror=false;
     				} else {
     					//Also have if/else to parse some inputs into decimal.
-    					parameters[x] = Integer.parseInt(stringtext);
+    					if (indicatorparameters.get(indicstring)[x].matches("K multiplier|alpha|beta|Acceleration factor|Max Acceleration|Acceleration Increment")) {
+    						parameters[x] = Decimal.valueOf(stringtext);
+    					} else {
+    					parameters[x] = Integer.valueOf(stringtext);
+    					}
     				}
     			}
     			x++;
     		}
-    		if (i==1) {
-    			person.setIndic1Param(parameters);
-    		} else if (i==2) {
-    			person.setIndic2Param(parameters);
+    		if (noerror==true) {
+	    		if (i==1) {
+	    			System.out.println("setting first indic");
+	    			person.setIndic1Param(parameters);
+	    			person.setIndicator1(code);
+	    		} else if (i==2) {
+	    			System.out.println("setting second indic");
+	    			person.setIndic2Param(parameters);
+	    			person.setIndicator2(code);
+	    		}
+	    		dialog.close();
     		} else {
-    			//error
+    		    String finalString = stringBuilder.toString();
+    	    	FxDialogs.showError(null, finalString);
     		}
-    		dialog.close();
     	});
     }
 

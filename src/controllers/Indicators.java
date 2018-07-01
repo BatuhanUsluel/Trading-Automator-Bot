@@ -2,7 +2,8 @@ package controllers;
 
 public enum Indicators {
 	 
-		AccelerationDecelerationIndicator("Accel", "AccelerationDecelerationIndicator")
+		Select("Select","Select")
+		,AccelerationDecelerationIndicator("Accel", "AccelerationDecelerationIndicator")
 		, AroonDownIndicator("AroonDown", "AroonDownIndicator")
 		, AroonOscillatorIndicator("AroonOscil","AroonOscillatorIndicator")
 		, AroonUpIndicator("ArronUp", "AroonUpIndicator")
