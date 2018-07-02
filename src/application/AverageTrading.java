@@ -19,6 +19,7 @@ import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
+import javafx.collections.ObservableList;
 
 import  java.lang.Thread;
 public class AverageTrading  implements Runnable  {
@@ -45,9 +46,10 @@ public class AverageTrading  implements Runnable  {
 	private String base;
 
 	private double volume;
-	
+
 	public AverageTrading(JSONObject json) throws JSONException {
 		this.json = json;
+
 	}
 	
 	public void run() {

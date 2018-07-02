@@ -114,16 +114,13 @@ public class BacktestController {
     @FXML private JFXComboBox<String> BackExchange;
     @FXML private TextField BackBase;
     @FXML private TextField BackAlt;
-    @FXML private JFXComboBox<String> Timeframe;
+    @FXML private JFXComboBox<String> timeframefx;
     @FXML private JFXButton BackAddExitRow;
     @FXML private JFXButton BackAddEntryRow;
     @FXML private JFXDatePicker starttime;
     @FXML private JFXDatePicker endtime;
     public static ObservableList<Person> Backdataentry =  FXCollections.observableArrayList();
     public static ObservableList<Person> Backdataexit =  FXCollections.observableArrayList();
-    static HashMap<String, String[]> indicatorparameters = new HashMap<String, String[]>();
-    static HashMap<String, String> indicatorclasspaths = new HashMap<String, String>();
-    HashMap<String, Integer> timeframes = new HashMap<String, Integer>();
 	private static String exchange;
 	private static String base;
 	private static String alt;
@@ -132,90 +129,18 @@ public class BacktestController {
 	@FXML
     public void initialize(){
 		System.out.println(ZonedDateTime.now());
-		timeframes.put("1m", 1);
-		timeframes.put("5m", 5);
-		timeframes.put("1h", 60);
-		timeframes.put("4h", 240);
-		timeframes.put("1d", 1440);
-		timeframes.put("1w", 10080);
-		indicatorparameters.put("AccelerationDecelerationIndicator",  new String[]{"series","timeFrameSma1" , "timeFrameSma2"});
-		indicatorparameters.put("AroonDownIndicator",  new String[]{"series","timeFrame"});
-		indicatorparameters.put("AroonOscillatorIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("AroonUpIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("AwesomeOscillatorIndicator", new String[]{"closeprice","timeFrameSma1", "timeFrameSma2"});
-		indicatorparameters.put("CCIIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("ChandelierExitLongIndicator", new String[]{"series","timeFrame","K multiplier"}); //K - Decimal
-		indicatorparameters.put("ChandelierExitShortIndicator", new String[]{"series","timeFrame","K multiplier"}); //K - Decimal
-		indicatorparameters.put("CMOIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("CoppockCurveIndicator", new String[]{"closeprice","longRoCTimeFrame", "shortRoCTimeFrame", "wmaTimeFrame"});
-		indicatorparameters.put("DoubleEMAIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("DPOIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("EMAIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("FisherIndicator", new String[]{"MedianPriceIndicator","timeFrame", "alpha","beta"}); // a - Decimal, b - Decimal
-		indicatorparameters.put("HMAIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("KAMAIndicator", new String[]{"closeprice","timeFrameEffectiveRatio", "timeFrameFast", "timeFrameSlow"});
-		indicatorparameters.put("MACDIndicator", new String[]{"closeprice","shortTimeFrame", "longTimeFrame"});
-		indicatorparameters.put("MMAIndicator", new String[]{"series","timeFrame"});//???
-		indicatorparameters.put("ParabolicSarIndicator", new String[]{"series","Acceleration factor", "Max Acceleration", "Acceleration Increment"}); //Decimal,Decimal,Decimal
-		indicatorparameters.put("PPOIndicator", new String[]{"closeprice","shortTimeFrame", "longTimeFrame"});
-		indicatorparameters.put("RandomWalkIndexHighIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("RandomWalkIndexLowIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("RAVIIndicator", new String[]{"closeprice","shortSmaTimeFrame" , "longSmaTimeFrame"});
-		indicatorparameters.put("ROCIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("RSIIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("SMAIndicator", new String[]{"closeprice","timeFrame"});
-		//?
-		indicatorparameters.put("StochasticOscillatorDIndicator", new String[]{"StochasticOscillatorKIndicator","series","timeFrame"});
-		indicatorparameters.put("StochasticOscillatorKIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("StochasticRSIIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("TripleEMAIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("UlcerIndexIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("WilliamsRIndicator", new String[]{"series","timeFrame"});
-		indicatorparameters.put("WMAIndicator", new String[]{"closeprice","timeFrame"});
-		indicatorparameters.put("ZLEMAIndicator", new String[]{"closeprice","timeFrame"});
 		
-		
-		indicatorclasspaths.put("AccelerationDecelerationIndicator", "org.ta4j.core.indicators.AccelerationDecelerationIndicator");
-		indicatorclasspaths.put("AroonDownIndicator", "org.ta4j.core.indicators.AroonDownIndicator");
-		indicatorclasspaths.put("AroonOscillatorIndicator", "org.ta4j.core.indicators.AroonOscillatorIndicator");
-		indicatorclasspaths.put("AroonUpIndicator", "org.ta4j.core.indicators.AroonUpIndicator");
-		indicatorclasspaths.put("AwesomeOscillatorIndicator", "org.ta4j.core.indicators.AwesomeOscillatorIndicator");
-		indicatorclasspaths.put("CCIIndicator", "org.ta4j.core.indicators.CCIIndicator");
-		indicatorclasspaths.put("ChandelierExitLongIndicator", "org.ta4j.core.indicators.ChandelierExitLongIndicator");
-		indicatorclasspaths.put("ChandelierExitShortIndicator", "org.ta4j.core.indicators.ChandelierExitShortIndicator");
-		indicatorclasspaths.put("CMOIndicator", "org.ta4j.core.indicators.CMOIndicator");
-		indicatorclasspaths.put("CoppockCurveIndicator", "org.ta4j.core.indicators.CoppockCurveIndicator");
-		indicatorclasspaths.put("DoubleEMAIndicator", "org.ta4j.core.indicators.DoubleEMAIndicator");
-		indicatorclasspaths.put("DPOIndicator", "org.ta4j.core.indicators.DPOIndicator");
-		indicatorclasspaths.put("EMAIndicator", "org.ta4j.core.indicators.EMAIndicator");
-		indicatorclasspaths.put("FisherIndicator", "org.ta4j.core.indicators.FisherIndicator");
-		indicatorclasspaths.put("HMAIndicator", "org.ta4j.core.indicators.HMAIndicator");
-		indicatorclasspaths.put("KAMAIndicator", "org.ta4j.core.indicators.KAMAIndicator");
-		indicatorclasspaths.put("MACDIndicator", "org.ta4j.core.indicators.MACDIndicator");
-		indicatorclasspaths.put("MMAIndicator", "org.ta4j.core.indicators.MMAIndicator");
-		indicatorclasspaths.put("ParabolicSarIndicator", "org.ta4j.core.indicators.ParabolicSarIndicator");
-		indicatorclasspaths.put("PPOIndicator", "org.ta4j.core.indicators.PPOIndicator");
-		indicatorclasspaths.put("RandomWalkIndexHighIndicator", "org.ta4j.core.indicators.RandomWalkIndexHighIndicator");
-		indicatorclasspaths.put("RandomWalkIndexLowIndicator", "org.ta4j.core.indicators.RandomWalkIndexLowIndicator");
-		indicatorclasspaths.put("RAVIIndicator", "org.ta4j.core.indicators.RAVIIndicator");
-		indicatorclasspaths.put("ROCIndicator", "org.ta4j.core.indicators.ROCIndicator");
-		indicatorclasspaths.put("ROCIndicator", "org.ta4j.core.indicators.ROCIndicator");
-		indicatorclasspaths.put("RSIIndicator", "org.ta4j.core.indicators.RSIIndicator");
-		indicatorclasspaths.put("SMAIndicator", "org.ta4j.core.indicators.SMAIndicator");
-		indicatorclasspaths.put("StochasticOscillatorDIndicator", "org.ta4j.core.indicators.StochasticOscillatorDIndicator");
-		indicatorclasspaths.put("StochasticOscillatorKIndicator", "org.ta4j.core.indicators.StochasticOscillatorKIndicator");
-		indicatorclasspaths.put("StochasticRSIIndicator", "org.ta4j.core.indicators.StochasticRSIIndicator");
-		indicatorclasspaths.put("TripleEMAIndicator", "org.ta4j.core.indicators.TripleEMAIndicator");
-		indicatorclasspaths.put("UlcerIndexIndicator", "org.ta4j.core.indicators.UlcerIndexIndicator");
-		indicatorclasspaths.put("WilliamsRIndicator", "org.ta4j.core.indicators.WilliamsRIndicator");
-		indicatorclasspaths.put("WMAIndicator", "org.ta4j.core.indicators.WMAIndicator");
-		indicatorclasspaths.put("ZLEMAIndicator", "org.ta4j.core.indicators.ZLEMAIndicator");
 		String css = this.getClass().getResource("/assets/datepicker.css").toExternalForm();
 		Controller.scene.getStylesheets().add(css);;
 		setUpEntryTable();
 		setUpExitTable();
         List<String> list = new ArrayList<String>(Exchanges.list);
         BackExchange.getItems().addAll(list);
+        List<String> timelist = new ArrayList<String>();
+        for (String key : IndicatorMaps.timeframes.keySet()) {
+        	timelist.add(key);
+        }
+        timeframefx.getItems().addAll(timelist);
     }
 	
     @FXML
@@ -295,20 +220,19 @@ public class BacktestController {
     		LocalDate starttime2 = starttime.getValue();
     		this.timestart=starttime2;
     		LocalDate endtime2 = endtime.getValue();
-    		int timeframe = 60;
-    		//int timeframe = timeframes.get(Timeframe.getValue().toString());
+    		int timeframe = IndicatorMaps.timeframes.get(timeframefx.getValue().toString());
     		
     		int days = (int) ChronoUnit.DAYS.between(starttime2, endtime2);
     		int candles = (days*1440)/timeframe;
     		this.candles=candles;
-    		this.base = BackBase.getText();
-    		this.alt = BackAlt.getText();
+    		this.base = base;
+    		this.alt = alt;
     		this.exchange = BackExchange.getValue().toString();
 			backtestJSON.put("base", base);
 	    	backtestJSON.put("alt", alt);
 	    	backtestJSON.put("request", "Historic");
 	    	backtestJSON.put("Exchanges", exchange);
-	    	backtestJSON.put("Timeframe", "1h");
+	    	backtestJSON.put("Timeframe", timeframefx.getValue().toString());
 	    	backtestJSON.put("StartTime", starttime.getValue() + " 00:00:00");
 	    	backtestJSON.put("Candles", candles);
 	    	backtestJSON.put("licenceKey", SocketCommunication.licencekey);
@@ -331,9 +255,10 @@ public class BacktestController {
     	Tick[] ticksarray = new Tick[candles];
     	ZonedDateTime endTime = timestart.atStartOfDay(ZoneOffset.UTC);
     	System.out.println(candles);
+    	int multiplier = IndicatorMaps.timeframes.get(jsonmessage.getString("Timeframe"));
     	for (int x=0;x<candles;x++) {
     		JSONArray ohlcv = returned.getJSONArray(x);
-    		ticksarray[x] = (new BaseTick(endTime.plusDays(x), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
+    		ticksarray[x] = (new BaseTick(endTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
     	}
     	List<Tick> ticks = Arrays.asList(ticksarray);
     	TimeSeries series = new BaseTimeSeries("series",ticks);
@@ -357,12 +282,6 @@ public class BacktestController {
             //Rule
             String entryrulestring = TradingRules.getByCode(entryrow.getTradingRule()).toString();
             Rule entryrule = null;
-            String test2 = "IsEqual" + "Rule";
-            if (test2.equals("IsEqualRule")) {
-            	System.out.println("equal");
-            } else {
-            	System.out.println("not");
-            }
             switch(entryrulestring) {
             	case "IsEqualRule":
             		entryrule = new IsEqualRule(indicator, indicator2);
@@ -547,10 +466,10 @@ public class BacktestController {
         }
         return chartTimeSeries;
 }
-    private static Indicator createindicator(Person entryrow, String indicatorname, Object[] parameters, TimeSeries series, ClosePriceIndicator closeprice) {
+    private static Indicator createindicator(Person row, String indicatorname, Object[] parameters, TimeSeries series, ClosePriceIndicator closeprice) {
 		int i = 0;
 		System.out.println(series);
-		String[] requiredparam = indicatorparameters.get(indicatorname);
+		String[] requiredparam = IndicatorMaps.indicatorparameters.get(indicatorname);
 		for (String x : requiredparam) {
 			if (x=="closeprice") {
 				parameters[i] = (Indicator) closeprice;
@@ -582,7 +501,7 @@ public class BacktestController {
 			}
 		}
 
-		Class myClass = Class.forName(indicatorclasspaths.get(indicatorname));
+		Class myClass = Class.forName(IndicatorMaps.indicatorclasspaths.get(indicatorname));
         Constructor constructor = myClass.getDeclaredConstructor(classes);
         Object indicator = constructor.newInstance(parameters);
         System.out.println("Create  " + indicator.toString());
@@ -915,7 +834,7 @@ public class BacktestController {
         hbox.getStylesheets().add(css);
         
         JFXButton button = new JFXButton("Done");
-        String[] parametersstring = indicatorparameters.get(indicstring);
+        String[] parametersstring = IndicatorMaps.indicatorparameters.get(indicstring);
         TextField[] TextFields = new TextField[parametersstring.length];
     	createSpecificGui(parametersstring,TextFields,vbox.getChildren(),vbox2.getChildren());
     	
@@ -937,7 +856,7 @@ public class BacktestController {
     					noerror=false;
     				} else {
     					//Also have if/else to parse some inputs into decimal.
-    					if (indicatorparameters.get(indicstring)[x].matches("K multiplier|alpha|beta|Acceleration factor|Max Acceleration|Acceleration Increment")) {
+    					if (IndicatorMaps.indicatorparameters.get(indicstring)[x].matches("K multiplier|alpha|beta|Acceleration factor|Max Acceleration|Acceleration Increment")) {
     						parameters[x] = Decimal.valueOf(stringtext);
     					} else {
     					parameters[x] = Integer.valueOf(stringtext);

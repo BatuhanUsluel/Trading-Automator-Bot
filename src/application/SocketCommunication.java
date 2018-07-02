@@ -20,6 +20,7 @@ import controllers.ArbitrageController;
 import controllers.AveragetradingController;
 import controllers.BacktestController;
 import controllers.Controller;
+import controllers.LiveController;
 import controllers.MarketController;
 import controllers.PendingController;
 import controllers.TrailingController;
@@ -154,6 +155,27 @@ public class SocketCommunication {
 												}
 										}
 										break;
+									case "prevlive":
+										HashMap<Integer, LiveTrading> livemap = LiveController.LiveTradingMap;
+										for (Entry<Integer, LiveTrading> entry : livemap.entrySet()) {
+											int key = entry.getKey();
+											if (key==jsonmessage.getInt("orderid")) {
+												LiveTrading value = entry.getValue();
+												value.recievedPreviousPrices(jsonmessage);
+											}
+										}
+										break;
+									case "LiveTrading":
+										HashMap<Integer, LiveTrading> livemap2 = LiveController.LiveTradingMap;
+										for (Entry<Integer, LiveTrading> entry : livemap2.entrySet()) {
+											int key = entry.getKey();
+											if (key==jsonmessage.getInt("orderid")) {
+												LiveTrading value = entry.getValue();
+												value.recievedLiveTrading(jsonmessage);
+											}
+										}
+										break;
+										
 									default:
 										System.out.println("Invalid");
 									}	

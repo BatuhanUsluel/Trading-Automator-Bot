@@ -1,5 +1,8 @@
 package application;
 	
+import java.time.Instant;
+
+import controllers.NTPTime;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,6 +20,11 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			long epoch = System.currentTimeMillis();
+
+			System.out.println("Epoch : " + (epoch / 1000));
+			System.out.println(Instant.now().toEpochMilli());
+			
 	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Sample.fxml"));
 	        AnchorPane rootLayout = loader.load();
 	        Scene scene = new Scene(rootLayout);
@@ -31,5 +39,8 @@ public class Main extends Application {
 	}
 	void usetScene(Scene scene) {
 		primaryStage.setScene(scene);
+	}
+	void getNTPTime() {
+		
 	}
 }

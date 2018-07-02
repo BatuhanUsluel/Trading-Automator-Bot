@@ -67,7 +67,6 @@ public class Controller {
     {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/home.fxml"));
 		mainView.setCenter(loader.load());
-		System.out.println("TABLE1!");
     }
 	
     @FXML
@@ -79,6 +78,7 @@ public class Controller {
         this.scene=scene;
         Main.primaryStage.setScene(scene);
         Main.primaryStage.show();
+        IndicatorMaps.addValues();
         Exchanges ex = new Exchanges();
         ex.createExchanges();
         SocketCommunication.setup();

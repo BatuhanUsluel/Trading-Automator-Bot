@@ -136,6 +136,12 @@ def main():
                     livetrading_thread = Thread(target=live_trading, args=(exchange, d, conn, data))
                     livetrading_thread.setDaemon(True)
                     livetrading_thread.start()
+                elif (request=="prevlive"):
+                    ex = getattr(ccxt, d['Exchanges'])
+                    exchange = ex()
+                    prevlive_thread = Thread(target=prev_live, args=(exchange, d, conn, data))
+                    prevlive_thread.setDaemon(True)
+                    prevlive_thread.start()
             except socket.error as error:
                 if error.errno == errno.WSAECONNRESET:
                     print('Connection no longer valid, closing thread!')
@@ -219,19 +225,31 @@ def main():
         starttime = d['StartTime']
         timeframe = d['Timeframe']
         candle = d['Candles']
-       # index = d['Index']
-        height = 20
-        length = 200
         from_timestamp = exchange.parse8601(starttime)
         print(candle)
         ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp, candle)
-        for entry in ohlcv:
-            print (entry)
-        #series = [x[index] for x in ohlcv]
-        #print("\n" + asciichartpy.plot(series[-length:], {'height': height}))  # print the chart
         sendMessage = data.rstrip()[:-1] + ",\"Return\":" + json.dumps(ohlcv) + "}\r\n"
         conn.send(sendMessage.encode('UTF-8'))
 
+    def prev_live(exchange, d, conn, data):
+        symbol = d['alt'] + "/" + d['base']
+        starttime = d['StartTime']
+        timeframe = d['Timeframe']
+        from_timestamp = exchange.parse8601(starttime)
+        ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp)
+        sendMessage = data.rstrip()[:-1] + ",\"Return\":" + json.dumps(ohlcv) + "}\r\n"
+        conn.send(sendMessage.encode('UTF-8'))
+        
+        
+    def live_trading(exchange, d, conn, data):
+        symbol = d['alt'] + "/" + d['base']
+        starttime = d['StartTime']
+        timeframe = d['Timeframe']
+        candle = d['Candles']
+        from_timestamp = exchange.parse8601(starttime)
+        ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp, candle)
+        sendMessage = data.rstrip()[:-1] + ",\"Return\":" + json.dumps(ohlcv) + "}\r\n"
+        conn.send(sendMessage.encode('UTF-8'))
     def fetch_quickprice(exchange, d, conn, data):
         print ('In thread')
         fetched_ticker = exchange.fetch_ticker(d["alt"] + "/" + d['base'])
@@ -270,9 +288,6 @@ def main():
         print(sendMessage)
         conn.send(sendMessage.encode('UTF-8'))
 
-    def live_trading(exchange, d, conn, data):
-        print('In live trading order thread')
-        fetched_ticker = exchange.fetch_ticker(d['alt'] + "/" + d['base'])
     def sendMarkettoclient(x, y):
         try:
             data4send = json.loads(y)

@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LiveController">
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LiveController">
    <children>
       <Separator fx:id="sepVertical" layoutX="565.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="14.0" style="-fx-opacity: 0.8;" />
       <TableView fx:id="EntryTable" layoutX="32.0" layoutY="46.0" prefHeight="240.0" prefWidth="509.0" />
@@ -24,7 +24,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <JFXButton fx:id="StartLive" layoutX="750.0" layoutY="505.0" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Start" textFill="WHITE">
+      <JFXButton fx:id="StartLive" layoutX="750.0" layoutY="505.0" onAction="#runLiveTrade" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Start" textFill="WHITE">
          <font>
             <Font size="33.0" />
          </font>
@@ -62,7 +62,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <TextField fx:id="LiveBase" layoutX="599.0" layoutY="351.0" prefHeight="44.0" prefWidth="94.0" promptText="0.005" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="LiveVolume" layoutX="599.0" layoutY="351.0" prefHeight="44.0" prefWidth="94.0" promptText="0.005" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
@@ -78,5 +78,11 @@
             <Font size="11.0" />
          </font>
       </JFXButton>
+      <Label layoutX="610.0" layoutY="406.0" text="Timeframe:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <JFXComboBox fx:id="timeframefx" layoutX="615.0" layoutY="440.0" />
    </children>
 </AnchorPane>

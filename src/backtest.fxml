@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.BacktestController">
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.BacktestController">
    <children>
       <Separator fx:id="sepVertical" layoutX="565.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="14.0" style="-fx-opacity: 0.8;" />
       <TableView fx:id="BackEntryTable" layoutX="32.0" layoutY="46.0" prefHeight="240.0" prefWidth="509.0" />
@@ -58,17 +58,6 @@
          </font>
       </TextField>
       <Separator layoutX="613.0" layoutY="209.0" prefHeight="9.0" prefWidth="38.0" />
-      <Label layoutX="609.0" layoutY="315.0" prefHeight="42.0" prefWidth="159.0" text="Base Volume:" textFill="#3592dd">
-         <font>
-            <Font size="26.0" />
-         </font>
-      </Label>
-      <TextField fx:id="LiveBase" layoutX="599.0" layoutY="351.0" prefHeight="44.0" prefWidth="94.0" promptText="0.005" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </TextField>
-      <Separator layoutX="613.0" layoutY="383.0" prefHeight="9.0" prefWidth="67.0" />
       <JFXButton fx:id="BackAddExitRow" layoutX="157.0" layoutY="303.0" onAction="#addExitRow" prefHeight="25.0" prefWidth="66.0" style="-fx-background-color: #2c87cc;" text="Add Row" textFill="#ffffffec">
          <font>
             <Font size="11.0" />
@@ -91,5 +80,11 @@
          </font>
       </Label>
       <JFXDatePicker fx:id="endtime" layoutX="738.0" layoutY="442.0" />
+      <Label layoutX="613.0" layoutY="315.0" text="Timeframe:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <JFXComboBox fx:id="timeframefx" layoutX="618.0" layoutY="349.0" />
    </children>
 </AnchorPane>
