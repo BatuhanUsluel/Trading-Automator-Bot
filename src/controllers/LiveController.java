@@ -160,31 +160,29 @@ public class LiveController {
     		stringBuilder.append("First row in exitcan not have 'or?' enabled\n");
     	}
     	if (noerror==true) {
-    	JSONObject liveJSON = new JSONObject();
-    	try {
-    		
-    		int timeframe = IndicatorMaps.timeframes.get(timeframefx.getValue().toString());
-			liveJSON.put("base", base);
-			liveJSON.put("alt", alt);
-			liveJSON.put("request", "LiveTrading");
-			liveJSON.put("Exchanges", exchange);
-			liveJSON.put("Timeframe", timeframefx.getValue().toString());
-			liveJSON.put("licenceKey", SocketCommunication.licencekey);
-			liveJSON.put("millisstart", System.currentTimeMillis());
-	    	Random rand = new Random();
-	    	int value = rand.nextInt(1000000000);
-	    	liveJSON.put("orderid", value);
-	    	liveJSON.put("endtime","N/A");
-	    	liveJSON.put("running","True");
-	    	LiveTrading livetradingclass = new LiveTrading(liveJSON,dataentry,dataexit);
-	    	LiveTradingMap.put(value, livetradingclass);
-	    	Thread t = new Thread(livetradingclass);
-	    	t.start();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}  	
-    	SocketCommunication.out.print(liveJSON.toString());
-    	SocketCommunication.out.flush();
+	    	JSONObject liveJSON = new JSONObject();
+	    	try {
+	    		
+	    		int timeframe = IndicatorMaps.timeframes.get(timeframefx.getValue().toString());
+				liveJSON.put("base", base);
+				liveJSON.put("alt", alt);
+				liveJSON.put("request", "livetrading");
+				liveJSON.put("Exchanges", exchange);
+				liveJSON.put("Timeframe", timeframefx.getValue().toString());
+				liveJSON.put("licenceKey", SocketCommunication.licencekey);
+				liveJSON.put("millisstart", System.currentTimeMillis());
+		    	Random rand = new Random();
+		    	int value = rand.nextInt(1000000000);
+		    	liveJSON.put("orderid", value);
+		    	liveJSON.put("endtime","N/A");
+		    	liveJSON.put("running","True");
+		    	LiveTrading livetradingclass = new LiveTrading(liveJSON,dataentry,dataexit);
+		    	LiveTradingMap.put(value, livetradingclass);
+		    	Thread t = new Thread(livetradingclass);
+		    	t.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}  	
     	} else {
     		String finalString = stringBuilder.toString();
 	    	FxDialogs.showError(null, finalString);

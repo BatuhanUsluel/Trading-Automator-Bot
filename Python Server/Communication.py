@@ -8,6 +8,7 @@ import ccxt
 import json
 import asciichartpy
 import json
+from datetime import datetime
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -130,7 +131,7 @@ def main():
                     pendingOrder_thread.setDaemon(True)
                     pendingOrder_thread.start()
 
-                elif (request=="livetrading"):
+                elif (request=="LiveTrading"):
                     ex = getattr(ccxt, d['Exchanges'])
                     exchange = ex()
                     livetrading_thread = Thread(target=live_trading, args=(exchange, d, conn, data))
@@ -237,6 +238,8 @@ def main():
         timeframe = d['Timeframe']
         from_timestamp = exchange.parse8601(starttime)
         ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp)
+        print("Prev: ")
+        print(ohlcv)
         sendMessage = data.rstrip()[:-1] + ",\"Return\":" + json.dumps(ohlcv) + "}\r\n"
         conn.send(sendMessage.encode('UTF-8'))
         
@@ -248,6 +251,8 @@ def main():
         candle = d['Candles']
         from_timestamp = exchange.parse8601(starttime)
         ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp, candle)
+        print("Live: ")
+        print(ohlcv)
         sendMessage = data.rstrip()[:-1] + ",\"Return\":" + json.dumps(ohlcv) + "}\r\n"
         conn.send(sendMessage.encode('UTF-8'))
     def fetch_quickprice(exchange, d, conn, data):
@@ -362,7 +367,7 @@ def main():
                 getvaluethreads.append(data_thread_arbitrage)
                 data_thread_arbitrage.setDaemon(True)
                 data_thread_arbitrage.start()
-        print('Threads: ' + str(threading.active_count()))
+        print(str(datetime.now())+ ' - Threads: ' + str(threading.active_count()))
 
         # Join threads
         for x in getvaluethreads:

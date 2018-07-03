@@ -253,12 +253,12 @@ public class BacktestController {
     public static void recievedBackTest(JSONObject jsonmessage){
     	JSONArray returned = jsonmessage.getJSONArray("Return");
     	Tick[] ticksarray = new Tick[candles];
-    	ZonedDateTime endTime = timestart.atStartOfDay(ZoneOffset.UTC);
+    	ZonedDateTime startTime = timestart.atStartOfDay(ZoneOffset.UTC);
     	System.out.println(candles);
     	int multiplier = IndicatorMaps.timeframes.get(jsonmessage.getString("Timeframe"));
     	for (int x=0;x<candles;x++) {
     		JSONArray ohlcv = returned.getJSONArray(x);
-    		ticksarray[x] = (new BaseTick(endTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
+    		ticksarray[x] = (new BaseTick(startTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
     	}
     	List<Tick> ticks = Arrays.asList(ticksarray);
     	TimeSeries series = new BaseTimeSeries("series",ticks);

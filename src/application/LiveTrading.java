@@ -3,7 +3,10 @@ package application;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -61,7 +64,7 @@ public class LiveTrading implements Runnable {
 	private Rule totalexitrule;
 	private Strategy tradingstrategy;
 	private String timeframe;
-	private int lasttime;
+	private long lasttime;
 	private boolean cancled=false;
 	private int maxtimeframe=0;
 	private sTime STime;
@@ -88,20 +91,24 @@ public class LiveTrading implements Runnable {
 		
 		sTime STime = new sTime();
 		this.STime=STime;
-		//String[] servers = new String[] {"pool.ntp.org","0.pool.ntp.org","1.pool.ntp.org","2.pool.ntp.org","3.pool.ntp.org"};
-		String[] servers = new String[] {"pool.ntp.org","0.pool.ntp.org"};
+		String[] servers = new String[] {"pool.ntp.org","0.pool.ntp.org","1.pool.ntp.org","2.pool.ntp.org","3.pool.ntp.org"};
+		//String[] servers = new String[] {"pool.ntp.org","0.pool.ntp.org"};
 		TimeStamp[] timestamps = NTPTime.runNTP(servers);
 		Long totaltimestamp = 0L;
+		int length = 0;
 		for (TimeStamp tstamp : timestamps) {
-			totaltimestamp = totaltimestamp + tstamp.getTime();
+			if (tstamp!=null) {
+				totaltimestamp = totaltimestamp + tstamp.getTime();
+				length++;
+			}
 		}
-		Long time = totaltimestamp/(timestamps.length);
+		Long time = totaltimestamp/(length);
 		STime.setservertime(time);
 		Thread servertimethread = new Thread(new java.lang.Runnable() {
             public void run() {
             	while(cancled!=true) {
 					try {TimeUnit.SECONDS.sleep(10);} catch (InterruptedException e) {e.printStackTrace();}
-					System.out.println("Adding 10 seconds");
+					System.out.println("Adding 10 seconds. Time: " + STime.getServerTime());
             		STime.addtensecond();
             	}
             }});
@@ -110,8 +117,12 @@ public class LiveTrading implements Runnable {
 		getMaxTimeFrame();
 		System.out.println("Max: " + maxtimeframe);
 		Long startime = STime.getServerTime() - (maxtimeframe * IndicatorMaps.timeframes.get(timeframe)*80000); //It is not 60000 to allow for some margin
-		prevlive.put("StartTime", startime);
-		SocketCommunication.out.print(json);
+		System.out.println((maxtimeframe * IndicatorMaps.timeframes.get(timeframe)*80000));
+		System.out.println(startime);
+		LocalDateTime starttimedate = LocalDateTime.ofInstant(Instant.ofEpochMilli(startime), ZoneOffset.UTC);
+		prevlive.put("StartTime", starttimedate);
+		System.out.println("Sending prevlive : " + prevlive.toString());
+		SocketCommunication.out.print(prevlive.toString());
     	SocketCommunication.out.flush();
 	}
 	
@@ -124,7 +135,7 @@ public class LiveTrading implements Runnable {
 			int y = 0;
 			for (String x : requiredparam1) {
 				if (x=="timeFrame") {
-					int time = Integer.parseInt((String) person.getIndic1Param()[y]);
+					int time = (int) (person.getIndic1Param()[y]);
 					if (time>maxtimeframe) {
 						maxtimeframe = time;
 					}
@@ -134,7 +145,7 @@ public class LiveTrading implements Runnable {
 			y=0;
 			for (String x : requiredparam2) {
 				if (x=="timeFrame") {
-					int time = Integer.parseInt((String) person.getIndic2Param()[y]);
+					int time = (int) (person.getIndic2Param()[y]);
 					if (time>maxtimeframe) {
 						maxtimeframe = time;
 					}
@@ -150,7 +161,7 @@ public class LiveTrading implements Runnable {
 			int y = 0;
 			for (String x : requiredparam1) {
 				if (x=="timeFrame") {
-					int time = Integer.parseInt((String) person.getIndic1Param()[y]);
+					int time = (int) (person.getIndic1Param()[y]);
 					if (time>maxtimeframe) {
 						maxtimeframe = time;
 					}
@@ -160,7 +171,7 @@ public class LiveTrading implements Runnable {
 			y=0;
 			for (String x : requiredparam2) {
 				if (x=="timeFrame") {
-					int time = Integer.parseInt((String) person.getIndic2Param()[y]);
+					int time =  (int) (person.getIndic2Param()[y]);
 					if (time>maxtimeframe) {
 						maxtimeframe = time;
 					}
@@ -171,11 +182,13 @@ public class LiveTrading implements Runnable {
 	}
 	
 	public void recievedPreviousPrices(JSONObject jsonmessage) {
-
+		System.out.println("recieved prev prices");
 		JSONArray returned = jsonmessage.getJSONArray("Return");
 		int lenght = returned.length();
+		System.out.println("len: " + lenght);
 		Tick[] ticksarray = new Tick[lenght];
-    	ZonedDateTime endTime = timestart.atStartOfDay(ZoneOffset.UTC);
+		Date date = new Date(Long.valueOf(returned.getJSONArray(0).getInt(0)));
+    	ZonedDateTime endTime = date.toInstant().atZone(ZoneOffset.UTC);
     	int multiplier = IndicatorMaps.timeframes.get(timeframe);
     	System.out.println(lenght);
     	for (int x=0;x<lenght;x++) {
@@ -303,8 +316,9 @@ public class LiveTrading implements Runnable {
     	this.totalexitrule = totalexitrule;
     	this.tradingstrategy = tradingstrategy;
     	int retlen = returned.length();
-    	System.out.println("last: " + returned.getJSONArray(retlen-1));
-    	this.lasttime = returned.getJSONArray(retlen-1).getInt(0);
+    	//System.out.println("last: " + (String) returned.getJSONArray(retlen-1).(0));
+    	this.lasttime = returned.getJSONArray(retlen-1).getLong(0);
+    	System.out.println("Lasttime: " + lasttime);
     	try {
 			loop();
 		} catch (InterruptedException e) {
@@ -314,14 +328,18 @@ public class LiveTrading implements Runnable {
 	 }
 	
 	public void loop() throws InterruptedException {
-		int timemili = IndicatorMaps.timeframes.get(timeframe)*60000;
+		Long timemili = Long.valueOf(IndicatorMaps.timeframes.get(timeframe)*60000);
 		while(cancled!=true) {
+			System.out.println("Lasttime: " + lasttime + "Timemili: " + timemili + "ServerTime: " + STime.getServerTime());
 			if (lasttime+timemili<STime.getServerTime()) {
 				System.out.println("Time. Requesting price");
 				TimeUnit.SECONDS.sleep(10);
 				JSONObject jsonrequest = json;
 				jsonrequest.put("Candles", 2);
-				jsonrequest.put("StartTime", new Date(lasttime));
+				LocalDateTime starttimedate = LocalDateTime.ofInstant(Instant.ofEpochMilli(lasttime), ZoneOffset.UTC);
+				jsonrequest.put("StartTime", starttimedate);
+				jsonrequest.put("request", "LiveTrading");
+				System.out.println("Live: " + jsonrequest.toString());
 				SocketCommunication.out.print(jsonrequest.toString());
 		    	SocketCommunication.out.flush();
 				lasttime=lasttime+timemili;
@@ -333,7 +351,7 @@ public class LiveTrading implements Runnable {
 	}
 	
 	public void recievedLiveTrading(JSONObject jsonmessage){
-		System.out.println("recieved price");
+		System.out.println("recieved live trading");
 		System.out.println(jsonmessage.toString());
 	}
 	
@@ -364,12 +382,6 @@ public class LiveTrading implements Runnable {
 					int timeframe = (int) parameters[2];
 					parameters = new Object[1];
 					parameters[i] = new StochasticOscillatorKIndicator(series, timeframe);
-					break;
-				} else if (x=="timeFrame") {
-					int y = Integer.parseInt(x);
-					if (y>maxtimeframe) {
-						maxtimeframe = y;
-					}
 				}
 				i++;
 			}
