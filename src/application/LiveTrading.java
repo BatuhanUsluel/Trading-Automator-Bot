@@ -26,11 +26,15 @@ import org.knowm.xchange.dto.marketdata.Ticker;
 import org.ta4j.core.BaseStrategy;
 import org.ta4j.core.BaseTick;
 import org.ta4j.core.BaseTimeSeries;
+import org.ta4j.core.BaseTradingRecord;
+import org.ta4j.core.Decimal;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.Tick;
 import org.ta4j.core.TimeSeries;
+import org.ta4j.core.TimeSeriesManager;
+import org.ta4j.core.TradingRecord;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
@@ -69,6 +73,8 @@ public class LiveTrading implements Runnable {
 	private int maxtimeframe=0;
 	private sTime STime;
 	private double volume;
+	private TimeSeries series;
+	private TradingRecord tradingRecord;
 	public LiveTrading(JSONObject json, ObservableList<Person> dataentry, ObservableList<Person> dataexit) throws JSONException {
 		this.json = json;
 		this.dataentry = dataentry;
@@ -110,7 +116,6 @@ public class LiveTrading implements Runnable {
             public void run() {
             	while(cancled!=true) {
 					try {TimeUnit.SECONDS.sleep(10);} catch (InterruptedException e) {e.printStackTrace();}
-					System.out.println("Adding 10 seconds. Time: " + STime.getServerTime());
             		STime.addtensecond();
             	}
             }});
@@ -194,22 +199,20 @@ public class LiveTrading implements Runnable {
 	}
 	
 	public void recievedPreviousPrices(JSONObject jsonmessage) {
-		System.out.println("recieved prev prices");
 		JSONArray returned = jsonmessage.getJSONArray("Return");
 		int lenght = returned.length();
 		System.out.println("len: " + lenght);
-		Tick[] ticksarray = new Tick[lenght];
+		Tick[] ticksarray = new Tick[lenght-1];
 		Date date = new Date(Long.valueOf(returned.getJSONArray(0).getInt(0)));
     	ZonedDateTime endTime = date.toInstant().atZone(ZoneOffset.UTC);
     	int multiplier = IndicatorMaps.timeframes.get(timeframe);
-    	System.out.println(lenght);
-    	for (int x=0;x<lenght;x++) {
+    	for (int x=0;x<lenght-1;x++) {
     		JSONArray ohlcv = returned.getJSONArray(x);
     		ticksarray[x] = (new BaseTick(endTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
     	}
     	List<Tick> ticks = Arrays.asList(ticksarray);
     	TimeSeries series = new BaseTimeSeries("series",ticks);
-    	System.out.println("Sclass: " + series.getClass());
+    	this.series=series;
     	
     	ClosePriceIndicator closeprice = new ClosePriceIndicator(series);
         ArrayList<Rule> entryrules = new ArrayList<Rule>();
@@ -324,9 +327,11 @@ public class LiveTrading implements Runnable {
     	}
     	System.out.println(totalentryrule.toString());
     	Strategy tradingstrategy =  new BaseStrategy(totalentryrule,totalexitrule);
+    	TradingRecord tradingRecord = new BaseTradingRecord();
     	this.totalentryrule = totalentryrule;
     	this.totalexitrule = totalexitrule;
     	this.tradingstrategy = tradingstrategy;
+    	this.tradingRecord = tradingRecord;
     	int retlen = returned.length();
     	//System.out.println("last: " + (String) returned.getJSONArray(retlen-1).(0));
     	this.lasttime = returned.getJSONArray(retlen-1).getLong(0)-1000L;
@@ -343,25 +348,51 @@ public class LiveTrading implements Runnable {
 		while(cancled!=true) {
 			System.out.println("Lasttime: " + lasttime + "Seconds: " + ((lasttime+timemili)-STime.getServerTime())/1000 + "ServerTime: " + STime.getServerTime());
 			if (lasttime+timemili<STime.getServerTime()) {
-				System.out.println("Time. Requesting price");
+				System.out.println("Requesting price");
 				TimeUnit.SECONDS.sleep(10);
 				JSONObject jsonrequest = json;
 				LocalDateTime starttimedate = LocalDateTime.ofInstant(Instant.ofEpochMilli(lasttime), ZoneOffset.UTC);
 				jsonrequest.put("StartTime", starttimedate);
 				jsonrequest.put("request", "LiveTrading");
-				System.out.println("Live: " + jsonrequest.toString());
 				SocketCommunication.out.print(jsonrequest.toString());
 		    	SocketCommunication.out.flush();
 				lasttime=lasttime+timemili;
 			} else {
-				System.out.println("Sleeping 5 seconds");
-				TimeUnit.SECONDS.sleep(5);
+				TimeUnit.SECONDS.sleep(10);
 			}
 		}
 	}
 	
 	public void recievedLiveTrading(JSONObject jsonmessage){
-		System.out.println("recieved live trading");
+		JSONArray ohlcv = jsonmessage.getJSONArray("Return").getJSONArray(0);
+		Date date = new Date(Long.valueOf(ohlcv.getInt(0)));
+    	ZonedDateTime time = date.toInstant().atZone(ZoneOffset.UTC);
+		Tick tick = new BaseTick(time, (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5));
+		int endIndex = series.getEndIndex();
+		if (tradingstrategy.shouldEnter(endIndex)) {
+			System.out.println("Strategy should ENTER on " + endIndex);
+		    tradingRecord.enter(endIndex, tick.getClosePrice(), Decimal.TEN);
+		    boolean entered = tradingRecord.enter(endIndex, tick.getClosePrice(), Decimal.TEN);
+            if (entered) {
+                org.ta4j.core.Order entry = tradingRecord.getLastEntry();
+                System.out.println("Entered on " + entry.getIndex()
+                        + " (price=" + entry.getPrice()
+                        + ", amount=" + entry.getAmount() + ")");
+            }
+		} else if (tradingstrategy.shouldExit(endIndex)) {
+			System.out.println("Strategy should EXIT on " + endIndex);
+		    tradingRecord.exit(endIndex, tick.getClosePrice(), Decimal.TEN);
+		    boolean exited = tradingRecord.exit(endIndex, tick.getClosePrice(), Decimal.TEN);
+            if (exited) {
+            	org.ta4j.core.Order exit = tradingRecord.getLastExit();
+                System.out.println("Exited on " + exit.getIndex()
+                        + " (price=" + exit.getPrice()
+                        + ", amount=" + exit.getAmount() + ")");
+            }
+		} else {
+			System.out.println("Trading strategy should do nothing");
+		}
+
 		System.out.println(jsonmessage.toString());
 	}
 	
