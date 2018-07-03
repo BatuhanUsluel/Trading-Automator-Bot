@@ -5,6 +5,7 @@ import org.json.JSONException;
 import controllers.ArbitrageController;
 import controllers.AveragetradingController;
 import controllers.DashboardController;
+import controllers.LiveController;
 import controllers.MarketController;
 import controllers.PendingController;
 import controllers.TrailingController;
@@ -23,8 +24,8 @@ public class RemoveOrder {
 			MarketController.cancelMarketOrder(person.getOrderID());
 		} else if(ordertype.equals("arbitrage")) {
 			ArbitrageController.cancelArbitrageOrder(person.getOrderID());
-		} else if(ordertype.equals("technical")) {
-			
+		} else if(ordertype.equals("livetrading")) {
+			LiveController.cancelLiveOrder(person.getOrderID());
 		}
 	}
 }

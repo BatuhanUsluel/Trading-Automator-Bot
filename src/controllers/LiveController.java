@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.ta4j.core.Rule;
@@ -83,6 +84,7 @@ public class LiveController {
     @FXML private JFXComboBox<String> timeframefx;
     @FXML private TextField LiveBase;
     @FXML private TextField LiveAlt;
+    @FXML private TextField LiveVolume;
     @FXML private TableView<Person> EntryTable = new TableView<Person>();
     @FXML private TableView<Person> ExitTable = new TableView<Person>();
     public static ObservableList<Person> dataentry =  FXCollections.observableArrayList();
@@ -131,7 +133,7 @@ public class LiveController {
     	}
 		boolean noexchange = false;
     	String exchange = "";
-     	
+     	String volume = LiveVolume.getText();
     	try {
     		exchange = LiveExchange.getValue().toString();
     	} catch (NullPointerException e) {
@@ -159,6 +161,10 @@ public class LiveController {
     		noerror=false;
     		stringBuilder.append("First row in exitcan not have 'or?' enabled\n");
     	}
+    	if(!NumberUtils.isCreatable(volume)) {
+    		noerror=false;
+    		stringBuilder.append(volume + " is not a valid number(volume).\n");
+    	}
     	if (noerror==true) {
 	    	JSONObject liveJSON = new JSONObject();
 	    	try {
@@ -176,6 +182,7 @@ public class LiveController {
 		    	liveJSON.put("orderid", value);
 		    	liveJSON.put("endtime","N/A");
 		    	liveJSON.put("running","True");
+		    	liveJSON.put("volume",volume);
 		    	LiveTrading livetradingclass = new LiveTrading(liveJSON,dataentry,dataexit);
 		    	LiveTradingMap.put(value, livetradingclass);
 		    	Thread t = new Thread(livetradingclass);
@@ -576,6 +583,21 @@ public class LiveController {
 			}
 			i++;
 		}
+	}
+	
+	public static void cancelLiveOrder(String orderid) {
+		for (Map.Entry<Integer, LiveTrading> entry : LiveTradingMap.entrySet()) {
+		    int key = entry.getKey();
+			try {
+				if (key == Integer.parseInt(orderid)) {
+					LiveTrading value = entry.getValue();
+					value.stopOrder();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+	}
 	}
 	
 }

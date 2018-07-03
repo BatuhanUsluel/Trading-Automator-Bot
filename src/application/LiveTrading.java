@@ -68,6 +68,7 @@ public class LiveTrading implements Runnable {
 	private boolean cancled=false;
 	private int maxtimeframe=0;
 	private sTime STime;
+	private double volume;
 	public LiveTrading(JSONObject json, ObservableList<Person> dataentry, ObservableList<Person> dataexit) throws JSONException {
 		this.json = json;
 		this.dataentry = dataentry;
@@ -86,6 +87,7 @@ public class LiveTrading implements Runnable {
 		this.exchangestring = json.getString("Exchanges");
 		this.exchange = Exchanges.exchangemap.get(exchangestring);
 		this.timeframe = json.getString("Timeframe");
+		this.volume = Double.parseDouble(json.getString("volume"));
 		JSONObject prevlive = json;
 		prevlive.put("request", "prevlive");
 		
@@ -119,11 +121,21 @@ public class LiveTrading implements Runnable {
 		Long startime = STime.getServerTime() - (maxtimeframe * IndicatorMaps.timeframes.get(timeframe)*80000); //It is not 60000 to allow for some margin
 		System.out.println((maxtimeframe * IndicatorMaps.timeframes.get(timeframe)*80000));
 		System.out.println(startime);
+		LocalDateTime utc = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneOffset.UTC);
 		LocalDateTime starttimedate = LocalDateTime.ofInstant(Instant.ofEpochMilli(startime), ZoneOffset.UTC);
 		prevlive.put("StartTime", starttimedate);
 		System.out.println("Sending prevlive : " + prevlive.toString());
 		SocketCommunication.out.print(prevlive.toString());
     	SocketCommunication.out.flush();
+		person.addOrderData("Starting Live Trading\n"
+				+ String.format("%-10s:%10s\n","Base", base)
+				+ String.format("%-10s:%10s\n","Alt", alt)
+				+ String.format("%-10s:%10s\n","Max Period", maxtimeframe)
+				+ String.format("%-10s:%10s\n","Exchange", exchangestring)
+				+ String.format("%-10s:%10s\n","UTC Time", utc)
+				+ String.format("%-10s:%10s\n","Volume", volume)
+				+ String.format("%-10s:%10s\n","Time Frame", timeframe)
+				+ "--------------------------------------\n") ;
 	}
 	
 	public void getMaxTimeFrame() {
@@ -317,12 +329,11 @@ public class LiveTrading implements Runnable {
     	this.tradingstrategy = tradingstrategy;
     	int retlen = returned.length();
     	//System.out.println("last: " + (String) returned.getJSONArray(retlen-1).(0));
-    	this.lasttime = returned.getJSONArray(retlen-1).getLong(0);
+    	this.lasttime = returned.getJSONArray(retlen-1).getLong(0)-1000L;
     	System.out.println("Lasttime: " + lasttime);
     	try {
 			loop();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	 }
@@ -330,12 +341,11 @@ public class LiveTrading implements Runnable {
 	public void loop() throws InterruptedException {
 		Long timemili = Long.valueOf(IndicatorMaps.timeframes.get(timeframe)*60000);
 		while(cancled!=true) {
-			System.out.println("Lasttime: " + lasttime + "Timemili: " + timemili + "ServerTime: " + STime.getServerTime());
+			System.out.println("Lasttime: " + lasttime + "Seconds: " + ((lasttime+timemili)-STime.getServerTime())/1000 + "ServerTime: " + STime.getServerTime());
 			if (lasttime+timemili<STime.getServerTime()) {
 				System.out.println("Time. Requesting price");
 				TimeUnit.SECONDS.sleep(10);
 				JSONObject jsonrequest = json;
-				jsonrequest.put("Candles", 2);
 				LocalDateTime starttimedate = LocalDateTime.ofInstant(Instant.ofEpochMilli(lasttime), ZoneOffset.UTC);
 				jsonrequest.put("StartTime", starttimedate);
 				jsonrequest.put("request", "LiveTrading");
@@ -411,4 +421,10 @@ public class LiveTrading implements Runnable {
 			}
 			 return null;
 	    }
+	
+	public void stopOrder() {
+		System.out.println("cancel live order!!!");
+		person.addOrderData("\nLive Trading has been manually canceled from dashboard.\n-------------------------------------------\n Stopping");
+		this.cancled = true;
+	}
 }

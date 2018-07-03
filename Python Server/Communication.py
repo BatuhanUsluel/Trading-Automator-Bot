@@ -248,9 +248,8 @@ def main():
         symbol = d['alt'] + "/" + d['base']
         starttime = d['StartTime']
         timeframe = d['Timeframe']
-        candle = d['Candles']
         from_timestamp = exchange.parse8601(starttime)
-        ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp, candle)
+        ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp)
         print("Live: ")
         print(ohlcv)
         sendMessage = data.rstrip()[:-1] + ",\"Return\":" + json.dumps(ohlcv) + "}\r\n"
