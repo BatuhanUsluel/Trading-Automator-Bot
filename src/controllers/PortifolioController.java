@@ -24,6 +24,7 @@ import org.knowm.xchange.dto.account.Balance;
 import com.google.gson.JsonParser;
 
 import application.Exchanges;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -118,7 +119,6 @@ public class PortifolioController {
 	  	        public void run()
 	  	        {
 	  	        	try {
-	  	        		int xd = test;
 	  		        	URL url = new URL("https://api.coinmarketcap.com/v2/ticker/1027");
 	  		    		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 	  		    		con.getResponseCode();
@@ -187,53 +187,67 @@ public class PortifolioController {
 	    });
 	    globaldata.start();
 	    threads.add(globaldata);
-        for (Thread thread : threads) {
-	        thread.join();
-	    }
-		DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-		DecimalFormat percentdecimal = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-		DecimalFormat pricedecimal = new DecimalFormat("$#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-		DecimalFormat pricedecimalchart = new DecimalFormat("#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-		df.setMaximumFractionDigits(340); // 340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
-		Volume.setText("$" + addCommasToNumericString(df.format(GlobalData.volume)));
-		marketcap.setText("$" + addCommasToNumericString(df.format(GlobalData.Dmarketcap)));
-		Percent.setText(percentdecimal.format(GlobalData.percentofmcap) + "%");
-		ETHUSD.setText(pricedecimal.format(ETHValues.price));
-		Color CustomRed = Color.valueOf("#d05b5b");
-		 if (ETHValues.daychange>0) {
-			 	ETHUSDChange.setTextFill(Color.GREEN);
-			 	ETHUSDChange.setText("+" + (df.format((ETHValues.daychange))+ "%"));
-			} else {
-				ETHUSDChange.setTextFill(CustomRed);
-				ETHUSDChange.setText(" " + (df.format((ETHValues.daychange))+ "%"));
-			}
-		if (BTCValues.DHourChange>0) {
-			HourChange.setTextFill(Color.GREEN);
-			HourChange.setText("+" + (df.format(BTCValues.DHourChange))+ "%");
-		} else {
-			HourChange.setTextFill(CustomRed);
-			HourChange.setText(" " + (df.format(BTCValues.DHourChange))+ "%");
-		}
-		if (BTCValues.DDayChange>0) {
-			DayChange.setTextFill(Color.GREEN);
-			DayChange.setText("+" + (df.format(BTCValues.DDayChange))+ "%");
-			btcusdchange.setTextFill(Color.GREEN);
-			btcusdchange.setText("+" + df.format(BTCValues.DDayChange) + "%");
-		} else {
-			DayChange.setTextFill(CustomRed);
-			DayChange.setText(" " + (df.format(BTCValues.DDayChange))+ "%");
-			btcusdchange.setTextFill(CustomRed);
-			btcusdchange.setText(df.format(BTCValues.DDayChange)+ "%");
-		}
-		if (BTCValues.DWeekChange>0) {
-			WeekChange.setTextFill(Color.GREEN);
-			WeekChange.setText("+" + (df.format(BTCValues.DWeekChange))+ "%");
-		} else {
-			WeekChange.setTextFill(CustomRed);
-			WeekChange.setText(" " + (df.format(BTCValues.DWeekChange))+ "%");
-		}
+	       new Thread() {
+	            public void run() {
+	            	DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+	        		DecimalFormat percentdecimal = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+	        		DecimalFormat pricedecimal = new DecimalFormat("$#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+	        		
+	        		df.setMaximumFractionDigits(340); // 340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
+	                for (Thread thread : threads) {
+	        	        try {
+							thread.join();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+	        	    }
+	                Platform.runLater(new Runnable() {
+	                    public void run() {
+	                    	Volume.setText("$" + addCommasToNumericString(df.format(GlobalData.volume)));
+	                		marketcap.setText("$" + addCommasToNumericString(df.format(GlobalData.Dmarketcap)));
+	                		Percent.setText(percentdecimal.format(GlobalData.percentofmcap) + "%");
+	                		ETHUSD.setText(pricedecimal.format(ETHValues.price));
+	                		Color CustomRed = Color.valueOf("#d05b5b");
+	                		 if (ETHValues.daychange>0) {
+	                			 	ETHUSDChange.setTextFill(Color.GREEN);
+	                			 	ETHUSDChange.setText("+" + (df.format((ETHValues.daychange))+ "%"));
+	                			} else {
+	                				ETHUSDChange.setTextFill(CustomRed);
+	                				ETHUSDChange.setText(" " + (df.format((ETHValues.daychange))+ "%"));
+	                			}
+	                		if (BTCValues.DHourChange>0) {
+	                			HourChange.setTextFill(Color.GREEN);
+	                			HourChange.setText("+" + (df.format(BTCValues.DHourChange))+ "%");
+	                		} else {
+	                			HourChange.setTextFill(CustomRed);
+	                			HourChange.setText(" " + (df.format(BTCValues.DHourChange))+ "%");
+	                		}
+	                		if (BTCValues.DDayChange>0) {
+	                			DayChange.setTextFill(Color.GREEN);
+	                			DayChange.setText("+" + (df.format(BTCValues.DDayChange))+ "%");
+	                			btcusdchange.setTextFill(Color.GREEN);
+	                			btcusdchange.setText("+" + df.format(BTCValues.DDayChange) + "%");
+	                		} else {
+	                			DayChange.setTextFill(CustomRed);
+	                			DayChange.setText(" " + (df.format(BTCValues.DDayChange))+ "%");
+	                			btcusdchange.setTextFill(CustomRed);
+	                			btcusdchange.setText(df.format(BTCValues.DDayChange)+ "%");
+	                		}
+	                		if (BTCValues.DWeekChange>0) {
+	                			WeekChange.setTextFill(Color.GREEN);
+	                			WeekChange.setText("+" + (df.format(BTCValues.DWeekChange))+ "%");
+	                		} else {
+	                			WeekChange.setTextFill(CustomRed);
+	                			WeekChange.setText(" " + (df.format(BTCValues.DWeekChange))+ "%");
+	                		}
+	                		
+	                		Sbtcusd.setText((pricedecimal.format(BTCValues.Dbtcusdprice)));
+	                    }
+	                });
+	            }
+	       }.start();
+
 		
-		Sbtcusd.setText((pricedecimal.format(BTCValues.Dbtcusdprice)));
 		ArrayList<Thread> exchangethreads = new ArrayList<Thread>();
 		//Get balances from each exchanges for all currencies and add them to hashmap, with currency being the key and the btc worth being the value(double)
 		HashMap<Currency, Double> balancepercurrency = new HashMap<Currency, Double>();
@@ -299,8 +313,11 @@ public class PortifolioController {
         String css = this.getClass().getResource("/assets/tableview.css").toExternalForm();
         tablebalance.getStylesheets().setAll(css);
         tablebalance.getColumns().addAll(CurrencyCol,BTCWorthCol, USDWorthCol, PercentCol,ChangeCol);
-        Task task = new Task<Void>() {
-            @Override public void run() {
+        new Thread() {
+            public void run() {
+            	DecimalFormat pricedecimalchart = new DecimalFormat("#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+            	DecimalFormat pricedecimal = new DecimalFormat("$#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+            	DecimalFormat percentdecimal = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
     	        for (Thread thread : exchangethreads) {
     		        try {
     					thread.join();
@@ -308,33 +325,28 @@ public class PortifolioController {
     					e.printStackTrace();
     				}
     		    }
-    			double total=0;		
-    			for (double value : balancepercurrency.values()) {
-    				 total+=value;
-    			}
-    			for (Entry<Currency, Double> entry : balancepercurrency.entrySet()) {
-    				Currency Currency = entry.getKey();
-    				Double value = entry.getValue();
-    				data.add(new Person(Currency.toString(), btcbalancedf.format(value), pricedecimalchart.format(value*BTCValues.Dbtcusdprice), percentdecimal.format((value/total)*100),"1"));
-    			}
-    			try {
-    			balance.setText(btcbalancedf.format(total) + " BTC");
-    			usdbalance.setText("USD: " + pricedecimal.format(BTCValues.Dbtcusdprice*total));
-    	    	tablebalance.setItems(data);
-    	        BTCWorthCol.setSortType(TableColumn.SortType.ASCENDING);
-    	        tablebalance.getSortOrder().setAll(BTCWorthCol);
-    			} catch (IllegalStateException e) {System.out.println("catched");}
+                Platform.runLater(new Runnable() {
+                    public void run() {
+            			double total=0;		
+            			for (double value : balancepercurrency.values()) {
+            				 total+=value;
+            			}
+            			for (Entry<Currency, Double> entry : balancepercurrency.entrySet()) {
+            				Currency Currency = entry.getKey();
+            				Double value = entry.getValue();
+            				data.add(new Person(Currency.toString(), btcbalancedf.format(value), pricedecimalchart.format(value*BTCValues.Dbtcusdprice), percentdecimal.format((value/total)*100),"1"));
+            			}
+                    	balance.setText(btcbalancedf.format(total) + " BTC");
+            			usdbalance.setText("USD: " + pricedecimal.format(BTCValues.Dbtcusdprice*total));
+            	    	tablebalance.setItems(data);
+            	        BTCWorthCol.setSortType(TableColumn.SortType.DESCENDING);
+            	        tablebalance.getSortOrder().setAll(BTCWorthCol);
+                    }
+                });
                 return;
             }
 
-			@Override
-			protected Void call() throws Exception {
-				return null;
-			}
-        };
-        ProgressBar bar = new ProgressBar();
-        bar.progressProperty().bind(task.progressProperty());
-        new Thread(task).start();
+        }.start();
 	}
 	private String addCommasToNumericString (String digits)
 	{
