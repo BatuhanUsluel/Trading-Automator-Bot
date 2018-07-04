@@ -1,6 +1,4 @@
 package application;
-import  java.lang.Double;
-import java.lang.Thread;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,8 +18,6 @@ import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
-
-import  java.lang.Thread;
 public class TrailingStop {
 	ArrayList<JSONObject> OrdersTrailing = new ArrayList<JSONObject>();
 	boolean run;

@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -14,26 +13,17 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 
-import org.json.*;
-
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
-import org.knowm.xchange.ExchangeFactory;
-import org.knowm.xchange.ExchangeSpecification;
-import org.knowm.xchange.coinmarketcap.CoinMarketCapExchange;
-import org.knowm.xchange.coinmarketcap.dto.marketdata.CoinMarketCapTicker;
-import org.knowm.xchange.coinmarketcap.service.CoinMarketCapMarketDataService;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.account.Balance;
-import org.knowm.xchange.service.marketdata.MarketDataService;
 
 import com.google.gson.JsonParser;
 
 import application.Exchanges;
-import controllers.DashboardController.Person;
-import javafx.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

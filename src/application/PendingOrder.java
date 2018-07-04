@@ -1,5 +1,4 @@
 package application;
-import  java.lang.Double;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -13,8 +12,6 @@ import org.knowm.xchange.dto.trade.LimitOrder;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
-
-import java.lang.Thread;
 public class PendingOrder implements Runnable {
 	ArrayList<JSONObject> OrdersPending = new ArrayList<JSONObject>();
 	

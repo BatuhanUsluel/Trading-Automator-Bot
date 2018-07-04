@@ -1,15 +1,12 @@
 package application;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -21,19 +18,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
-import org.knowm.xchange.currency.CurrencyPair;
-import org.knowm.xchange.dto.marketdata.Ticker;
+import org.ta4j.core.Bar;
+import org.ta4j.core.BaseBar;
 import org.ta4j.core.BaseStrategy;
-import org.ta4j.core.BaseTick;
 import org.ta4j.core.BaseTimeSeries;
 import org.ta4j.core.BaseTradingRecord;
 import org.ta4j.core.Decimal;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
-import org.ta4j.core.Tick;
 import org.ta4j.core.TimeSeries;
-import org.ta4j.core.TimeSeriesManager;
+import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
@@ -44,7 +39,6 @@ import org.ta4j.core.trading.rules.IsEqualRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
-import controllers.BacktestController;
 import controllers.DashboardController;
 import controllers.IndicatorMaps;
 import controllers.Indicators;
@@ -202,16 +196,16 @@ public class LiveTrading implements Runnable {
 		JSONArray returned = jsonmessage.getJSONArray("Return");
 		int lenght = returned.length();
 		System.out.println("len: " + lenght);
-		Tick[] ticksarray = new Tick[lenght-1];
+		Bar[] ticksarray = new Bar[lenght-1];
 		Date date = new Date(Long.valueOf(returned.getJSONArray(0).getInt(0)));
     	ZonedDateTime endTime = date.toInstant().atZone(ZoneOffset.UTC);
     	int multiplier = IndicatorMaps.timeframes.get(timeframe);
     	for (int x=0;x<lenght-1;x++) {
     		JSONArray ohlcv = returned.getJSONArray(x);
-    		ticksarray[x] = (new BaseTick(endTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
+    		ticksarray[x] = (new BaseBar(endTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
     	}
-    	List<Tick> ticks = Arrays.asList(ticksarray);
-    	TimeSeries series = new BaseTimeSeries("series",ticks);
+    	List<Bar> Bars = Arrays.asList(ticksarray);
+    	TimeSeries series = new BaseTimeSeries("series",Bars);
     	this.series=series;
     	
     	ClosePriceIndicator closeprice = new ClosePriceIndicator(series);
@@ -367,12 +361,13 @@ public class LiveTrading implements Runnable {
 		JSONArray ohlcv = jsonmessage.getJSONArray("Return").getJSONArray(0);
 		Date date = new Date(Long.valueOf(ohlcv.getInt(0)));
     	ZonedDateTime time = date.toInstant().atZone(ZoneOffset.UTC);
-		Tick tick = new BaseTick(time, (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5));
+    	Bar bar = new BaseBar(time, (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5));
+    	series.addBar(bar);
 		int endIndex = series.getEndIndex();
 		if (tradingstrategy.shouldEnter(endIndex)) {
 			System.out.println("Strategy should ENTER on " + endIndex);
-		    tradingRecord.enter(endIndex, tick.getClosePrice(), Decimal.TEN);
-		    boolean entered = tradingRecord.enter(endIndex, tick.getClosePrice(), Decimal.TEN);
+		    tradingRecord.enter(endIndex, bar.getClosePrice(), Decimal.TEN);
+		    boolean entered = tradingRecord.enter(endIndex, bar.getClosePrice(), Decimal.TEN);
             if (entered) {
                 org.ta4j.core.Order entry = tradingRecord.getLastEntry();
                 System.out.println("Entered on " + entry.getIndex()
@@ -381,8 +376,8 @@ public class LiveTrading implements Runnable {
             }
 		} else if (tradingstrategy.shouldExit(endIndex)) {
 			System.out.println("Strategy should EXIT on " + endIndex);
-		    tradingRecord.exit(endIndex, tick.getClosePrice(), Decimal.TEN);
-		    boolean exited = tradingRecord.exit(endIndex, tick.getClosePrice(), Decimal.TEN);
+		    tradingRecord.exit(endIndex, bar.getClosePrice(), Decimal.TEN);
+		    boolean exited = tradingRecord.exit(endIndex, bar.getClosePrice(), Decimal.TEN);
             if (exited) {
             	org.ta4j.core.Order exit = tradingRecord.getLastExit();
                 System.out.println("Exited on " + exit.getIndex()
@@ -454,6 +449,9 @@ public class LiveTrading implements Runnable {
 	    }
 	
 	public void stopOrder() {
+		for (Trade trade : tradingRecord.getTrades()) {
+        	System.out.println(trade.toString());
+		}
 		System.out.println("cancel live order!!!");
 		person.addOrderData("\nLive Trading has been manually canceled from dashboard.\n-------------------------------------------\n Stopping");
 		this.cancled = true;

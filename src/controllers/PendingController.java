@@ -1,10 +1,8 @@
 package controllers;
-import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -16,7 +14,6 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXRadioButton;
 
-import application.AverageTrading;
 import application.Exchanges;
 import application.FxDialogs;
 import application.PendingOrder;
@@ -27,7 +24,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
-import java.lang.Thread;
 public class PendingController {
     
 //Pending Order

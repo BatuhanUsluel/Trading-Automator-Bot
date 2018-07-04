@@ -1,7 +1,5 @@
 package application;
 import java.io.IOException;
-import  java.lang.Double;
-import java.lang.Thread;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -24,8 +22,6 @@ import org.knowm.xchange.dto.trade.LimitOrder;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
-
-import  java.lang.Long;
 public class QuickBuy {
 	static HashMap<java.lang.Integer, Person> hmap = new HashMap<java.lang.Integer, Person>();
 	private static List<JsonObject> myList = new ArrayList<>();

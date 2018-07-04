@@ -10,7 +10,6 @@ import com.jfoenix.controls.JFXCheckBox;
 import application.Exchanges;
 import application.FxDialogs;
 import application.Main;
-import application.MarketMaking;
 import application.SocketCommunication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,7 +19,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
 
 public class Controller {
 	public static Scene scene;

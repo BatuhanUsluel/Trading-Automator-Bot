@@ -11,7 +11,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -26,44 +25,35 @@ import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.ta4j.core.Bar;
+import org.ta4j.core.BaseBar;
 import org.ta4j.core.BaseStrategy;
-import org.ta4j.core.BaseTick;
 import org.ta4j.core.BaseTimeSeries;
 import org.ta4j.core.Decimal;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
-import org.ta4j.core.Tick;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.TimeSeriesManager;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.analysis.criteria.AverageProfitCriterion;
 import org.ta4j.core.analysis.criteria.AverageProfitableTradesCriterion;
 import org.ta4j.core.analysis.criteria.BuyAndHoldCriterion;
-import org.ta4j.core.analysis.criteria.LinearTransactionCostCriterion;
 import org.ta4j.core.analysis.criteria.MaximumDrawdownCriterion;
-import org.ta4j.core.analysis.criteria.NumberOfTicksCriterion;
 import org.ta4j.core.analysis.criteria.NumberOfTradesCriterion;
 import org.ta4j.core.analysis.criteria.RewardRiskRatioCriterion;
 import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.analysis.criteria.VersusBuyAndHoldCriterion;
-import org.ta4j.core.indicators.SMAIndicator;
-import org.ta4j.core.indicators.StochasticOscillatorDIndicator;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
-import org.ta4j.core.trading.rules.AndRule;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.trading.rules.IsEqualRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
-import org.ta4j.core.trading.rules.StopGainRule;
-import org.ta4j.core.trading.rules.StopLossRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
 import com.jfoenix.controls.JFXButton;
@@ -99,13 +89,11 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-
 
 public class BacktestController {
     @FXML private TableView<Person> BackEntryTable = new TableView<Person>();
@@ -252,15 +240,15 @@ public class BacktestController {
     
     public static void recievedBackTest(JSONObject jsonmessage){
     	JSONArray returned = jsonmessage.getJSONArray("Return");
-    	Tick[] ticksarray = new Tick[candles];
+    	Bar[] ticksarray = new Bar[candles];
     	ZonedDateTime startTime = timestart.atStartOfDay(ZoneOffset.UTC);
     	System.out.println(candles);
     	int multiplier = IndicatorMaps.timeframes.get(jsonmessage.getString("Timeframe"));
     	for (int x=0;x<candles;x++) {
     		JSONArray ohlcv = returned.getJSONArray(x);
-    		ticksarray[x] = (new BaseTick(startTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
+    		ticksarray[x] = (new BaseBar(startTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
     	}
-    	List<Tick> ticks = Arrays.asList(ticksarray);
+    	List<Bar> ticks = Arrays.asList(ticksarray);
     	TimeSeries series = new BaseTimeSeries("series",ticks);
     	System.out.println("Sclass: " + series.getClass());
     	
@@ -379,7 +367,7 @@ public class BacktestController {
     	Strategy tradingstrategy =  new BaseStrategy(totalentryrule,totalexitrule);
     	TimeSeriesManager seriesManager = new TimeSeriesManager(series);
 		TradingRecord tradingRecord = seriesManager.run(tradingstrategy);
-		System.out.println("TC: " + tradingRecord.getTradeCount() + "GT:  " + series.getTickCount());
+		System.out.println("TC: " + tradingRecord.getTradeCount() + "GT:  " + series.getBarCount());
 		
 		
 		
@@ -408,16 +396,18 @@ public class BacktestController {
         for (Trade trade : tradingRecord.getTrades()) {
         	System.out.println(trade.toString());
             // Buy signal
-            double buySignalTickTime = new Minute(Date.from(series.getTick(trade.getEntry().getIndex()).getEndTime().toInstant())).getFirstMillisecond();
+            double buySignalTickTime = new Minute(Date.from(series.getBar(trade.getEntry().getIndex()).getEndTime().toInstant())).getFirstMillisecond();
             Marker buyMarker = new ValueMarker(buySignalTickTime);
-            //buyMarker.setPaint(javafx.scene.paint.Paint.valueOf("#33cc33"));
+            buyMarker.setPaint(java.awt.Color.GREEN);
             buyMarker.setLabel("B");
+            buyMarker.setLabelPaint(java.awt.Color.GREEN);
             plot.addDomainMarker(buyMarker);
             // Sell signal
-            double sellSignalTickTime = new Minute(Date.from(series.getTick(trade.getExit().getIndex()).getEndTime().toInstant())).getFirstMillisecond();
+            double sellSignalTickTime = new Minute(Date.from(series.getBar(trade.getExit().getIndex()).getEndTime().toInstant())).getFirstMillisecond();
             Marker sellMarker = new ValueMarker(sellSignalTickTime);
-            //sellMarker.setPaint(Color.RED);
+            sellMarker.setPaint(java.awt.Color.RED);
             sellMarker.setLabel("S");
+            sellMarker.setLabelPaint(java.awt.Color.RED);
             plot.addDomainMarker(sellMarker);
         }
         
@@ -438,10 +428,6 @@ public class BacktestController {
 		// Total profit
         TotalProfitCriterion totalProfit = new TotalProfitCriterion();
         System.out.println("Total profit: " + totalProfit.calculate(series, tradingRecord));
-        // Number of bars
-        System.out.println("Number of bars: " + new NumberOfTicksCriterion().calculate(series, tradingRecord));
-        // Average profit (per bar)
-        System.out.println("Average profit (per bar): " + new AverageProfitCriterion().calculate(series, tradingRecord));
         // Number of trades
         System.out.println("Number of trades: " + new NumberOfTradesCriterion().calculate(series, tradingRecord));
         // Profitable trades ratio
@@ -450,8 +436,6 @@ public class BacktestController {
         System.out.println("Maximum drawdown: " + new MaximumDrawdownCriterion().calculate(series, tradingRecord));
         // Reward-risk ratio
         System.out.println("Reward-risk ratio: " + new RewardRiskRatioCriterion().calculate(series, tradingRecord));
-        // Total transaction cost
-        System.out.println("Total transaction cost (from $1000): " + new LinearTransactionCostCriterion(1000, 0.005).calculate(series, tradingRecord));
         // Buy-and-hold
         System.out.println("Buy-and-hold: " + new BuyAndHoldCriterion().calculate(series, tradingRecord));
         // Total profit vs buy-and-hold
@@ -460,8 +444,8 @@ public class BacktestController {
 
     private static org.jfree.data.time.TimeSeries buildChartTimeSeries(TimeSeries tickSeries, Indicator<Decimal> indicator, String name) {
         org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
-        for (int i = 0; i < tickSeries.getTickCount(); i++) {
-            Tick tick = tickSeries.getTick(i);
+        for (int i = 0; i < tickSeries.getBarCount(); i++) {
+        	Bar tick = tickSeries.getBar(i);
             chartTimeSeries.add(new Minute(Date.from(tick.getEndTime().toInstant())), indicator.getValue(i).toDouble());
         }
         return chartTimeSeries;

@@ -1,15 +1,8 @@
 package controllers;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.lang.Exception;
-import java.text.SimpleDateFormat;
-import java.lang.Long;
+
 import org.apache.commons.lang3.math.NumberUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;

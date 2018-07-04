@@ -1,7 +1,5 @@
 package application;
 import java.io.IOException;
-import java.lang.Double;
-import java.lang.Thread;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -9,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
@@ -19,9 +16,6 @@ import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
-import javafx.collections.ObservableList;
-
-import  java.lang.Thread;
 public class AverageTrading  implements Runnable  {
 	public ArrayList<JSONObject> Orders = new ArrayList<JSONObject>();
 	

@@ -8,9 +8,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.knowm.xchange.Exchange;

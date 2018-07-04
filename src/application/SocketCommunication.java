@@ -19,7 +19,6 @@ import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import controllers.ArbitrageController;
 import controllers.AveragetradingController;
 import controllers.BacktestController;
-import controllers.Controller;
 import controllers.LiveController;
 import controllers.MarketController;
 import controllers.PendingController;

@@ -2,7 +2,6 @@ package application;
 	
 import java.time.Instant;
 
-import controllers.NTPTime;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

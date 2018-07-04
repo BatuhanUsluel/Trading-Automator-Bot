@@ -13,8 +13,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
-import java.lang.Exception;
-import  java.lang.Integer;
+
 import application.AverageTrading;
 import application.Exchanges;
 import application.FxDialogs;
@@ -25,7 +24,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import java.lang.Thread;
 public class AveragetradingController {
 	
 	//Average Trading

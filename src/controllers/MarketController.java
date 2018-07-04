@@ -1,10 +1,9 @@
 package controllers;
-import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
@@ -37,7 +36,7 @@ public class MarketController {
         List<String> list = new ArrayList<String>(Exchanges.list);
         ExchangeMM.getItems().addAll(list);
         try {
-			MarketMaking.testtheMarket();
+			//MarketMaking.testtheMarket();
 		} catch (java.lang.Exception e) {
 			e.printStackTrace();
 		}
