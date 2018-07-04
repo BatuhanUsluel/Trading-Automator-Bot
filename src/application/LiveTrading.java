@@ -195,7 +195,6 @@ public class LiveTrading implements Runnable {
 	public void recievedPreviousPrices(JSONObject jsonmessage) {
 		JSONArray returned = jsonmessage.getJSONArray("Return");
 		int lenght = returned.length();
-		System.out.println("len: " + lenght);
 		Bar[] ticksarray = new Bar[lenght-1];
 		Date date = new Date(Long.valueOf(returned.getJSONArray(0).getInt(0)));
     	ZonedDateTime endTime = date.toInstant().atZone(ZoneOffset.UTC);
@@ -328,16 +327,18 @@ public class LiveTrading implements Runnable {
     	int retlen = returned.length();
     	this.lasttime = returned.getJSONArray(retlen-1).getLong(0)-1000L;
     	System.out.println("Lasttime: " + lasttime);
-    	try {
-			loop();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+        new Thread() {
+            public void run() {
+				try {
+					loop();
+				} catch (InterruptedException e) {e.printStackTrace();}
+            }}.start();
 	 }
 	
 	public void loop() throws InterruptedException {
 		Long timemili = Long.valueOf(IndicatorMaps.timeframes.get(timeframe)*60000);
 		Long timeformessage = timemili/5;
+		person.addOrderData("\nSeconds Until Candle Close: " + ((lasttime+timemili)-STime.getServerTime())/1000);
 		while(cancled!=true) {
 			if (lasttime+timeformessage<STime.getServerTime()) {
 				person.addOrderData("\nSeconds Until Candle Close: " + ((lasttime+timemili)-STime.getServerTime())/1000);

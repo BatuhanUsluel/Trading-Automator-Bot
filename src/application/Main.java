@@ -18,12 +18,7 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
-		try {
-			long epoch = System.currentTimeMillis();
-
-			System.out.println("Epoch : " + (epoch / 1000));
-			System.out.println(Instant.now().toEpochMilli());
-			
+		try {		
 	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Sample.fxml"));
 	        AnchorPane rootLayout = loader.load();
 	        Scene scene = new Scene(rootLayout);

@@ -1,11 +1,24 @@
 package controllers;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -20,7 +33,13 @@ import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.account.Balance;
+import org.knowm.xchange.dto.marketdata.Ticker;
 
+import com.dslplatform.json.DslJson;
+import com.dslplatform.json.JsonWriter;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import application.Exchanges;
@@ -73,13 +92,44 @@ public class PortifolioController {
 	public void initialize() throws IOException, JSONException, InterruptedException{
 		ObservableList<Person> data =  FXCollections.observableArrayList();
 		ArrayList<Thread> threads = new ArrayList<Thread>();
+		String everything = null;
+		try {
+		BufferedReader br = new BufferedReader(new FileReader("cmc.txt"));
+			try {
+			    StringBuilder sb = new StringBuilder();
+			    String line = br.readLine();
+	
+			    while (line != null) {
+			        sb.append(line);
+			        sb.append(System.lineSeparator());
+			        line = br.readLine();
+			    }
+			    everything = sb.toString();
+			} finally {
+			    br.close();
+			}
+		} catch (FileNotFoundException e) {
+			
+		}
+
+		System.out.println("everything" + everything + ".");
+		if (!everything.isEmpty()) {
+			JsonObject jsonObject = new JsonParser().parse(everything).getAsJsonObject();
+			JsonObject metadata = jsonObject.get("metadata").getAsJsonObject();
+			long time = metadata.get("usertime").getAsLong();
+			long currenttime = System.currentTimeMillis();
+			if (time+604800000L<currenttime) {
+				getCmcListings();
+			}
+		} else {
+			getCmcListings();
+		}
+		
 		//BTC TICKER
-		int test = 1;
 	    Thread btcticker = new Thread(new Runnable() {
 	        public void run()
 	        {
 	        	try {
-	        		int xd = test;
 		        	URL url = new URL("https://api.coinmarketcap.com/v2/ticker/1");
 		    		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		    		con.getResponseCode();
@@ -268,7 +318,10 @@ public class PortifolioController {
 					    	if (currency.toString()!="BTC") {
 					    		BigDecimal last;
 								try {
-									last = Exchange.getMarketDataService().getTicker(new CurrencyPair(currency.toString(), "BTC")).getLast();
+									Ticker ticker = Exchange.getMarketDataService().getTicker(new CurrencyPair(currency.toString(), "BTC"));
+									last = ticker.getLast();
+									System.out.println("Ticker: " + ticker);
+									
 									btcbalance = last.multiply(balance.getTotal());
 								} catch (IOException e) {
 									e.printStackTrace();
@@ -277,7 +330,7 @@ public class PortifolioController {
 					    	} else {
 					    		btcbalance = balance.getTotal();
 					    	}
-							System.out.println(currency + ": " + balance + "btcworth" + btcbalance);
+							//System.out.println(currency + ": " + balance + "btcworth" + btcbalance);
 							if (balancepercurrency.get(currency) != null) {
 								balancepercurrency.put(currency, (balancepercurrency.get(currency)+btcbalance.doubleValue()));
 							} else {
@@ -347,6 +400,29 @@ public class PortifolioController {
             }
 
         }.start();
+	}
+	private void getCmcListings() throws IOException {
+		System.out.println("getting cmc");
+		URL url = new URL("https://api.coinmarketcap.com/v2/listings/");
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setDoOutput(true);
+		int responseCode = con.getResponseCode();
+		BufferedReader in = new BufferedReader(
+		new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer content = new StringBuffer();
+		while ((inputLine = in.readLine()) != null) {
+		    content.append(inputLine);
+		}
+		String contentstring = content.toString();
+		in.close();
+		con.disconnect();
+		JsonObject jsonObject = new JsonParser().parse(contentstring).getAsJsonObject();
+		jsonObject.get("metadata").getAsJsonObject().addProperty("usertime", System.currentTimeMillis());
+		try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+	              new FileOutputStream("cmc.txt"), "utf-8"))) {
+			writer.write(jsonObject.toString());
+		}
 	}
 	private String addCommasToNumericString (String digits)
 	{
