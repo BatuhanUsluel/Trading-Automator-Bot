@@ -319,7 +319,6 @@ public class LiveTrading implements Runnable {
     	for (int i=1;i<exitrules.size();i++) {
     		totalexitrule = totalexitrule.or(exitrules.get(i));
     	}
-    	System.out.println(totalentryrule.toString());
     	Strategy tradingstrategy =  new BaseStrategy(totalentryrule,totalexitrule);
     	TradingRecord tradingRecord = new BaseTradingRecord();
     	this.totalentryrule = totalentryrule;
@@ -327,7 +326,6 @@ public class LiveTrading implements Runnable {
     	this.tradingstrategy = tradingstrategy;
     	this.tradingRecord = tradingRecord;
     	int retlen = returned.length();
-    	//System.out.println("last: " + (String) returned.getJSONArray(retlen-1).(0));
     	this.lasttime = returned.getJSONArray(retlen-1).getLong(0)-1000L;
     	System.out.println("Lasttime: " + lasttime);
     	try {
@@ -339,10 +337,15 @@ public class LiveTrading implements Runnable {
 	
 	public void loop() throws InterruptedException {
 		Long timemili = Long.valueOf(IndicatorMaps.timeframes.get(timeframe)*60000);
+		Long timeformessage = timemili/5;
 		while(cancled!=true) {
-			System.out.println("Lasttime: " + lasttime + "Seconds: " + ((lasttime+timemili)-STime.getServerTime())/1000 + "ServerTime: " + STime.getServerTime());
+			if (lasttime+timeformessage<STime.getServerTime()) {
+				person.addOrderData("\nSeconds Until Candle Close: " + ((lasttime+timemili)-STime.getServerTime())/1000);
+				timeformessage=timeformessage+(timemili/5);
+			}
+			//System.out.println("Lasttime: " + lasttime + "Seconds: " + ((lasttime+timemili)-STime.getServerTime())/1000 + "ServerTime: " + STime.getServerTime());
 			if (lasttime+timemili<STime.getServerTime()) {
-				System.out.println("Requesting price");
+				person.addOrderData("\nRequesting Price");
 				TimeUnit.SECONDS.sleep(10);
 				JSONObject jsonrequest = json;
 				LocalDateTime starttimedate = LocalDateTime.ofInstant(Instant.ofEpochMilli(lasttime), ZoneOffset.UTC);
@@ -359,9 +362,22 @@ public class LiveTrading implements Runnable {
 	
 	public void recievedLiveTrading(JSONObject jsonmessage){
 		JSONArray ohlcv = jsonmessage.getJSONArray("Return").getJSONArray(0);
+		
 		Date date = new Date(Long.valueOf(ohlcv.getInt(0)));
     	ZonedDateTime time = date.toInstant().atZone(ZoneOffset.UTC);
-    	Bar bar = new BaseBar(time, (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5));
+    	Object open = ohlcv.get(1);
+    	Object high = ohlcv.get(2);
+    	Object low = ohlcv.get(3);
+    	Object close = ohlcv.get(4);
+    	Object volume = ohlcv.get(5);
+    	person.addOrderData("\nRecieved Price"
+    			+ "\nCandle Start Time: " + time.toString()
+    			+ "\nOpen: " + open.toString()
+    			+ "\nHigh: " + high.toString()
+    			+ "\nLow: " + low.toString()
+    			+ "\nClose: " + close.toString()
+    			+ "\nVolume " + volume.toString());
+    	Bar bar = new BaseBar(time, (double) open, (double) high, (double) low, (double) close, (double) volume);
     	series.addBar(bar);
 		int endIndex = series.getEndIndex();
 		if (tradingstrategy.shouldEnter(endIndex)) {
@@ -370,9 +386,9 @@ public class LiveTrading implements Runnable {
 		    boolean entered = tradingRecord.enter(endIndex, bar.getClosePrice(), Decimal.TEN);
             if (entered) {
                 org.ta4j.core.Order entry = tradingRecord.getLastEntry();
-                System.out.println("Entered on " + entry.getIndex()
-                        + " (price=" + entry.getPrice()
-                        + ", amount=" + entry.getAmount() + ")");
+                person.addOrderData("\nEntered on " + entry.getIndex()
+                + " \n(price=" + entry.getPrice()
+                + "\n, amount=" + entry.getAmount() + ")");
             }
 		} else if (tradingstrategy.shouldExit(endIndex)) {
 			System.out.println("Strategy should EXIT on " + endIndex);
@@ -380,12 +396,12 @@ public class LiveTrading implements Runnable {
 		    boolean exited = tradingRecord.exit(endIndex, bar.getClosePrice(), Decimal.TEN);
             if (exited) {
             	org.ta4j.core.Order exit = tradingRecord.getLastExit();
-                System.out.println("Exited on " + exit.getIndex()
-                        + " (price=" + exit.getPrice()
-                        + ", amount=" + exit.getAmount() + ")");
+                person.addOrderData("\nExited on " + exit.getIndex()
+                + " \n(price=" + exit.getPrice()
+                + "\n, amount=" + exit.getAmount() + ")");
             }
 		} else {
-			System.out.println("Trading strategy should do nothing");
+			 person.addOrderData("No trade executed");
 		}
 
 		System.out.println(jsonmessage.toString());
