@@ -27,8 +27,10 @@ import application.Exchanges;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -191,6 +193,7 @@ public class PortifolioController {
 		DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 		DecimalFormat percentdecimal = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 		DecimalFormat pricedecimal = new DecimalFormat("$#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		DecimalFormat pricedecimalchart = new DecimalFormat("#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 		df.setMaximumFractionDigits(340); // 340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
 		Volume.setText("$" + addCommasToNumericString(df.format(GlobalData.volume)));
 		marketcap.setText("$" + addCommasToNumericString(df.format(GlobalData.Dmarketcap)));
@@ -231,57 +234,54 @@ public class PortifolioController {
 		}
 		
 		Sbtcusd.setText((pricedecimal.format(BTCValues.Dbtcusdprice)));
-		
+		ArrayList<Thread> exchangethreads = new ArrayList<Thread>();
 		//Get balances from each exchanges for all currencies and add them to hashmap, with currency being the key and the btc worth being the value(double)
-		HashMap<Currency, Double> balanceperexchange = new HashMap<Currency, Double>();
+		HashMap<Currency, Double> balancepercurrency = new HashMap<Currency, Double>();
 		for (Entry<String, Exchange> entry : Exchanges.exchangemap.entrySet()) {
 		    String ExchangeString = entry.getKey();
 		    System.out.println("Looping for exchange: " + ExchangeString);
 		    Exchange Exchange = entry.getValue();
-		    Map<Currency, Balance> balancemap = Exchange.getAccountService().getAccountInfo().getWallet().getBalances();
-		    for (Entry<Currency, Balance> entry2 : balancemap.entrySet()) {
-		    	Balance balance = entry2.getValue();
-		    	if (balance.getTotal().doubleValue()>0) {
-			    	Currency currency = entry2.getKey();
-			    	BigDecimal btcbalance = null;
-			    	if (currency.toString()!="BTC") {
-			    		BigDecimal last;
-						try {
-							last = Exchange.getMarketDataService().getTicker(new CurrencyPair(currency.toString(), "BTC")).getLast();
-							btcbalance = last.multiply(balance.getTotal());
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-			    	} else {
-			    		btcbalance = balance.getTotal();
-			    	}
-					System.out.println(currency + ": " + balance + "btcworth" + btcbalance);
-					if (balanceperexchange.get(currency) != null) {
-						balanceperexchange.put(currency, (balanceperexchange.get(currency)+btcbalance.doubleValue()));
-					} else {
-						balanceperexchange.put(currency, btcbalance.doubleValue());
-					}
-		    	}
-		    }
-		}
-		double total=0;
-		
-		for (double value : balanceperexchange.values()) {
-			 total+=value;
-		}
-		DecimalFormat btcbalancedf = new DecimalFormat("###########.########", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-		balance.setText(btcbalancedf.format(total) + " BTC");
-		usdbalance.setText("USD: " + pricedecimal.format(BTCValues.Dbtcusdprice*total));
-		
-		for (Entry<Currency, Double> entry : balanceperexchange.entrySet()) {
-			Currency Currency = entry.getKey();
-			Double value = entry.getValue();
-			data.add(new Person(Currency.toString(), btcbalancedf.format(value), pricedecimal.format(value*BTCValues.Dbtcusdprice), percentdecimal.format((value/total)*100),"1"));
+		    Thread exchangethread = new Thread(new Runnable() {
+		    public void run() {
+			    Map<Currency, Balance> balancemap;
+				try {
+					balancemap = Exchange.getAccountService().getAccountInfo().getWallet().getBalances();
+				    for (Entry<Currency, Balance> entry2 : balancemap.entrySet()) {
+				    	Balance balance = entry2.getValue();
+				    	if (balance.getTotal().doubleValue()>0) {
+					    	Currency currency = entry2.getKey();
+					    	BigDecimal btcbalance = null;
+					    	if (currency.toString()!="BTC") {
+					    		BigDecimal last;
+								try {
+									last = Exchange.getMarketDataService().getTicker(new CurrencyPair(currency.toString(), "BTC")).getLast();
+									btcbalance = last.multiply(balance.getTotal());
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								
+					    	} else {
+					    		btcbalance = balance.getTotal();
+					    	}
+							System.out.println(currency + ": " + balance + "btcworth" + btcbalance);
+							if (balancepercurrency.get(currency) != null) {
+								balancepercurrency.put(currency, (balancepercurrency.get(currency)+btcbalance.doubleValue()));
+							} else {
+								balancepercurrency.put(currency, btcbalance.doubleValue());
+							}
+				    	}
+				    }
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		    }});
+		    exchangethread.start();
+		    exchangethreads.add(exchangethread);
 		}
 
-		
+		DecimalFormat btcbalancedf = new DecimalFormat("###########.########", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
 		TableColumn<Person, String> CurrencyCol = new TableColumn<Person, String>("Currency");
 		CurrencyCol.setCellValueFactory(new PropertyValueFactory<>("Currency"));
         
@@ -298,11 +298,43 @@ public class PortifolioController {
         ChangeCol.setCellValueFactory(new PropertyValueFactory<>("Change"));
         String css = this.getClass().getResource("/assets/tableview.css").toExternalForm();
         tablebalance.getStylesheets().setAll(css);
-        tablebalance.setItems(data);
-        BTCWorthCol.setSortType(TableColumn.SortType.ASCENDING);
-        tablebalance.getSortOrder().setAll(BTCWorthCol);
         tablebalance.getColumns().addAll(CurrencyCol,BTCWorthCol, USDWorthCol, PercentCol,ChangeCol);
-	    System.out.println("DONE!");
+        Task task = new Task<Void>() {
+            @Override public void run() {
+    	        for (Thread thread : exchangethreads) {
+    		        try {
+    					thread.join();
+    				} catch (InterruptedException e) {
+    					e.printStackTrace();
+    				}
+    		    }
+    			double total=0;		
+    			for (double value : balancepercurrency.values()) {
+    				 total+=value;
+    			}
+    			for (Entry<Currency, Double> entry : balancepercurrency.entrySet()) {
+    				Currency Currency = entry.getKey();
+    				Double value = entry.getValue();
+    				data.add(new Person(Currency.toString(), btcbalancedf.format(value), pricedecimalchart.format(value*BTCValues.Dbtcusdprice), percentdecimal.format((value/total)*100),"1"));
+    			}
+    			try {
+    			balance.setText(btcbalancedf.format(total) + " BTC");
+    			usdbalance.setText("USD: " + pricedecimal.format(BTCValues.Dbtcusdprice*total));
+    	    	tablebalance.setItems(data);
+    	        BTCWorthCol.setSortType(TableColumn.SortType.ASCENDING);
+    	        tablebalance.getSortOrder().setAll(BTCWorthCol);
+    			} catch (IllegalStateException e) {System.out.println("catched");}
+                return;
+            }
+
+			@Override
+			protected Void call() throws Exception {
+				return null;
+			}
+        };
+        ProgressBar bar = new ProgressBar();
+        bar.progressProperty().bind(task.progressProperty());
+        new Thread(task).start();
 	}
 	private String addCommasToNumericString (String digits)
 	{
