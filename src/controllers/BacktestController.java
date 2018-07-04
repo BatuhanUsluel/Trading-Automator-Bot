@@ -374,6 +374,18 @@ public class BacktestController {
 		//CHART
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 		dataset.addSeries(buildChartTimeSeries(series, new ClosePriceIndicator(series), exchange  + " - "+ base + "/" + alt));
+		for (Person exitrow : Backdataexit) {
+			Indicator indic1 = (Indicator) exitrow.getfirstindicator();
+			Indicator indic2 = (Indicator) exitrow.getsecondindicator();
+			dataset.addSeries(buildChartTimeSeries(series, indic1, indic1.toString()));
+			dataset.addSeries(buildChartTimeSeries(series, indic2, indic2.toString()));
+		}
+		for (Person entryrow : Backdataentry) {
+			Indicator indic1 = (Indicator) entryrow.getfirstindicator();
+			Indicator indic2 = (Indicator) entryrow.getsecondindicator();
+			dataset.addSeries(buildChartTimeSeries(series, indic1, indic1.toString()));
+			dataset.addSeries(buildChartTimeSeries(series, indic2, indic2.toString()));
+		}
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
                 "Backtesting Chart", // title
                 "Date", // x-axis label
@@ -781,14 +793,7 @@ public class BacktestController {
     }
     
     public void createFormGUI(Person person, int i, String code) {
-    	String indiccode;
-    	if (i==1) {
-    		person.setfirstindicator(code);
-    		indiccode = person.getIndicator1();
-    	} else {
-    		person.setsecondindicator(code);
-    		indiccode = person.getIndicator2();
-    	}
+
     	if (code=="Select") {
     		return;
     	}

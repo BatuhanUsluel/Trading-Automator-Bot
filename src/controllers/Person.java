@@ -1,16 +1,18 @@
 package controllers;
 
+import org.ta4j.core.Indicator;
+
 public class Person {
     
     private String Indicator1;
     private String Indicator2;
     private String TradingRule;
-    private Object firstindicator;
-    private Object secondindicator;
+    private Indicator firstindicator;
+    private Indicator secondindicator;
     private boolean or;
     private Object[] Indic1Param;
     private Object[] Indic2Param;
-    public Person(String Indicator1, boolean or, String Indicator2, String TradingRule, Object firstindicator, Object secondindicator, Object[] Indic1Param, Object[] Indic2Param) {
+    public Person(String Indicator1, boolean or, String Indicator2, String TradingRule, Indicator firstindicator, Indicator secondindicator, Object[] Indic1Param, Object[] Indic2Param) {
         this.Indicator1 = Indicator1;
         this.or = or;
         this.Indicator2 = Indicator2;
@@ -22,16 +24,16 @@ public class Person {
     }
 
  
-    public Object getfirstindicator() {
+    public Indicator getfirstindicator() {
     	return firstindicator;
     }
-    public Object getsecondindicator() {
+    public Indicator getsecondindicator() {
     	return secondindicator;
     }
-    public void setfirstindicator(Object firstindicator) {
+    public void setfirstindicator(Indicator firstindicator) {
     	this.firstindicator=firstindicator;
     }
-    public void setsecondindicator(Object secondindicator) {
+    public void setsecondindicator(Indicator secondindicator) {
     	this.secondindicator=secondindicator;
     }
     

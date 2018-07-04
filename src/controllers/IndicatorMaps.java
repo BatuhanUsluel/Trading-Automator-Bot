@@ -17,6 +17,7 @@ public class IndicatorMaps {
 		indicatorparameters.put("AroonDownIndicator",  new String[]{"series","timeFrame"});
 		indicatorparameters.put("AroonOscillatorIndicator", new String[]{"series","timeFrame"});
 		indicatorparameters.put("AroonUpIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("ATRIndicator", new String[]{"series","timeFrame"});//
 		indicatorparameters.put("AwesomeOscillatorIndicator", new String[]{"closeprice","timeFrameSma1", "timeFrameSma2"});
 		indicatorparameters.put("CCIIndicator", new String[]{"series","timeFrame"});
 		indicatorparameters.put("ChandelierExitLongIndicator", new String[]{"series","timeFrame","K multiplier"}); //K - Decimal
@@ -30,7 +31,7 @@ public class IndicatorMaps {
 		indicatorparameters.put("HMAIndicator", new String[]{"closeprice","timeFrame"});
 		indicatorparameters.put("KAMAIndicator", new String[]{"closeprice","timeFrameEffectiveRatio", "timeFrameFast", "timeFrameSlow"});
 		indicatorparameters.put("MACDIndicator", new String[]{"closeprice","shortTimeFrame", "longTimeFrame"});
-		indicatorparameters.put("MMAIndicator", new String[]{"series","timeFrame"});//???
+		indicatorparameters.put("MassIndexIndicator", new String[]{"series","emaTimeFrame", "timeFrame"});
 		indicatorparameters.put("ParabolicSarIndicator", new String[]{"series","Acceleration factor", "Max Acceleration", "Acceleration Increment"}); //Decimal,Decimal,Decimal
 		indicatorparameters.put("PPOIndicator", new String[]{"closeprice","shortTimeFrame", "longTimeFrame"});
 		indicatorparameters.put("RandomWalkIndexHighIndicator", new String[]{"series","timeFrame"});
@@ -39,7 +40,6 @@ public class IndicatorMaps {
 		indicatorparameters.put("ROCIndicator", new String[]{"closeprice","timeFrame"});
 		indicatorparameters.put("RSIIndicator", new String[]{"closeprice","timeFrame"});
 		indicatorparameters.put("SMAIndicator", new String[]{"closeprice","timeFrame"});
-		//?
 		indicatorparameters.put("StochasticOscillatorDIndicator", new String[]{"StochasticOscillatorKIndicator","series","timeFrame"});
 		indicatorparameters.put("StochasticOscillatorKIndicator", new String[]{"series","timeFrame"});
 		indicatorparameters.put("StochasticRSIIndicator", new String[]{"series","timeFrame"});
@@ -48,12 +48,20 @@ public class IndicatorMaps {
 		indicatorparameters.put("WilliamsRIndicator", new String[]{"series","timeFrame"});
 		indicatorparameters.put("WMAIndicator", new String[]{"closeprice","timeFrame"});
 		indicatorparameters.put("ZLEMAIndicator", new String[]{"closeprice","timeFrame"});
+		indicatorparameters.put("ADXIndicator", new String[]{"series","diTimeFrame", "adxTimeFrame"});
+		indicatorparameters.put("MinusDIIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("PlusDIIndicator", new String[]{"series","timeFrame"});
 		
-		
+		indicatorparameters.put("BollingerBandsLowerIndicator", new String[]{"BollingerBandsMiddleIndicator","closeprice" , "K multiplier"}); //K-Decimal
+		indicatorparameters.put("BollingerBandsMiddleIndicator", new String[]{"SMAIndicator", "timeFrame"});
+		indicatorparameters.put("PlusDIIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("PlusDIIndicator", new String[]{"series","timeFrame"});
+		indicatorparameters.put("PlusDIIndicator", new String[]{"series","timeFrame"});
 		indicatorclasspaths.put("AccelerationDecelerationIndicator", "org.ta4j.core.indicators.AccelerationDecelerationIndicator");
 		indicatorclasspaths.put("AroonDownIndicator", "org.ta4j.core.indicators.AroonDownIndicator");
 		indicatorclasspaths.put("AroonOscillatorIndicator", "org.ta4j.core.indicators.AroonOscillatorIndicator");
 		indicatorclasspaths.put("AroonUpIndicator", "org.ta4j.core.indicators.AroonUpIndicator");
+		indicatorclasspaths.put("AroonUpIndicator", "org.ta4j.core.indicators.ATRIndicator");
 		indicatorclasspaths.put("AwesomeOscillatorIndicator", "org.ta4j.core.indicators.AwesomeOscillatorIndicator");
 		indicatorclasspaths.put("CCIIndicator", "org.ta4j.core.indicators.CCIIndicator");
 		indicatorclasspaths.put("ChandelierExitLongIndicator", "org.ta4j.core.indicators.ChandelierExitLongIndicator");
