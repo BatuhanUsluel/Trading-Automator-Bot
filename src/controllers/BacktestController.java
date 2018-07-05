@@ -122,8 +122,8 @@ public class BacktestController {
     @FXML private JFXButton load;
     @FXML private JFXDatePicker starttime;
     @FXML private JFXDatePicker endtime;
-
-
+    @FXML private JFXButton removeEntryRow;
+    @FXML private JFXButton removeExitRow;
     public static ObservableList<Person> Backdataentry =  FXCollections.observableArrayList();
     public static ObservableList<Person> Backdataexit =  FXCollections.observableArrayList();
 	private static String exchange;
@@ -972,5 +972,15 @@ public class BacktestController {
     	    BackExitTable.setItems(Backdataexit);
     	    BackExitTable.refresh();
         }
+	}
+	@FXML
+	void removeEntryRow(ActionEvent event) {
+		Person selectedItem = BackEntryTable.getSelectionModel().getSelectedItem();
+		BackEntryTable.getItems().remove(selectedItem);
+	}
+	@FXML
+	void removeExitRow(ActionEvent event) {
+		Person selectedItem = BackExitTable.getSelectionModel().getSelectedItem();
+		BackExitTable.getItems().remove(selectedItem);
 	}
 }
