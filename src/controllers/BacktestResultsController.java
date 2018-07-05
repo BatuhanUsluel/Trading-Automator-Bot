@@ -22,7 +22,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 
 public class BacktestResultsController {
 
@@ -59,7 +61,12 @@ public class BacktestResultsController {
     private Label bhl;
     @FXML
     private Label svbhpl;
-    
+
+    @FXML
+    private HBox hbox1;
+
+    @FXML
+    private HBox hbox2;
     @FXML
     public void initialize(){
     	ChartViewer viewer = new ChartViewer(BacktestController.chart);
@@ -74,26 +81,53 @@ public class BacktestResultsController {
         TradingRecord tradingRecord = BacktestController.tradingRecord;
         TotalProfitCriterion totalProfit = new TotalProfitCriterion();
         tp.setText(df2.format(totalProfit.calculate(series, tradingRecord)));
-        AnchorPane.setRightAnchor(tp,725.0);
-        AnchorPane.setRightAnchor(tpl,896.0);
+        //AnchorPane.setRightAnchor(tp,725.0);
+        //AnchorPane.setRightAnchor(tpl,896.0);
         nt.setText(df2.format(new NumberOfTradesCriterion().calculate(series, tradingRecord)));
-        AnchorPane.setRightAnchor(nt,540.0);
-        AnchorPane.setRightAnchor(ntl,590.0);
+        //AnchorPane.setRightAnchor(nt,540.0);
+        //AnchorPane.setRightAnchor(ntl,590.0);
         ptr.setText(df2.format(new AverageProfitableTradesCriterion().calculate(series, tradingRecord)));
-        AnchorPane.setRightAnchor(ptr,240.0);
-        AnchorPane.setRightAnchor(ptrl,310.0);
+        //AnchorPane.setRightAnchor(ptr,240.0);
+        //AnchorPane.setRightAnchor(ptrl,310.0);
         md.setText(df2.format(new MaximumDrawdownCriterion().calculate(series, tradingRecord)));
-        AnchorPane.setRightAnchor(md,10.0);
-        AnchorPane.setRightAnchor(mdl,80.0);
+        //AnchorPane.setRightAnchor(md,10.0);
+        //AnchorPane.setRightAnchor(mdl,80.0);
         rrr.setText(df2.format(new RewardRiskRatioCriterion().calculate(series, tradingRecord)));
-        AnchorPane.setRightAnchor(rrr,665.0);
-        AnchorPane.setRightAnchor(rrr,730.0);
+        //AnchorPane.setRightAnchor(rrr,665.0);
+        //AnchorPane.setRightAnchor(rrr,730.0);
         bh.setText(df2.format(new BuyAndHoldCriterion().calculate(series, tradingRecord)));
-        AnchorPane.setRightAnchor(bh,456.0);
-        AnchorPane.setRightAnchor(bhl,510.0);
+        //AnchorPane.setRightAnchor(bh,456.0);
+        //AnchorPane.setRightAnchor(bhl,510.0);
         svbhp.setText(df2.format(new VersusBuyAndHoldCriterion(totalProfit).calculate(series, tradingRecord)));
-        AnchorPane.setRightAnchor(svbhp,10.0);
-        AnchorPane.setRightAnchor(svbhp,80.0);
+        //AnchorPane.setRightAnchor(svbhp,10.0);
+        //AnchorPane.setRightAnchor(svbhp,80.0);
+        hbox1.setSpacing(5.0);
+        hbox2.setSpacing(5.0);
+        
+        HBox.setHgrow(tp, Priority.ALWAYS);
+        HBox.setHgrow(nt, Priority.ALWAYS);
+        HBox.setHgrow(ptr, Priority.ALWAYS);
+        HBox.setHgrow(md, Priority.ALWAYS);
+        HBox.setHgrow(rrr, Priority.ALWAYS);
+        HBox.setHgrow(bh, Priority.ALWAYS);
+        HBox.setHgrow(svbhp, Priority.ALWAYS);
+        
+        tp.setMaxWidth(Double.MAX_VALUE);
+        nt.setMaxWidth(Double.MAX_VALUE);
+        ptr.setMaxWidth(Double.MAX_VALUE);
+        md.setMaxWidth(Double.MAX_VALUE);
+        rrr.setMaxWidth(Double.MAX_VALUE);
+        bh.setMaxWidth(Double.MAX_VALUE);
+        svbhp.setMaxWidth(Double.MAX_VALUE);
+        
+        tpl.setMaxWidth(Double.MAX_VALUE);
+        ntl.setMaxWidth(Double.MAX_VALUE);
+        ptrl.setMaxWidth(Double.MAX_VALUE);
+        mdl.setMaxWidth(Double.MAX_VALUE);
+        rrrl.setMaxWidth(Double.MAX_VALUE);
+        bhl.setMaxWidth(Double.MAX_VALUE);
+        svbhpl.setMaxWidth(Double.MAX_VALUE);
+        
         System.out.println("Total profit: " + totalProfit.calculate(series, tradingRecord));
         // Number of trades
         System.out.println("Number of trades: " + new NumberOfTradesCriterion().calculate(series, tradingRecord));
