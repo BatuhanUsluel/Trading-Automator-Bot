@@ -473,4 +473,6 @@ public class LiveTrading implements Runnable {
 		person.addOrderData("\nLive Trading has been manually canceled from dashboard.\n-------------------------------------------\n Stopping");
 		this.cancled = true;
 	}
+	
+	
 }

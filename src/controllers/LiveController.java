@@ -1,4 +1,10 @@
 package controllers;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,6 +52,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -571,5 +578,80 @@ public class LiveController {
 
 	}
 	}
-	
+	@FXML
+	void saveStrategy(ActionEvent event) throws IOException, ClassNotFoundException  {
+		
+		
+		List<Person> entryrules = EntryTable.getItems();
+		List<Person> exitrules = ExitTable.getItems();
+		Person[] entryrulesarray = new Person[entryrules.size()];
+		Person[] exitrulesarray = new Person[entryrules.size()];
+		int i=0;
+		for(Person entry : entryrules) {
+			entryrulesarray[i] = entry;
+			i++;
+		}
+		i=0;
+		for(Person exit : exitrules) {
+			exitrulesarray[i] = exit;
+			i++;
+		}
+		FullStrategy fullstrat = new FullStrategy(entryrulesarray, exitrulesarray);
+		
+		
+		FileChooser fileChooser = new FileChooser();
+		 
+        //Set extension filter for text files
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SER files (*.ser)", "*.ser");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(Main.primaryStage);
+
+        if (file != null) {
+    		FileOutputStream fos = new FileOutputStream(file,false);
+    		ObjectOutputStream oos = new ObjectOutputStream(fos);
+    		oos.writeObject(fullstrat);
+    		oos.close();
+        }
+
+
+
+	}
+	@FXML
+	void loadStrategy(ActionEvent event) throws IOException, ClassNotFoundException {
+		 final FileChooser fileChooser = new FileChooser();
+		File file = fileChooser.showOpenDialog(Main.primaryStage);
+        if (file != null) {
+        	FileInputStream fis = new FileInputStream(file);
+    		ObjectInputStream ois = new ObjectInputStream(fis);
+    		FullStrategy result = (FullStrategy) ois.readObject();
+    		ois.close();
+    		Person[] entryrules = result.getentryrules();
+    		Person[] exitrules = result.getexitrules();
+    		dataentry.clear();
+    		dataexit.clear();
+    		for (Person entry : entryrules) {
+    			dataentry.add(entry);
+    		}
+    		for (Person exit : exitrules) {
+    			dataexit.add(exit);
+    		}
+    		EntryTable.setItems(dataentry);
+    		EntryTable.refresh();
+    	    
+    	    ExitTable.setItems(dataexit);
+    	    ExitTable.refresh();
+        }
+	}
+	@FXML
+	void removeEntryRow(ActionEvent event) {
+		Person selectedItem = EntryTable.getSelectionModel().getSelectedItem();
+		EntryTable.getItems().remove(selectedItem);
+	}
+	@FXML
+	void removeExitRow(ActionEvent event) {
+		Person selectedItem = ExitTable.getSelectionModel().getSelectedItem();
+		ExitTable.getItems().remove(selectedItem);
+	}
 }
