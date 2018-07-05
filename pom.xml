@@ -25,6 +25,13 @@
   </build>
   
   <dependencies>
+  
+ 	 <dependency>
+    	<groupId>org.jfree</groupId>
+   		<artifactId>jfreechart-fx</artifactId>
+   		<version>1.0.1</version>
+	</dependency>
+	
 	<dependency>
   		<groupId>com.dslplatform</groupId>
   		<artifactId>dsl-json-java8</artifactId>
@@ -128,10 +135,17 @@
 	</dependency>
 	
 	<dependency>
-    	<groupId>jfree</groupId>
+  		<groupId>org.jfree</groupId>
    		<artifactId>jfreechart</artifactId>
-    	<version>1.0.13</version>
+   		<version>1.5.0</version>
 	</dependency>
+	
+	<dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>fxgraphics2d</artifactId>
+        <version>1.7</version>
+    </dependency>
+    
   </dependencies>
   
 </project>

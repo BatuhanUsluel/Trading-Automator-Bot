@@ -1,8 +1,10 @@
 package controllers;
 
+import java.io.Serializable;
+
 import org.ta4j.core.Indicator;
 
-public class Person {
+public class Person implements Serializable {
     
     private String Indicator1;
     private String Indicator2;

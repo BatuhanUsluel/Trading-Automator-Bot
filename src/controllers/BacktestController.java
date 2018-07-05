@@ -1,6 +1,14 @@
 package controllers;
 
 import java.awt.Dimension;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
@@ -20,12 +28,12 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.Marker;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.ui.RefineryUtilities;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.ta4j.core.Bar;
@@ -64,14 +72,17 @@ import application.Exchanges;
 import application.FxDialogs;
 import application.Main;
 import application.SocketCommunication;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -87,10 +98,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -105,8 +118,12 @@ public class BacktestController {
     @FXML private JFXComboBox<String> timeframefx;
     @FXML private JFXButton BackAddExitRow;
     @FXML private JFXButton BackAddEntryRow;
+    @FXML private JFXButton save;
+    @FXML private JFXButton load;
     @FXML private JFXDatePicker starttime;
     @FXML private JFXDatePicker endtime;
+
+
     public static ObservableList<Person> Backdataentry =  FXCollections.observableArrayList();
     public static ObservableList<Person> Backdataexit =  FXCollections.observableArrayList();
 	private static String exchange;
@@ -114,6 +131,11 @@ public class BacktestController {
 	private static String alt;
 	private static int candles;
 	private static LocalDate timestart;
+	static ChartPanel panel;
+	static JFreeChart chart;
+	static ChartViewer viewer;
+	static TimeSeries series;
+	static TradingRecord tradingRecord;
 	@FXML
     public void initialize(){
 		System.out.println(ZonedDateTime.now());
@@ -238,7 +260,7 @@ public class BacktestController {
     	
     }
     
-    public static void recievedBackTest(JSONObject jsonmessage){
+    public static void recievedBackTest(JSONObject jsonmessage) throws IOException{
     	JSONArray returned = jsonmessage.getJSONArray("Return");
     	Bar[] ticksarray = new Bar[candles];
     	ZonedDateTime startTime = timestart.atStartOfDay(ZoneOffset.UTC);
@@ -315,6 +337,8 @@ public class BacktestController {
     		//1
     		String indicatorname1 = Indicators.getByCode(exitrow.getIndicator1()).toString();
     		Object[] parameters1 = exitrow.getIndic1Param();
+    		
+    		
     		Indicator indicator = createindicator(exitrow, indicatorname1, parameters1, series, closeprice);
     		exitrow.setfirstindicator(indicator);
     		//2
@@ -428,30 +452,28 @@ public class BacktestController {
         panel.setFillZoomRectangle(true);
         panel.setMouseWheelEnabled(true);
         panel.setPreferredSize(new Dimension(1024, 400));
-        // Application frame
-        JFrame frame = new JFrame("Backtest chart");
-        frame.setContentPane(panel);
-        frame.pack();
-        RefineryUtilities.centerFrameOnScreen(frame);
-        frame.setVisible(true);
-        
-        
-        
-		// Total profit
-        TotalProfitCriterion totalProfit = new TotalProfitCriterion();
-        System.out.println("Total profit: " + totalProfit.calculate(series, tradingRecord));
-        // Number of trades
-        System.out.println("Number of trades: " + new NumberOfTradesCriterion().calculate(series, tradingRecord));
-        // Profitable trades ratio
-        System.out.println("Profitable trades ratio: " + new AverageProfitableTradesCriterion().calculate(series, tradingRecord));
-        // Maximum drawdown
-        System.out.println("Maximum drawdown: " + new MaximumDrawdownCriterion().calculate(series, tradingRecord));
-        // Reward-risk ratio
-        System.out.println("Reward-risk ratio: " + new RewardRiskRatioCriterion().calculate(series, tradingRecord));
-        // Buy-and-hold
-        System.out.println("Buy-and-hold: " + new BuyAndHoldCriterion().calculate(series, tradingRecord));
-        // Total profit vs buy-and-hold
-        System.out.println("Custom strategy profit vs buy-and-hold strategy profit: " + new VersusBuyAndHoldCriterion(totalProfit).calculate(series, tradingRecord));
+        ChartViewer viewer = new ChartViewer(chart);
+        BacktestController.chart=chart;
+        BacktestController.viewer=viewer;
+        Platform.runLater(new Runnable() {
+            public void run() {
+		        FXMLLoader fxmlLoader = new FXMLLoader();
+		        fxmlLoader.setLocation(BacktestController.class.getResource("/backtestresults.fxml"));
+		        Scene scene;
+				try {
+					scene = new Scene(fxmlLoader.load(), 600, 400);
+			        Stage stage = new Stage();
+			        stage.setTitle("New Window");
+			        stage.setScene(scene);
+			        stage.show();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        }});
+        BacktestController.series=series;
+        BacktestController.tradingRecord=tradingRecord;
+		
     }
 
     private static org.jfree.data.time.TimeSeries buildChartTimeSeries(TimeSeries tickSeries, Indicator<Decimal> indicator, String name) {
@@ -884,5 +906,71 @@ public class BacktestController {
 			}
 			i++;
 		}
+	}
+	@FXML
+	void saveStrategy(ActionEvent event) throws IOException, ClassNotFoundException  {
+		
+		
+		List<Person> entryrules = BackEntryTable.getItems();
+		List<Person> exitrules = BackExitTable.getItems();
+		Person[] entryrulesarray = new Person[entryrules.size()];
+		Person[] exitrulesarray = new Person[entryrules.size()];
+		int i=0;
+		for(Person entry : entryrules) {
+			entryrulesarray[i] = entry;
+			i++;
+		}
+		i=0;
+		for(Person exit : exitrules) {
+			exitrulesarray[i] = exit;
+			i++;
+		}
+		FullStrategy fullstrat = new FullStrategy(entryrulesarray, exitrulesarray);
+		
+		
+		FileChooser fileChooser = new FileChooser();
+		 
+        //Set extension filter for text files
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Ser)", "*.ser");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(Main.primaryStage);
+
+        if (file != null) {
+    		FileOutputStream fos = new FileOutputStream(file,false);
+    		ObjectOutputStream oos = new ObjectOutputStream(fos);
+    		oos.writeObject(fullstrat);
+    		oos.close();
+        }
+
+
+
+	}
+	@FXML
+	void loadStrategy(ActionEvent event) throws IOException, ClassNotFoundException {
+		 final FileChooser fileChooser = new FileChooser();
+		File file = fileChooser.showOpenDialog(Main.primaryStage);
+        if (file != null) {
+        	FileInputStream fis = new FileInputStream(file);
+    		ObjectInputStream ois = new ObjectInputStream(fis);
+    		FullStrategy result = (FullStrategy) ois.readObject();
+    		ois.close();
+    		Person[] entryrules = result.getentryrules();
+    		Person[] exitrules = result.getexitrules();
+    		Backdataentry.clear();
+    		Backdataexit.clear();
+    		for (Person entry : entryrules) {
+    			Backdataentry.add(entry);
+    		}
+    		for (Person exit : exitrules) {
+    			Backdataexit.add(exit);
+    		}
+    		BackEntryTable.setItems(Backdataentry);
+    		BackEntryTable.refresh();
+    	    
+    	    BackExitTable.setItems(Backdataexit);
+    	    BackExitTable.refresh();
+        }
 	}
 }
