@@ -461,9 +461,9 @@ public class BacktestController {
 		        fxmlLoader.setLocation(BacktestController.class.getResource("/backtestresults.fxml"));
 		        Scene scene;
 				try {
-					scene = new Scene(fxmlLoader.load(), 600, 400);
+					scene = new Scene(fxmlLoader.load(), 1000, 700);
 			        Stage stage = new Stage();
-			        stage.setTitle("New Window");
+			        stage.setTitle("Backtest Results");
 			        stage.setScene(scene);
 			        stage.show();
 				} catch (IOException e) {
@@ -931,7 +931,7 @@ public class BacktestController {
 		FileChooser fileChooser = new FileChooser();
 		 
         //Set extension filter for text files
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Ser)", "*.ser");
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SER files (*.ser)", "*.ser");
         fileChooser.getExtensionFilters().add(extFilter);
 
         //Show save file dialog
