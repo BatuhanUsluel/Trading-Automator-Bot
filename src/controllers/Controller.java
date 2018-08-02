@@ -1,6 +1,26 @@
 package controllers;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.logging.Level;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.json.JSONException;
 
@@ -22,6 +42,7 @@ import javafx.scene.layout.BorderPane;
 
 public class Controller {
 	public static Scene scene;
+	public static String pass;
     //Main
 		 @FXML private PasswordField Pass;
 		 @FXML private TextField Email;
@@ -68,27 +89,158 @@ public class Controller {
     }
 	
     @FXML
-    private void LogIn(ActionEvent event) throws IOException, JSONException, InterruptedException
+    private void LogIn(ActionEvent event) throws IOException, JSONException, InterruptedException, NoSuchAlgorithmException
     {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
-        AnchorPane rootLayout = loader.load(); 
-        Scene scene = new Scene(rootLayout);
-        this.scene=scene;
-        Main.primaryStage.setScene(scene);
-        Main.primaryStage.show();
-        IndicatorMaps.addValues();
-        Exchanges ex = new Exchanges();
-        ex.createExchanges();
-        SocketCommunication.setup();
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
+        String password = Pass.getText();
+    	messageDigest.update(password.getBytes());
+    	String encryptedString = new String(messageDigest.digest());
+		File licencetxtfile = new File("licencekey.txt");
+		File exchangetxtfile = new File("exchanges.txt");
+		File licencekeyencrypted = new File("licencekey.encrypted");
+		File exchangesencrypted = new File("exchanges.encrypted");
+		pass=password;
+        if(new File("password.hashed").isFile()) {
+        	Main.logger.log(Level.INFO, "password.hashed file found");
+            FileReader fileReader = new FileReader("password.hashed");
+            BufferedReader bufferedReader =  new BufferedReader(fileReader);
+
+        	if (encryptedString.equals(bufferedReader.readLine())) { //If file exists & the password is correct
+        		
+        		if (licencetxtfile.isFile()) {
+        			if (licencetxtfile.length()==0) {
+        				Main.logger.log(Level.WARNING, "licencekey.txt file is empty. Please paste your licencekey into the file. If you wish to use stored licencekey(licencekey.encrypted), delete the licencekey.txt file");
+        				FxDialogs.showError("Licence Key File Error", "licencekey.txt file is empty. Please paste your licencekey into the file.");
+        			} else {
+        				Main.logger.log(Level.INFO, "Inputted licencekey from licencekey.txt");
+	        			FileReader fileReaderlicence = new FileReader("licencekey.txt");
+	                    BufferedReader bufferedReaderlicence =  new BufferedReader(fileReaderlicence);
+	        			SocketCommunication.licencekey = bufferedReaderlicence.readLine();
+	        			bufferedReaderlicence.close();
+        			}
+        		} else if (licencekeyencrypted.isFile()) {
+        			fileProcessor(Cipher.DECRYPT_MODE,password, licencekeyencrypted, licencetxtfile, 0);
+        			Main.logger.log(Level.INFO, "Inputted licencekey from licencekey.encrypted");
+        		} else {
+        			Main.logger.log(Level.WARNING, "Could not find file licencekey.txt or licencekey.encrypted. Empty licencekey.txt has been automatically created. Please paste your licence key in the file");
+        			FxDialogs.showError("Licence Key File Error", "Could not find file licencekey.txt or licencekey.encrypted. Empty licencekey.txt has been automatically created. Please paste your licence key in the file");
+        			licencetxtfile.createNewFile();
+        		}
+        		
+        		if (exchangetxtfile.isFile()) {
+        			if (exchangetxtfile.length()==0) {
+        				Main.logger.log(Level.WARNING, "Exchanges.txt file is empty. Continuing with 0 exchanges");
+        				FxDialogs.showWarning("Exchange config file error", "Exchanges.txt is empty. Continuing with 0 exchanges");
+        			} else {
+        				Main.logger.log(Level.INFO, "Inputting exchanges from exchanges.txt");
+        			}
+	        	} else if (exchangesencrypted.isFile()) {
+	        		fileProcessor(Cipher.DECRYPT_MODE,password,exchangesencrypted, exchangetxtfile, 1);
+	        		Main.logger.log(Level.INFO, "Inputting exchanges from exchanges.encrypted");
+        		} else {
+        			Main.logger.log(Level.WARNING, "Could not find file exchanges.txt or exchanges.encrypted. Empty exchanges.txt has been automatically created. Continuing with 0 exchanges");
+        			FxDialogs.showWarning("Exchange config file error", "Could not find file exchanges.txt or exchanges.encrypted. Empty exchanges.txt has been automatically created. Continuing with 0 exchanges");
+        			exchangetxtfile.createNewFile();
+        		}
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
+                AnchorPane rootLayout = loader.load(); 
+                Scene scene = new Scene(rootLayout);
+                this.scene=scene;
+                Main.primaryStage.setScene(scene);
+                Main.primaryStage.show();
+                IndicatorMaps.addValues();
+                Exchanges ex = new Exchanges();
+                ex.createExchanges();
+                SocketCommunication.setup();
+        	} else { //If file exists but the password is incorrect
+        		FxDialogs.showError("Invalid password", "Hashed password does not match password.hashed.");
+        		Main.logger.log(Level.WARNING, "Invalid password for login. Hashed password does not match password.hashed. If you wish to use a new password, delete the password.hashed file");
+        	}
+        	bufferedReader.close();
+        } else { //If file does not exist
+        	FxDialogs.showWarning("New password", "password.hashed file does not exist. Creating new password.hashed with the inputed password");
+        	Main.logger.log(Level.WARNING, "password.hashed file does not exist. Creating new password.hashed with the inputed password");
+            FileWriter fileWriter = new FileWriter("password.hashed");
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(encryptedString);
+            bufferedWriter.close();
+            if (exchangetxtfile.isFile()) {
+            	if (exchangetxtfile.length()==0) {
+    				Main.logger.log(Level.WARNING, "Exchanges.txt file is empty. Continuing with 0 exchanges");
+    				FxDialogs.showWarning("Exchange config file error", "Exchanges.txt is empty. Continuing with 0 exchanges");
+    			} else {
+    				Main.logger.log(Level.INFO, "Inputting exchanges from exchanges.txt");
+    			}
+            } else {
+            	Main.logger.log(Level.WARNING, "Could not find file exchanges.txt. Empty exchanges.txt has been automatically created. Continuing with 0 exchanges");
+    			FxDialogs.showWarning("Exchange config file error", "Could not find file exchanges.txt. Empty exchanges.txt has been automatically created. Continuing with 0 exchanges");
+    			exchangetxtfile.createNewFile();
+            }
+	        if (licencetxtfile.isFile()) {
+	        	if (licencetxtfile.length()==0) {
+    				Main.logger.log(Level.WARNING, "licencekey.txt file is empty. Please paste your licencekey into the file.");
+    				FxDialogs.showError("Licence Key File Error", "licencekey.txt file is empty. Please paste your licencekey into the file.");
+    			} else {
+    				Main.logger.log(Level.INFO, "Inputted licencekey from licencekey.txt");
+        			FileReader fileReaderlicence = new FileReader("licencekey.txt");
+                    BufferedReader bufferedReaderlicence =  new BufferedReader(fileReaderlicence);
+        			SocketCommunication.licencekey = bufferedReaderlicence.readLine();
+        			bufferedReaderlicence.close();
+    			}
+	        } else {
+	        	Main.logger.log(Level.WARNING, "Could not find file licencekey.txt. Empty licencekey.txt has been automatically created. Please paste your licence key in the file");
+    			FxDialogs.showError("Licence Key File Error", "Could not find file licencekey.txt. Empty licencekey.txt has been automatically created. Please paste your licence key in the file");
+    			licencetxtfile.createNewFile();
+	        }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
+            AnchorPane rootLayout = loader.load(); 
+            Scene scene = new Scene(rootLayout);
+            this.scene=scene;
+            Main.primaryStage.setScene(scene);
+            Main.primaryStage.show();
+            IndicatorMaps.addValues();
+            Exchanges ex = new Exchanges();
+            ex.createExchanges();
+            SocketCommunication.setup();
+        }
     }
 
-    public static void connectionError() {
-    	FxDialogs.showError("Connection Error", "Error connecting to server, retrying every 2 seconds");
-    }
-    
-    public static void connected() {
-    	FxDialogs.showInformation("Connected", "Succesfully connected to server");
-    }
+    public static boolean fileProcessor(int cipherMode,String key,File inputFile,File outputFile, int x){
+   	 try {
+   		 if (key==null) {
+   			 return false;
+   		 }
+   		   MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+		   String password = key;
+		   messageDigest.update(password.getBytes());
+		   byte[] hashedkey = messageDigest.digest();
+		   hashedkey = Arrays.copyOf(hashedkey, 16);
+		   Key secretKey = new SecretKeySpec(hashedkey, "AES");
+   	       Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+   	       cipher.init(cipherMode, secretKey);
+
+   	       FileInputStream inputStream = new FileInputStream(inputFile);
+   	       byte[] inputBytes = new byte[(int) inputFile.length()];
+   	       inputStream.read(inputBytes);
+
+   	       byte[] outputBytes = cipher.doFinal(inputBytes);
+
+   	       FileOutputStream outputStream = new FileOutputStream(outputFile);
+   	       outputStream.write(outputBytes);
+   	      
+   	       inputStream.close();
+   	       outputStream.close();
+   	       if (x==0) {
+   	    	   SocketCommunication.licencekey =  new String(outputBytes, StandardCharsets.UTF_8);
+   	       }
+   	       System.out.println("returning true");
+   	       return true;
+   	    } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | IOException e) {
+   	    	e.printStackTrace();
+   	    	System.out.println("returning false");
+   	    	return false;
+               }
+        }
 }
 
 

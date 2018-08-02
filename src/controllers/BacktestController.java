@@ -1,5 +1,6 @@
 package controllers;
 
+import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.JFrame;
 
@@ -29,12 +31,20 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.Marker;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.CandlestickRenderer;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.xy.DefaultHighLowDataset;
+import org.jfree.data.xy.OHLCDataset;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BaseBar;
@@ -173,8 +183,8 @@ public class BacktestController {
     void runBackTest(ActionEvent event) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 
     	
-    	String base = BackBase.getText();
-    	String alt = BackAlt.getText();
+    	String base = BackBase.getText().toUpperCase();
+    	String alt = BackAlt.getText().toUpperCase();
     	boolean noerror = true;
 		StringBuilder stringBuilder = new StringBuilder();
     	for (Person person : BackEntryTable.getItems()) {
@@ -253,6 +263,7 @@ public class BacktestController {
 		}
     	SocketCommunication.out.print(backtestJSON.toString());
     	SocketCommunication.out.flush();
+    	Main.logger.log(Level.INFO, "Requesting historic prices for backtesting");
     	} else {
     		String finalString = stringBuilder.toString();
 	    	FxDialogs.showError(null, finalString);
@@ -261,15 +272,44 @@ public class BacktestController {
     }
     
     public static void recievedBackTest(JSONObject jsonmessage) throws IOException{
+    	if (jsonmessage.has("Error")) {
+    		String error = jsonmessage.getString("Error");
+    		Platform.runLater(new Runnable() {
+                public void run() {
+                	if (error.equals("1m") || error.equals("5m") || error.equals("1h") || error.equals("4h") || error.equals("1d") || error.equals("1w")) {
+                		FxDialogs.showError("Error getting prices, not running", exchange + " does not support the timeframe: " + error);
+                		Main.logger.log(Level.SEVERE, "Error getting historical prices, not running. " + exchange + " does not support the timeframe: " + error);
+                	} else {
+                	FxDialogs.showError("Error getting prices, not running", error);
+                	Main.logger.log(Level.SEVERE, "Error getting historical prices, not running. " + error);
+                	}
+                }});
+    		return;
+    	}
     	JSONArray returned = jsonmessage.getJSONArray("Return");
     	Bar[] ticksarray = new Bar[candles];
     	ZonedDateTime startTime = timestart.atStartOfDay(ZoneOffset.UTC);
     	System.out.println(candles);
     	int multiplier = IndicatorMaps.timeframes.get(jsonmessage.getString("Timeframe"));
-    	for (int x=0;x<candles;x++) {
+        final int nbTicks = returned.length();
+        Date[] dates = new Date[nbTicks];
+        double[] opens = new double[nbTicks];
+        double[] highs = new double[nbTicks];
+        double[] lows = new double[nbTicks];
+        double[] closes = new double[nbTicks];
+        double[] volumes = new double[nbTicks];
+    	for (int x=0;x<returned.length();x++) {
     		JSONArray ohlcv = returned.getJSONArray(x);
-    		ticksarray[x] = (new BaseBar(startTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
+    		Bar bar = new BaseBar(startTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5));
+    		ticksarray[x] = bar;
+            dates[x] = new Date(bar.getEndTime().toEpochSecond() * 1000);
+            opens[x] = bar.getOpenPrice().toDouble();
+            highs[x] = bar.getMaxPrice().toDouble();
+            lows[x] = bar.getMinPrice().toDouble();
+            closes[x] = bar.getClosePrice().toDouble();
+            volumes[x] = bar.getVolume().toDouble();
     	}
+    	
     	List<Bar> ticks = Arrays.asList(ticksarray);
     	TimeSeries series = new BaseTimeSeries("series",ticks);
     	System.out.println("Sclass: " + series.getClass());
@@ -337,8 +377,6 @@ public class BacktestController {
     		//1
     		String indicatorname1 = Indicators.getByCode(exitrow.getIndicator1()).toString();
     		Object[] parameters1 = exitrow.getIndic1Param();
-    		
-    		
     		Indicator indicator = createindicator(exitrow, indicatorname1, parameters1, series, closeprice);
     		exitrow.setfirstindicator(indicator);
     		//2
@@ -394,41 +432,53 @@ public class BacktestController {
 		System.out.println("TC: " + tradingRecord.getTradeCount() + "GT:  " + series.getBarCount());
 		
 		
+		Date startdate = new Date(Long.parseLong(returned.getJSONArray(0).get(0).toString()));
+	    int retlen = returned.length();
+	    Date enddate = new Date(Long.parseLong(returned.getJSONArray(retlen-1).get(0).toString()));
 		
-		//CHART
+	    
+	    //CHART
+	    
+		//Add indicators to chart
+	    ArrayList<String> usedindicators = new ArrayList();
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
-		dataset.addSeries(buildChartTimeSeries(series, new ClosePriceIndicator(series), exchange  + " - "+ base + "/" + alt));
+		
 		for (Person exitrow : Backdataexit) {
 			Indicator indic1 = (Indicator) exitrow.getfirstindicator();
 			Indicator indic2 = (Indicator) exitrow.getsecondindicator();
 			dataset.addSeries(buildChartTimeSeries(series, indic1, indic1.toString()));
 			dataset.addSeries(buildChartTimeSeries(series, indic2, indic2.toString()));
 		}
+		
 		for (Person entryrow : Backdataentry) {
-			Indicator indic1 = (Indicator) entryrow.getfirstindicator();
+			Indicator indic1 = (Indicator) entryrow.getfirstindicator();		
 			Indicator indic2 = (Indicator) entryrow.getsecondindicator();
 			dataset.addSeries(buildChartTimeSeries(series, indic1, indic1.toString()));
 			dataset.addSeries(buildChartTimeSeries(series, indic2, indic2.toString()));
 		}
+		
+		//Add OHLC to chart
+		OHLCDataset dataset2 = new DefaultHighLowDataset( exchange  + " - "+ base + "/" + alt, dates, highs, lows, opens, closes, volumes);
+		
+		//Create chart
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
                 "Backtesting Chart", // title
                 "Date", // x-axis label
                 "Price", // y-axis label
-                dataset, // data
+                dataset2, // data
                 true, // create legend?
                 true, // generate tooltips?
                 false // generate URLs?
                 );
+        
         XYPlot plot = (XYPlot) chart.getPlot();
         DateAxis axis = (DateAxis) plot.getDomainAxis();
         
-        Date startdate = new Date(Long.parseLong(returned.getJSONArray(0).get(0).toString()));
-        System.out.println("S: " + startdate);
-        int retlen = returned.length();
-        Date enddate = new Date(Long.parseLong(returned.getJSONArray(retlen-1).get(0).toString()));
-        System.out.println("E: " + enddate);
+        //Configure Axis
         axis.setRange(startdate, enddate);
         axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
+        
+        //Add buy & sell trades to chart
         for (Trade trade : tradingRecord.getTrades()) {
         	System.out.println(trade.toString());
             // Buy signal
@@ -437,6 +487,7 @@ public class BacktestController {
             buyMarker.setPaint(java.awt.Color.GREEN);
             buyMarker.setLabel("B");
             buyMarker.setLabelPaint(java.awt.Color.GREEN);
+            buyMarker.setStroke(new BasicStroke(2));
             plot.addDomainMarker(buyMarker);
             // Sell signal
             double sellSignalTickTime = new Minute(Date.from(series.getBar(trade.getExit().getIndex()).getEndTime().toInstant())).getFirstMillisecond();
@@ -444,8 +495,23 @@ public class BacktestController {
             sellMarker.setPaint(java.awt.Color.RED);
             sellMarker.setLabel("S");
             sellMarker.setLabelPaint(java.awt.Color.RED);
+            sellMarker.setStroke(new BasicStroke(2));
             plot.addDomainMarker(sellMarker);
         }
+        
+        // Candlestick rendering
+        CandlestickRenderer renderer = new CandlestickRenderer();
+        renderer.setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_SMALLEST);
+        XYPlot plot2 = chart.getXYPlot();
+        plot2.setRenderer(renderer);
+        
+        // Additional dataset 
+        int index = 1; 
+        plot.setDataset(index, dataset); 
+        plot.mapDatasetToRangeAxis(index, 0); 
+        XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer(true, false); 
+        renderer2.setSeriesPaint(index, java.awt.Color.BLUE); 
+        plot.setRenderer(index, renderer2);
         
         // Chart panel
         ChartPanel panel = new ChartPanel(chart);
@@ -453,6 +519,7 @@ public class BacktestController {
         panel.setMouseWheelEnabled(true);
         panel.setPreferredSize(new Dimension(1024, 400));
         ChartViewer viewer = new ChartViewer(chart);
+        
         BacktestController.chart=chart;
         BacktestController.viewer=viewer;
         Platform.runLater(new Runnable() {
@@ -518,8 +585,8 @@ public class BacktestController {
 				classes[ii] = parameters[ii].getClass();
 			}
 		}
-
-		Class myClass = Class.forName(IndicatorMaps.indicatorclasspaths.get(indicatorname));
+	
+		Class myClass = Class.forName("org.ta4j.core.indicators." + IndicatorMaps.indicatorclasspaths.get(indicatorname));
         Constructor constructor = myClass.getDeclaredConstructor(classes);
         Object indicator = constructor.newInstance(parameters);
         System.out.println("Create  " + indicator.toString());

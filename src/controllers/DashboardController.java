@@ -179,7 +179,7 @@ public class DashboardController {
 	   	
         //filter = new TableFilter<Person>(tableView);
 	   	try {
-	   		TableFilter.forTableView(tableView).apply();
+	   		//TableFilter.forTableView(tableView).apply();
 	   	} catch (NoSuchMethodError e) {
 	   		
 	   	}

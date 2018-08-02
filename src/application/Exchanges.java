@@ -2,6 +2,7 @@ package application;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,20 +14,14 @@ import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.ExchangeFactory;
 import org.knowm.xchange.ExchangeSpecification;
-
+import java.util.logging.*;
 public class Exchanges {
 	public HashMap<String, String> exchangecodemap = new HashMap<String, String>();
 	public static HashMap<String, Exchange> exchangemap = new HashMap<String, Exchange>();
 	public static ArrayList<String> list = new ArrayList<String>();
-	public void createExchanges() throws JSONException, IOException, InterruptedException {
-		/*Create hashmap with exchanges short name, and long version. Then loop for everythign in the json text file, and do hashmap.get(exchangeshort).
-		 * Then create a exchange object with this using:
-		 * 	ExchangeSpecification exSpec = new ExchangeSpecification("class org.knowm.xchange.bittrex.BittrexExchange");
-		 * 	Then place this into a NEW hashmap, with the short names and the created exchanges
-		 *  Then from other classes, you can do new Exhange().hashmap2.get("bittrex") to get the exchange
-		 *  Then you can just get the marketdataservice, etc. from that object
-		 */
-		
+	public void createExchanges() {
+		Thread t = new Thread(new java.lang.Runnable() {
+            public void run() {
 		exchangecodemap.put("binance", "org.knowm.xchange.binance.BinanceExchange");
 		exchangecodemap.put("bitbay", "org.knowm.xchange.bitbay.BitbayExchange");
 		exchangecodemap.put("bitfinexv1", "org.knowm.xchange.bitfinex.v1.BitfinexExchange");
@@ -52,46 +47,57 @@ public class Exchanges {
 		exchangecodemap.put("quoine", "org.knowm.xchange.quoine.QuoineExchange");
 		exchangecodemap.put("yobit", "org.knowm.xchange.yobit.YoBitExchange");
 		
-		String everything;
-		try(BufferedReader br = new BufferedReader(new FileReader(new File(getClass().getClassLoader().getResource("exchanges").getFile())))) {
-		    StringBuilder sb = new StringBuilder();
-		    String line = br.readLine();
-
-		    while (line != null) {
-		        sb.append(line);
-		        sb.append(System.lineSeparator());
-		        line = br.readLine();
-		    }
-		    everything = sb.toString();
+		String everything = null;
+		BufferedReader br = null;
+		try {
+				br = new BufferedReader(new FileReader("exchanges.txt"));
+			    StringBuilder sb = new StringBuilder();
+			    String line = br.readLine();
+	
+			    while (line != null) {
+			        sb.append(line);
+			        sb.append(System.lineSeparator());
+			        line = br.readLine();
+			    }
+			    everything = sb.toString();
+		} catch (FileNotFoundException e) {
+			Main.logger.log(Level.SEVERE, "exchanges.txt file not found. Error setting up exchanges");
+		} catch (IOException e) {
+			Main.logger.log(Level.SEVERE, "Error reading exchanges.txt file");
+		} finally {
+			try {br.close();} catch (IOException e) {e.printStackTrace();}
 		}
-		JSONObject jsonmessage = new JSONObject(everything);
-		Iterator<?> keys = jsonmessage.keys();
-		while(keys.hasNext()) {
-			String key = (String)keys.next();
-			key = key.toLowerCase();
-			//System.out.println(jsonmessage.get(key));
-			System.out.println(key);
-			
-			JSONObject specific = (JSONObject) jsonmessage.get(key);
-			String apikey = specific.getString("apikey");
-			String apisecret = specific.getString("apisecret");
-			//System.out.println("Exchange:" + exchange + " Apikey: " + apikey + " Apisecret: " + apisecret);
-			String longex = exchangecodemap.get(key);
-			System.out.println("LongEx: " + longex);
-			ExchangeSpecification exSpec = new ExchangeSpecification(longex);
-			exSpec.setApiKey(apikey);
-			exSpec.setSecretKey(apisecret);
-			try {
-		    Exchange ex = ExchangeFactory.INSTANCE.createExchange(exSpec);
-			
-		    exchangemap.put(key, ex);
-		    System.out.println(key);
-		    list.add(key);
-		    //System.out.println(ex.getMarketDataService().getTicker(new CurrencyPair("ETH", "BTC")));
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-		    
+		if (!everything.isEmpty()) {
+			JSONObject jsonmessage = new JSONObject(everything);
+			Iterator<?> keys = jsonmessage.keys();
+			while(keys.hasNext()) {
+				String key = (String)keys.next();
+				key = key.toLowerCase();
+				System.out.println(key);
+				
+				JSONObject specific = (JSONObject) jsonmessage.get(key);
+				String apikey = specific.getString("apikey");
+				String apisecret = specific.getString("apisecret");
+				System.out.println("logged");
+				Main.logger.log(Level.INFO, "Creating exchange for " + key);
+				String longex = exchangecodemap.get(key);
+				System.out.println("LongEx: " + longex);
+				ExchangeSpecification exSpec = new ExchangeSpecification(longex);
+				exSpec.setApiKey(apikey);
+				exSpec.setSecretKey(apisecret);
+				try {
+				    Exchange ex = ExchangeFactory.INSTANCE.createExchange(exSpec);
+				    exchangemap.put(key, ex);
+				    list.add(key);
+				    Main.logger.log(Level.INFO, "Succesfully created exchange for " + key);	
+		        } catch (Exception e) {
+		        	Main.logger.log(Level.SEVERE, "Error creating exchange for " + key + " | " + e.getMessage());	
+		        }  
+			}
+		} else {
+			Main.logger.log(Level.SEVERE, "exchanges.txt file empty. Error setting up exchanges");
 		}
+    }});
+	t.start();
 	}
 }

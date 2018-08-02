@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.controlsfx.control.CheckComboBox;
@@ -17,6 +18,7 @@ import com.jfoenix.controls.JFXButton;
 import application.ArbitrageOrder;
 import application.Exchanges;
 import application.FxDialogs;
+import application.Main;
 import application.SocketCommunication;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -61,8 +63,8 @@ public class ArbitrageController {
 		for (String string : exchanges){
 			exchange.add(Exchanges.exchangemap.get(string));
 		}
-		String base = bPAr.getText();
-		String alt = aPAr.getText();
+		String base = bPAr.getText().toUpperCase();
+		String alt = aPAr.getText().toUpperCase();
 		String MinArbitrage = mAAr.getText();
     	if(!NumberUtils.isCreatable(MinArbitrage)) {
     		noerror=false;
@@ -99,6 +101,7 @@ public class ArbitrageController {
 	    	ArbitrageOrderMap.put(arbitrageJSON, arbit);
 	    	Thread t = new Thread(arbit);
 	    	t.start();
+	    	Main.logger.log(Level.INFO, "Started running arbitrage order");
 		} else {
 			String finalString = stringBuilder.toString();
 			FxDialogs.showError(null, finalString);

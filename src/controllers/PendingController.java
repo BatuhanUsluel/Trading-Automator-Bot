@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.controlsfx.control.NotificationPane;
@@ -16,6 +17,7 @@ import com.jfoenix.controls.JFXRadioButton;
 
 import application.Exchanges;
 import application.FxDialogs;
+import application.Main;
 import application.PendingOrder;
 import application.SocketCommunication;
 import javafx.event.ActionEvent;
@@ -49,8 +51,8 @@ public class PendingController {
     	String exchange = "";
     	StringBuilder stringBuilder = new StringBuilder();
     	JSONObject pendingOrder = new JSONObject();
-    	String base = POBPU.getText();
-    	String alt = APPOU.getText();
+    	String base = POBPU.getText().toUpperCase();
+    	String alt = APPOU.getText().toUpperCase();
     	String price = PPOU.getText();
     	String volume = BVPOU.getText();
     	String percent = POVPOU.getText();
@@ -109,6 +111,7 @@ public class PendingController {
 		    	Thread t = new Thread(pend);
 		    	t.start();
 			} else {
+				Main.logger.log(Level.INFO, "Pending order canceled from dialog");
 				System.out.println("Not running order");
 			}
     	} else {
@@ -129,6 +132,7 @@ public class PendingController {
 				if (key.getInt("orderid") == java.lang.Integer.parseInt(orderid)) {
 					PendingOrder value = entry.getValue();
 					value.stopOrder();
+					Main.logger.log(Level.INFO, "Stopped pending order");
 				}
 			} catch (java.lang.Exception e) {
 				e.printStackTrace();

@@ -90,8 +90,8 @@ public class LiveController {
     
 	@FXML
     void runLiveTrade(ActionEvent event) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {  	
-    	String base = LiveBase.getText();
-    	String alt = LiveAlt.getText();
+    	String base = LiveBase.getText().toUpperCase();
+    	String alt = LiveAlt.getText().toUpperCase();
     	boolean noerror = true;
 		StringBuilder stringBuilder = new StringBuilder();
     	for (Person person : EntryTable.getItems()) {

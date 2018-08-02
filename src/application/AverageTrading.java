@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -144,8 +145,8 @@ public class AverageTrading  implements Runnable  {
 	}	
 	
 	public void stopOrder() {
-		System.out.println("cancel Average order!!!");
-		person.addOrderData("\nAverage order has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Average Trading.");
+		person.addOrderData("\nAverage order has been manually stopped from dashboard.\n-------------------------------------------\n Stopping Average Trading.");
+		Main.logger.log(Level.INFO, "Average order has been stopped");
 		this.ordercanceled = true;
 	}
 }

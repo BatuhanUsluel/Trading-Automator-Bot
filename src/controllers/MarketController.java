@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
@@ -14,6 +15,7 @@ import com.jfoenix.controls.JFXComboBox;
 
 import application.Exchanges;
 import application.FxDialogs;
+import application.Main;
 import application.MarketMaking;
 import application.SocketCommunication;
 import javafx.event.ActionEvent;
@@ -44,8 +46,8 @@ public class MarketController {
 	
 	public void marketMaking(ActionEvent event)  throws JSONException {
     	JSONObject marketMaking = new JSONObject();
-    	String base = BaseMM.getText();
-    	String Alt = AltMM.getText();
+    	String base = BaseMM.getText().toUpperCase();
+    	String Alt = AltMM.getText().toUpperCase();
     	String Spread = SpreadMM.getText();
     	String MaxBal = MaxBalMM.getText();
     	String MinBal = MinBalMM.getText();
@@ -105,7 +107,7 @@ public class MarketController {
 		    	Thread t = new Thread(market);
 		    	t.start();
 			} else {
-				System.out.println("Not running order");
+				Main.logger.log(Level.INFO, "Market making canceled from dialog");
 			}
 	    } else {
 		    String finalString = stringBuilder.toString();
@@ -113,15 +115,13 @@ public class MarketController {
 	    }
 	}
 	public static void cancelMarketOrder(String orderid) {
-		System.out.println("Cancel market order");
 		for (Map.Entry<JSONObject, MarketMaking> entry : marketMakingMap.entrySet()) {
 		    JSONObject key = entry.getKey();
 			try {
-				System.out.println("Order1: " + key.getInt("orderid") + " Order2: " + java.lang.Integer.parseInt(orderid));
 				if (key.getInt("orderid") == java.lang.Integer.parseInt(orderid)) {
-					System.out.println("They are equal!");
 					MarketMaking value = entry.getValue();
 					value.stopOrder();
+					Main.logger.log(Level.INFO, "Stopping market making");
 				}
 			} catch (java.lang.Exception e) {
 				e.printStackTrace();

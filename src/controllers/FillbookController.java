@@ -1,6 +1,7 @@
 package controllers;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -11,6 +12,7 @@ import com.jfoenix.controls.JFXRadioButton;
 import application.Exchanges;
 import application.FillOrderBook;
 import application.FxDialogs;
+import application.Main;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
@@ -39,8 +41,8 @@ public class FillbookController {
 	
 	@FXML
     public void fillOrderBook(ActionEvent event) {
-    	String base = FOBase.getText();
-    	String alt = FOAlt.getText();
+    	String base = FOBase.getText().toUpperCase();
+    	String alt = FOAlt.getText().toUpperCase();
     	String startprice = FOStartP.getText();
     	String endprice = FOEndP.getText();
     	String balanceused = FOBalanceUsed.getText();
@@ -91,9 +93,10 @@ public class FillbookController {
 	    		String run = FxDialogs.showConfirm("Run Order?",confirm, "Run", "Cancel");
 	    		System.out.println(run);
 				if (run.equals("Run")) {
+					Main.logger.log(Level.INFO, "Running fill order book");
 					FillOrderBook.fillOrderBook(base, alt, startprice,endprice, balanceused, nooforders, BuySell, exchange);
 				} else {
-					System.out.println("Not running order");
+					Main.logger.log(Level.INFO, "Average order has been canceled from dialog");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

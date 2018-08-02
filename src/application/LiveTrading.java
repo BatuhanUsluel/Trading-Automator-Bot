@@ -113,6 +113,7 @@ public class LiveTrading implements Runnable {
             		STime.addtensecond();
             	}
             }});
+		servertimethread.setDaemon(true);
 		servertimethread.start();
 		
 		getMaxTimeFrame();

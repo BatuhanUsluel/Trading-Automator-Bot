@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,32 +35,44 @@ public class SocketCommunication {
 	public static Socket socket;
 	static String server="localhost";
 	static int port=8888;
-	public static void setup() throws UnknownHostException, IOException{
-		connect(server,port);
-        listen();
-        System.out.println("Done");
+	public static void setup(){
+		Thread t = new Thread(new java.lang.Runnable() {
+			@Override
+			public void run() {
+				while(connect(server,port)==false) {
+					try {
+						TimeUnit.SECONDS.sleep(2);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+		        listen();
+			 }	
+			});
+	    t.setDaemon(true);
+	    t.start();
     }
 
-    public static void listen() throws IOException {
-    	Thread t = new Thread(new java.lang.Runnable() {
-            @Override
-            public void run() {
+    public static void listen() {
             	boolean x = true;
             	while (x == true){
         			String message;
 					try {
-						
 						message = stdIn.readLine();
+						System.out.println(message);
 				    	Thread t = new Thread(new java.lang.Runnable() {
 				            public void run() {
 				            	try {
+				            		
 									JSONObject jsonmessage = new JSONObject(message);
 									String request = jsonmessage.getString("request");
 									switch (request) {
 									case "quickBuy":
+										Main.logger.log(Level.INFO, "Recieved quickbuy prices");
 										QuickBuy.recievedQuickBuyMessage(jsonmessage);
 										break;
 									case "arbitrageOrder":
+										Main.logger.log(Level.INFO, "Recieved arbitrage prices");
 										HashMap<JSONObject, ArbitrageOrder> arbitrageMap = ArbitrageController.ArbitrageOrderMap;
 										for (Entry<JSONObject, ArbitrageOrder> entry : arbitrageMap.entrySet()) {
 											JSONObject key = entry.getKey();
@@ -76,11 +89,12 @@ public class SocketCommunication {
 										}
 										break;
 									case "Historic":
+										Main.logger.log(Level.INFO, "Recieved historic prices");
 										BacktestController.recievedBackTest(jsonmessage);
 										System.out.println(message);
 										break;
 									case "averageTrading":
-										System.out.println("Recieved AVERAGE");										
+										Main.logger.log(Level.INFO, "Recieved prices for average trading");								
 										HashMap<JSONObject, AverageTrading> hashmapaverage = AveragetradingController.AverageTradingMap;
 										for (Entry<JSONObject, AverageTrading> entry : hashmapaverage.entrySet()) {
 										    JSONObject key = entry.getKey();
@@ -101,6 +115,7 @@ public class SocketCommunication {
 										}
 										break;
 									case "trailingStop":
+										Main.logger.log(Level.INFO, "Recieved prices for trailing stop");
 										HashMap<JSONObject, TrailingStop> hashmaptrailing = TrailingController.TrailingStopMap;
 										for (Entry<JSONObject, TrailingStop> entry : hashmaptrailing.entrySet()) {
 										    JSONObject key = entry.getKey();
@@ -119,6 +134,7 @@ public class SocketCommunication {
 										}
 										break;
 									case "pendingOrder":
+										Main.logger.log(Level.INFO, "Recieved prices for pending order");
 										HashMap<JSONObject, PendingOrder> hashmappending = PendingController.PendingOrderMap;
 										for (Entry<JSONObject, PendingOrder> entry : hashmappending.entrySet()) {
 											JSONObject key = entry.getKey();
@@ -137,6 +153,7 @@ public class SocketCommunication {
 										}
 										break;
 									case "marketMaking":
+										Main.logger.log(Level.INFO, "Recieved prices for market making");
 										HashMap<JSONObject, MarketMaking> hashmapmarket = MarketController.marketMakingMap;
 										for (Entry<JSONObject, MarketMaking> entry : hashmapmarket.entrySet()) {
 											JSONObject key = entry.getKey();
@@ -155,6 +172,7 @@ public class SocketCommunication {
 										}
 										break;
 									case "prevlive":
+										Main.logger.log(Level.INFO, "Recieved prices live trading(historical)");
 										HashMap<Integer, LiveTrading> livemap = LiveController.LiveTradingMap;
 										for (Entry<Integer, LiveTrading> entry : livemap.entrySet()) {
 											int key = entry.getKey();
@@ -165,6 +183,7 @@ public class SocketCommunication {
 										}
 										break;
 									case "LiveTrading":
+										Main.logger.log(Level.INFO, "Recieved prices for live trading");
 										HashMap<Integer, LiveTrading> livemap2 = LiveController.LiveTradingMap;
 										for (Entry<Integer, LiveTrading> entry : livemap2.entrySet()) {
 											int key = entry.getKey();
@@ -176,6 +195,7 @@ public class SocketCommunication {
 										break;
 										
 									default:
+										Main.logger.log(Level.WARNING, "Recieved invalid message from server: " + request);
 										System.out.println("Invalid");
 									}	
 									System.out.println("M:   " + message);
@@ -190,9 +210,10 @@ public class SocketCommunication {
 								}
 						          }
 						    	});
+				    	t.setDaemon(true);
 				    	t.start();
 					} catch (SocketException e) {
-						System.out.println("Socket Exception");
+						Main.logger.log(Level.SEVERE, "Lost connection with server. Retrying");
 						connect(server, port);
 						try {
 							TimeUnit.SECONDS.sleep(2);
@@ -204,21 +225,21 @@ public class SocketCommunication {
 						e3.printStackTrace();
 					}
 	            }
-            }
-	   });
-    t.start();
     }
     
-    private static void connect(String server, int port){
+    private static boolean connect(String server, int port){
         try {
             socket = new Socket(server, port);
             stdIn =new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
+            Main.logger.log(Level.INFO, "Connected to server");
+            return true;
         } catch (UnknownHostException e) {
-
+        	Main.logger.log(Level.SEVERE, "Error connecting to server. UnknownHost | " + e.getMessage());
+        	return false;
         } catch (IOException e) {
-
+        	Main.logger.log(Level.SEVERE, "Error connecting to server. IOException | " + e.getMessage());
+        	return false;
         }
-        
     }
 }

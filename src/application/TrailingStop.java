@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +28,7 @@ public class TrailingStop {
 	LimitOrder LastOrder;
 	Person person;
 	public void runOrder(JSONObject message) {
+    		Main.logger.log(Level.INFO, "Running trailing stop");
 			final JSONObject messagefinal = message;
 			Thread thread = new Thread(new Runnable() {
 				public void run() {
@@ -63,6 +65,7 @@ public class TrailingStop {
 				}
 	        }
 		});
+		thread.setDaemon(true);
 	    thread.start();
 	}
 	

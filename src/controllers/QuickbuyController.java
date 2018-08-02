@@ -1,6 +1,7 @@
 package controllers;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -9,6 +10,7 @@ import com.jfoenix.controls.JFXComboBox;
 
 import application.Exchanges;
 import application.FxDialogs;
+import application.Main;
 import application.QuickBuy;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,9 +32,8 @@ public class QuickbuyController {
 
 	@FXML
     public void quickPrice(ActionEvent event) {
-      	System.out.println("running quickPrice");
-      	String base = qBase.getText();
-      	String alt = qAlt.getText();
+      	String base = qBase.getText().toUpperCase();
+      	String alt = qAlt.getText().toUpperCase();
       	String volume =qVolume.getText();
       	String percent = qBAA.getText();
      	boolean noerror = true;
@@ -64,7 +65,7 @@ public class QuickbuyController {
     	}
     	if (noerror==true) {
     		QuickBuy.sendQuickPriceRequest(base,alt,exchange, Double.parseDouble(volume), Double.parseDouble(percent));
-    		FxDialogs.showInformation(null, "Order Placed");
+        	Main.logger.log(Level.INFO, "Sending quick buy price request");
     	} else {
 			String finalString = stringBuilder.toString();
 			FxDialogs.showError(null, finalString);

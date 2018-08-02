@@ -145,6 +145,7 @@ public class MarketMaking implements Runnable {
 					}
 	    	    }
 			};
+			baseBalance.setDaemon(true);
 			baseBalance.start();
 			Thread altBalance = new Thread() {
 	    	    public void run() {
@@ -160,6 +161,7 @@ public class MarketMaking implements Runnable {
 					}
 	    	    }
 			};
+			altBalance.setDaemon(true);
 			altBalance.start();
 
 		} catch (NotAvailableFromExchangeException e) {
@@ -207,6 +209,7 @@ public class MarketMaking implements Runnable {
 						}
 		    	    }
 				};
+				baseBalance.setDaemon(true);
 				baseBalance.start();
 				
 				Thread altBalance = new Thread() {
@@ -223,6 +226,7 @@ public class MarketMaking implements Runnable {
 						}
 		    	    }
 				};
+				altBalance.setDaemon(true);
 				altBalance.start();
 				
 		        person.addOrderData("\nFirst run== " + firstrun);

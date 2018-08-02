@@ -126,6 +126,7 @@ public class ArbitrageOrder implements Runnable{
 	    			
 	    	    }
 	    	};
+	    	basethread.setDaemon(true);
 	    	basethread.start();
 	    	balanceThreads.add(basethread);
 
@@ -143,6 +144,7 @@ public class ArbitrageOrder implements Runnable{
 					}
 	    	    }
 	    	};
+	    	altthread.setDaemon(true);
 	    	altthread.start();
 	    	balanceThreads.add(altthread);
 			

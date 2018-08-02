@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
@@ -17,6 +18,7 @@ import com.jfoenix.controls.JFXTextField;
 import application.AverageTrading;
 import application.Exchanges;
 import application.FxDialogs;
+import application.Main;
 import application.SocketCommunication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -57,8 +59,8 @@ public class AveragetradingController {
     public void averageTrading(ActionEvent event) throws JSONException {
      	System.out.println("running averageTrading");
     	JSONObject averageTrading = new JSONObject();
-    	String base = BPAvU.getText();
-    	String alt =APAvU.getText();
+    	String base = BPAvU.getText().toUpperCase();
+    	String alt =APAvU.getText().toUpperCase();
     	
     	String coinstotrade = MABAv.getText();
     	String volumeperorder = VpOAV.getText();
@@ -126,7 +128,9 @@ public class AveragetradingController {
 		    	AverageTradingMap.put(averageTrading, averagetradingclass);
 		    	Thread t = new Thread(averagetradingclass);
 		    	t.start();
+		    	Main.logger.log(Level.INFO, "Started running average trading");
 			} else {
+				Main.logger.log(Level.INFO, "Average trading canceled from dialog");
 				System.out.println("Not running order");
 			}
     	} else {

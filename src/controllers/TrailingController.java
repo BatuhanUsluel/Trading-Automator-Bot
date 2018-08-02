@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
@@ -15,6 +16,7 @@ import com.jfoenix.controls.JFXRadioButton;
 
 import application.Exchanges;
 import application.FxDialogs;
+import application.Main;
 import application.SocketCommunication;
 import application.TrailingStop;
 import javafx.event.ActionEvent;
@@ -48,8 +50,8 @@ public void initialize(){
 		String exchange = "";
 		StringBuilder stringBuilder = new StringBuilder();
 		JSONObject trailingStop = new JSONObject();
-    	String base = TStopBase.getText();
-    	String alt = TStopAlt.getText();
+    	String base = TStopBase.getText().toUpperCase();
+    	String alt = TStopAlt.getText().toUpperCase();
     	String volume = TStopVolume.getText();
     	String trail = TStopTrail.getText();
     	String buysell = ((RadioButton) TStopToggleBS.getSelectedToggle()).getText();
@@ -100,7 +102,7 @@ public void initialize(){
 		    	trailingstopclass.runOrder(trailingStop);
 		    	TrailingStopMap.put(trailingStop, trailingstopclass);
 			} else {
-				System.out.println("Not running order");
+				Main.logger.log(Level.INFO, "Trailing stop has been canceled from dialog");
 			}
 		} else {
 	    	String finalString = stringBuilder.toString();
@@ -114,6 +116,7 @@ public void initialize(){
 				if (key.getInt("orderid") == Integer.parseInt(orderid)) {
 					TrailingStop value = entry.getValue();
 					value.stopOrder();
+					Main.logger.log(Level.INFO, "Stopped trailing stop");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

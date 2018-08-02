@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +46,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import application.Exchanges;
+import application.Main;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -115,10 +117,9 @@ public class PortifolioController {
 			    br.close();
 			}
 		} catch (FileNotFoundException e) {
-			
+			Main.logger.log(Level.SEVERE, "cmc file not found");
 		}
 
-		System.out.println("everything" + everything + ".");
 		if (!everything.isEmpty()) {
 			jsonObject = new JsonParser().parse(everything).getAsJsonObject();
 			JsonObject metadata = jsonObject.get("metadata").getAsJsonObject();
@@ -474,7 +475,7 @@ public class PortifolioController {
         }.start();
 	}
 	private JsonObject getCmcListings() throws IOException {
-		System.out.println("getting cmc");
+		Main.logger.log(Level.INFO, "Getting listings from cmc");
 		URL url = new URL("https://api.coinmarketcap.com/v2/listings/");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setDoOutput(true);

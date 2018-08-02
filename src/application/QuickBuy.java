@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.logging.Level;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -26,7 +27,6 @@ public class QuickBuy {
 	static HashMap<java.lang.Integer, Person> hmap = new HashMap<java.lang.Integer, Person>();
 	private static List<JsonObject> myList = new ArrayList<>();
 	public static void recievedQuickBuyMessage(JSONObject message) throws JSONException, IOException {
-		System.out.println("Recieved quickbuy");
 		System.out.println(myList.toString());
 		for (int i = 0; i < myList.size(); i++) {
 			JsonObject listitem = myList.get(i);
@@ -48,10 +48,15 @@ public class QuickBuy {
 				System.out.println(buyprice);
 				double altvolume = btcvolume/buyprice;
 				LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN));
-				person.addOrderData("Placing buy order for " + btcvolume + (listitem.getString("base")) + "(" + new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN) + (listitem.getString("alt")) + ") @ price: " + new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN) + "\n");
-				person.addOrderData(BuyingOrder.toString());
 				if (btcvolume>0.0001) {
+					person.addOrderData("Placing buy order for " + btcvolume + (listitem.getString("base")) + "(" + new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN) + (listitem.getString("alt")) + ") @ price: " + new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN) + "\n");
+					person.addOrderData(BuyingOrder.toString());
+					FxDialogs.showInformation(null, "Order Placed");
+					Main.logger.log(Level.INFO, "Placed quick buy order");
 					String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+				} else {
+					FxDialogs.showInformation(null, "BTC Volume too low(below 0.0001). Unable to place order");
+					Main.logger.log(Level.WARNING, "QuickBuy: BTC Volume too low(below 0.0001). Unable to place order");
 				}
 			} else {
 				System.out.println("Values don't match!!");
