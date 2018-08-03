@@ -552,7 +552,11 @@ public class BacktestController {
         return chartTimeSeries;
 }
     private static Indicator createindicator(Person row, String indicatorname, Object[] parameters, TimeSeries series, ClosePriceIndicator closeprice) {
-		int i = 0;
+		System.out.println(indicatorname);
+    	if (indicatorname.equals("ClosePriceIndicator")) {
+			return (Indicator) closeprice;
+		}
+    	int i = 0;
 		System.out.println(series);
 		String[] requiredparam = IndicatorMaps.indicatorparameters.get(indicatorname);
 		for (String x : requiredparam) {
@@ -884,6 +888,18 @@ public class BacktestController {
     public void createFormGUI(Person person, int i, String code) {
 
     	if (code=="Select") {
+    		return;
+    	}
+    	System.out.println("Code" + code);
+    	if (code=="CP") {
+    		System.out.println("CPPP");
+    		if (i==1) {
+    			person.setIndic1Param(new Object[0]);
+    			person.setIndicator1(code);
+    		} else if (i==2) {
+    			person.setIndic2Param(new Object[0]);
+    			person.setIndicator2(code);
+    		}
     		return;
     	}
     	String indicstring = Indicators.getByCode(code).toString();

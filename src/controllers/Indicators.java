@@ -3,7 +3,12 @@ package controllers;
 public enum Indicators {
 	 
 		Select("Select","Select")
-		,AccelerationDecelerationIndicator("Accel", "AccelerationDecelerationIndicator")
+		, SMAIndicator("SMA", "SMAIndicator")
+		, MACDIndicator("MACD", "MACDIndicator")
+		, EMAIndicator("EMA", "EMAIndicator")
+		, ClosePriceIndicator("CP","ClosePriceIndicator")
+		, VWAPIndicator("VWAP", "VWAPIndicator")
+		, AccelerationDecelerationIndicator("Accel", "AccelerationDecelerationIndicator")
 		, AroonDownIndicator("AroonDown", "AroonDownIndicator")
 		, AroonOscillatorIndicator("AroonOscil","AroonOscillatorIndicator")
 		, AroonUpIndicator("ArronUp", "AroonUpIndicator")
@@ -15,11 +20,9 @@ public enum Indicators {
 		, CoppockCurveIndicator("CoCI", "CoppockCurveIndicator")
 		, DoubleEMAIndicator("DEI", "DoubleEMAIndicator")
 		, DPOIndicator("DPO", "DPOIndicator")
-		, EMAIndicator("EMA", "EMAIndicator")
 		, FisherIndicator("FI", "FisherIndicator")
 		, HMAIndicator("HMA", "HMAIndicator")
 		, KAMAIndicator("KAMA", "KAMAIndicator")
-		, MACDIndicator("MACD", "MACDIndicator")
 		, ParabolicSarIndicator("PSI", "ParabolicSarIndicator")
 		, PPOIndicator("PPO", "PPOIndicator")
 		, RandomWalkIndexHighIndicator("RWIHI", "RandomWalkIndexHighIndicator")
@@ -27,7 +30,6 @@ public enum Indicators {
 		, RAVIIndicator("RAVI", "RAVIIndicator")
 		, ROCIndicator("ROCI", "ROCIndicator")
 		, RSIIndicator("RSI", "RSIIndicator")
-		, SMAIndicator("SMA", "SMAIndicator")
 		, StochasticOscillatorDIndicator("SODI", "StochasticOscillatorDIndicator")
 		, StochasticOscillatorKIndicator("SOKI", "StochasticOscillatorKIndicator")
 		, StochasticRSIIndicator("SRI", "StochasticRSIIndicator")
@@ -73,8 +75,8 @@ public enum Indicators {
 		, NVIIndicator("NVI", "NVIIndicator")
 		, OnBalanceVolumeIndicator("OBVI", "OnBalanceVolumeIndicator")
 		, PVIIndicator("PVI", "PVIIndicator")
-		, ROCVIndicator("ROCV", "ROCVIndicator")
-		, VWAPIndicator("VWAP", "VWAPIndicator");
+		, ROCVIndicator("ROCV", "ROCVIndicator");
+		
 	   private String code;
 	   private String text;
 	 
