@@ -30,6 +30,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.Marker;
@@ -435,49 +436,59 @@ public class BacktestController {
 		Date startdate = new Date(Long.parseLong(returned.getJSONArray(0).get(0).toString()));
 	    int retlen = returned.length();
 	    Date enddate = new Date(Long.parseLong(returned.getJSONArray(retlen-1).get(0).toString()));
-		
+	    DateAxis domainAxis = new DateAxis("Date");
+	    domainAxis.setRange(startdate, enddate);
+	    domainAxis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
 	    
-	    //CHART
-	    
-		//Add indicators to chart
-	    ArrayList<String> usedindicators = new ArrayList();
-		TimeSeriesCollection dataset = new TimeSeriesCollection();
+	    //CHART    
+		TimeSeriesCollection indicatordataset = new TimeSeriesCollection();
+		OHLCDataset ohlcdataset = new DefaultHighLowDataset( exchange  + " - "+ base + "/" + alt, dates, highs, lows, opens, closes, volumes);
+
 		
+        ArrayList<XYPlot> oscilators = new ArrayList();
 		for (Person exitrow : Backdataexit) {
 			Indicator indic1 = (Indicator) exitrow.getfirstindicator();
 			Indicator indic2 = (Indicator) exitrow.getsecondindicator();
-			dataset.addSeries(buildChartTimeSeries(series, indic1, indic1.toString()));
-			dataset.addSeries(buildChartTimeSeries(series, indic2, indic2.toString()));
+			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset);
+			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset);
 		}
 		
 		for (Person entryrow : Backdataentry) {
-			Indicator indic1 = (Indicator) entryrow.getfirstindicator();		
+			Indicator indic1 = (Indicator) entryrow.getfirstindicator();
 			Indicator indic2 = (Indicator) entryrow.getsecondindicator();
-			dataset.addSeries(buildChartTimeSeries(series, indic1, indic1.toString()));
-			dataset.addSeries(buildChartTimeSeries(series, indic2, indic2.toString()));
+			boolean added=false;
+			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset);
+			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset);
 		}
-		
-		//Add OHLC to chart
-		OHLCDataset dataset2 = new DefaultHighLowDataset( exchange  + " - "+ base + "/" + alt, dates, highs, lows, opens, closes, volumes);
-		
-		//Create chart
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                "Backtesting Chart", // title
-                "Date", // x-axis label
-                "Price", // y-axis label
-                dataset2, // data
-                true, // create legend?
-                true, // generate tooltips?
-                false // generate URLs?
-                );
+
+        // Candlestick rendering
+        CandlestickRenderer renderer = new CandlestickRenderer();
+        renderer.setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_SMALLEST);
+        NumberAxis priceAxis= new NumberAxis("Price");
+        priceAxis.setAutoRangeIncludesZero(false);
+        XYPlot XYPlotCandleStick = new XYPlot(ohlcdataset, domainAxis, priceAxis, renderer);
         
-        XYPlot plot = (XYPlot) chart.getPlot();
-        DateAxis axis = (DateAxis) plot.getDomainAxis();
-        
-        //Configure Axis
-        axis.setRange(startdate, enddate);
-        axis.setDateFormatOverride(new SimpleDateFormat("MM-dd HH:mm"));
-        
+        //Indicator Dataset
+        int index = 1; 
+        XYPlotCandleStick.setDataset(index, indicatordataset); 
+        XYPlotCandleStick.mapDatasetToRangeAxis(index, 0); 
+        XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer(true, false); 
+        renderer2.setSeriesPaint(index, java.awt.Color.BLUE); 
+        XYPlotCandleStick.setRenderer(index, renderer2);
+
+        //Build Combined Plot
+        CombinedDomainXYPlot mainPlot = new CombinedDomainXYPlot(domainAxis);
+        mainPlot.add(XYPlotCandleStick,90);
+
+        for (XYPlot plot : oscilators) {
+        	 System.out.println("adding oscilator");
+        	 mainPlot.add(plot,20);
+        }
+       // double lowestLow = getLowestLow(lows);
+        //double highestHigh = getHighestHigh(highs);
+        JFreeChart finalchart = new JFreeChart("Test", null, mainPlot, true);
+        XYPlot plot = (XYPlot) finalchart.getPlot();
+        //finalchart.getXYPlot().getRangeAxis().setRange(lowestLow*0.95, highestHigh*1.05);
         //Add buy & sell trades to chart
         for (Trade trade : tradingRecord.getTrades()) {
         	System.out.println(trade.toString());
@@ -519,8 +530,9 @@ public class BacktestController {
         panel.setMouseWheelEnabled(true);
         panel.setPreferredSize(new Dimension(1024, 400));
         ChartViewer viewer = new ChartViewer(chart);
+        ChartViewer viewer = new ChartViewer(finalchart);
         
-        BacktestController.chart=chart;
+        BacktestController.chart=finalchart;
         BacktestController.viewer=viewer;
         Platform.runLater(new Runnable() {
             public void run() {
@@ -543,7 +555,41 @@ public class BacktestController {
 		
     }
 
-    private static org.jfree.data.time.TimeSeries buildChartTimeSeries(TimeSeries tickSeries, Indicator<Decimal> indicator, String name) {
+    private static void addindicatortochart(Indicator indic1, ArrayList<XYPlot> oscilators, double[] closes, DateAxis domainAxis, TimeSeriesCollection indicatordataset) {
+    	boolean added = false;
+    	for (int i=0;i<closes.length-1 && i<10;i++) {
+			if (!added) {
+			Decimal close = Decimal.valueOf(closes[i]);
+			System.out.println(close.toString());
+			Object indicvalue = indic1.getValue(i);
+			System.out.println(indicvalue.getClass());
+			if (indicvalue.getClass()==Decimal.class) {
+				System.out.println("decimall");
+				Decimal indicvalued = (Decimal) indicvalue;
+				if (close.multipliedBy(2).isLessThan(indicvalued) || close.multipliedBy(0.5).isGreaterThan(indicvalued)) {
+					added=true;
+					System.out.println("indicator entry1 IS oscilator");
+					XYLineAndShapeRenderer rendereroscilator = new XYLineAndShapeRenderer(true, false);
+					TimeSeriesCollection oscilatordata = new TimeSeriesCollection(buildChartTimeSeries(series, indic1, indic1.toString()));
+					NumberAxis numberaxis = new NumberAxis(indic1.toString());
+					XYPlot oscilatorPlot = new XYPlot(oscilatordata, domainAxis, numberaxis, rendereroscilator);
+					oscilators.add(oscilatorPlot);
+				} else {
+					System.out.println("indicator entry1 NOT oscilator");
+				}
+			} else {
+				System.out.println("not decimal");
+			}
+			} else {
+				System.out.println("already added");
+			}
+		}
+		if (!added) {
+			indicatordataset.addSeries(buildChartTimeSeries(series, indic1, indic1.toString()));
+		}
+	}
+
+	private static org.jfree.data.time.TimeSeries buildChartTimeSeries(TimeSeries tickSeries, Indicator<Decimal> indicator, String name) {
         org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
         for (int i = 0; i < tickSeries.getBarCount(); i++) {
         	Bar tick = tickSeries.getBar(i);
@@ -1066,4 +1112,27 @@ public class BacktestController {
 		Person selectedItem = BackExitTable.getSelectionModel().getSelectedItem();
 		BackExitTable.getItems().remove(selectedItem);
 	}
+	
+	private static double getLowestLow(double[] lows){
+	    double lowest;
+	    lowest = lows[0];
+	    for(int i=1;i<lows.length-1;i++){
+	        if(lows[i] < lowest){
+	            lowest = lows[i];
+	        }
+	    }
+	    return lowest;
+	}
+
+	private static double getHighestHigh(double[] highs){
+	    double highest;
+	    highest = highs[0];
+	    for(int i=1;i<highs.length-1;i++){
+	        if(highs[i] < highest){
+	        	highest = highs[i];
+	        }
+	    }
+	    return highest;
+	}
+	
 }

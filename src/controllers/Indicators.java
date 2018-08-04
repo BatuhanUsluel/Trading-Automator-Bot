@@ -7,6 +7,8 @@ public enum Indicators {
 		, MACDIndicator("MACD", "MACDIndicator")
 		, EMAIndicator("EMA", "EMAIndicator")
 		, ClosePriceIndicator("CP","ClosePriceIndicator")
+		, DecimalValue("Dec", "DecimalValue")
+		, BooleanValue("Bool", "BooleanValue")
 		, VWAPIndicator("VWAP", "VWAPIndicator")
 		, AccelerationDecelerationIndicator("Accel", "AccelerationDecelerationIndicator")
 		, AroonDownIndicator("AroonDown", "AroonDownIndicator")

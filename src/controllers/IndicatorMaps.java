@@ -14,6 +14,11 @@ public class IndicatorMaps {
 		timeframes.put("4h", 240);
 		timeframes.put("1d", 1440);
 		timeframes.put("1w", 10080);
+		
+		indicatorparameters.put("DecimalValue",  new String[]{"Value"});
+		indicatorparameters.put("BooleanValue",  new String[]{"True/False"});
+		
+		
 		//Indicators
 		indicatorparameters.put("AccelerationDecelerationIndicator",  new String[]{"series","timeFrameSma1" , "timeFrameSma2"});
 		indicatorparameters.put("AroonDownIndicator",  new String[]{"series","timeFrame"});
