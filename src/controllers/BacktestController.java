@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -446,21 +447,21 @@ public class BacktestController {
 		TimeSeriesCollection indicatordataset = new TimeSeriesCollection();
 		OHLCDataset ohlcdataset = new DefaultHighLowDataset( exchange  + " - "+ base + "/" + alt, dates, highs, lows, opens, closes, volumes);
 
-		
+		HashMap<String, Object[]> usedindicators = new HashMap<String, Object[]>();
         ArrayList<XYPlot> oscilators = new ArrayList();
 		for (Person exitrow : Backdataexit) {
 			Indicator indic1 = (Indicator) exitrow.getfirstindicator();
 			Indicator indic2 = (Indicator) exitrow.getsecondindicator();
-			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset, series, exitrow.getIndicator1());
-			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset, series, exitrow.getIndicator1());
+			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset, series, exitrow.getIndicator1(), exitrow.getIndic1Param(), usedindicators);
+			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset, series, exitrow.getIndicator2(), exitrow.getIndic2Param(), usedindicators);
 		}
 		
 		for (Person entryrow : Backdataentry) {
 			Indicator indic1 = (Indicator) entryrow.getfirstindicator();
 			Indicator indic2 = (Indicator) entryrow.getsecondindicator();
 			boolean added=false;
-			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset, series, entryrow.getIndicator1());
-			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset, series,  entryrow.getIndicator1());
+			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset, series, entryrow.getIndicator1(), entryrow.getIndic1Param(), usedindicators);
+			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset, series,  entryrow.getIndicator2(), entryrow.getIndic2Param(), usedindicators);
 		}
 
         // Candlestick rendering
@@ -489,7 +490,7 @@ public class BacktestController {
        // double lowestLow = getLowestLow(lows);
         //double highestHigh = getHighestHigh(highs);
         JFreeChart finalchart = new JFreeChart("Backtesting Chart", null, mainPlot, true);
-        XYPlot plot = (XYPlot) finalchart.getPlot();
+        XYPlot plot = XYPlotCandleStick;
         //finalchart.getXYPlot().getRangeAxis().setRange(lowestLow*0.95, highestHigh*1.05);
         //Add buy & sell trades to chart
         for (Trade trade : tradingRecord.getTrades()) {
@@ -541,9 +542,28 @@ public class BacktestController {
         BacktestController.tradingRecord=tradingRecord;
     }
 
-    private static void addindicatortochart(Indicator indic1, ArrayList<XYPlot> oscilators, double[] closes, DateAxis domainAxis, TimeSeriesCollection indicatordataset, TimeSeries series, String indicatorcode) {
+    private static void addindicatortochart(Indicator indic1, ArrayList<XYPlot> oscilators, double[] closes, DateAxis domainAxis, TimeSeriesCollection indicatordataset, TimeSeries series, String indicatorcode, Object[] parameters, HashMap<String, Object[]> usedindicators) {
     	System.out.println("indiccode: " + indicatorcode);
     	if (indicatorcode.equals("Dec")) {
+    		return;
+    	}
+    	boolean allequals=false;
+    	System.out.println("checking contains");
+    	if (usedindicators.containsKey(indicatorcode)) {
+    		System.out.println("contains indicaator");
+    		allequals=true;
+    		int x = 0;
+    		for (Object object : usedindicators.get(indicatorcode)) {
+    			System.out.println("looping");
+    			if (!parameters[x].equals(object)) {
+    				System.out.println("not equal");
+    				allequals=false;
+    			}
+    			x++;
+    		}
+    	}
+    	if (allequals==true) {
+    		System.out.println("all equals");
     		return;
     	}
     	boolean added = false;
@@ -565,6 +585,7 @@ public class BacktestController {
 					numberaxis.setAutoRangeIncludesZero(false);
 					XYPlot oscilatorPlot = new XYPlot(oscilatordata, domainAxis, numberaxis, rendereroscilator);
 					oscilators.add(oscilatorPlot);
+					usedindicators.put(indicatorcode, parameters);
 				} else {
 					System.out.println("indicator entry1 NOT oscilator");
 				}
@@ -577,6 +598,7 @@ public class BacktestController {
 		}
 		if (!added) {
 			indicatordataset.addSeries(buildChartTimeSeries(series, indic1, indic1.toString()));
+			usedindicators.put(indicatorcode, parameters);
 		}
 	}
 
