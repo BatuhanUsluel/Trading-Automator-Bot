@@ -68,6 +68,7 @@ import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.analysis.criteria.VersusBuyAndHoldCriterion;
 import org.ta4j.core.indicators.StochasticOscillatorKIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.indicators.helpers.ConstantIndicator;
 import org.ta4j.core.indicators.helpers.MedianPriceIndicator;
 import org.ta4j.core.trading.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule;
@@ -324,7 +325,8 @@ public class BacktestController {
     		String indicatorname1 = Indicators.getByCode(entryrow.getIndicator1()).toString();
     		Object[] parameters1 = entryrow.getIndic1Param();
     		Indicator indicator = createindicator(entryrow, indicatorname1, parameters1, series, closeprice);
-            entryrow.setfirstindicator(indicator);
+    		entryrow.setfirstindicator(indicator);
+            
     		//2
     		String indicatorname2 =Indicators.getByCode(entryrow.getIndicator2()).toString();
     		Object[] parameters2 = entryrow.getIndic2Param();
@@ -449,16 +451,16 @@ public class BacktestController {
 		for (Person exitrow : Backdataexit) {
 			Indicator indic1 = (Indicator) exitrow.getfirstindicator();
 			Indicator indic2 = (Indicator) exitrow.getsecondindicator();
-			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset);
-			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset);
+			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset, series, exitrow.getIndicator1());
+			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset, series, exitrow.getIndicator1());
 		}
 		
 		for (Person entryrow : Backdataentry) {
 			Indicator indic1 = (Indicator) entryrow.getfirstindicator();
 			Indicator indic2 = (Indicator) entryrow.getsecondindicator();
 			boolean added=false;
-			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset);
-			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset);
+			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset, series, entryrow.getIndicator1());
+			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset, series,  entryrow.getIndicator1());
 		}
 
         // Candlestick rendering
@@ -486,7 +488,7 @@ public class BacktestController {
         }
        // double lowestLow = getLowestLow(lows);
         //double highestHigh = getHighestHigh(highs);
-        JFreeChart finalchart = new JFreeChart("Test", null, mainPlot, true);
+        JFreeChart finalchart = new JFreeChart("Backtesting Chart", null, mainPlot, true);
         XYPlot plot = (XYPlot) finalchart.getPlot();
         //finalchart.getXYPlot().getRangeAxis().setRange(lowestLow*0.95, highestHigh*1.05);
         //Add buy & sell trades to chart
@@ -510,26 +512,11 @@ public class BacktestController {
             plot.addDomainMarker(sellMarker);
         }
         
-        // Candlestick rendering
-        CandlestickRenderer renderer = new CandlestickRenderer();
-        renderer.setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_SMALLEST);
-        XYPlot plot2 = chart.getXYPlot();
-        plot2.setRenderer(renderer);
-        
-        // Additional dataset 
-        int index = 1; 
-        plot.setDataset(index, dataset); 
-        plot.mapDatasetToRangeAxis(index, 0); 
-        XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer(true, false); 
-        renderer2.setSeriesPaint(index, java.awt.Color.BLUE); 
-        plot.setRenderer(index, renderer2);
-        
         // Chart panel
-        ChartPanel panel = new ChartPanel(chart);
+        ChartPanel panel = new ChartPanel(finalchart);
         panel.setFillZoomRectangle(true);
         panel.setMouseWheelEnabled(true);
         panel.setPreferredSize(new Dimension(1024, 400));
-        ChartViewer viewer = new ChartViewer(chart);
         ChartViewer viewer = new ChartViewer(finalchart);
         
         BacktestController.chart=finalchart;
@@ -552,10 +539,13 @@ public class BacktestController {
         }});
         BacktestController.series=series;
         BacktestController.tradingRecord=tradingRecord;
-		
     }
 
-    private static void addindicatortochart(Indicator indic1, ArrayList<XYPlot> oscilators, double[] closes, DateAxis domainAxis, TimeSeriesCollection indicatordataset) {
+    private static void addindicatortochart(Indicator indic1, ArrayList<XYPlot> oscilators, double[] closes, DateAxis domainAxis, TimeSeriesCollection indicatordataset, TimeSeries series, String indicatorcode) {
+    	System.out.println("indiccode: " + indicatorcode);
+    	if (indicatorcode.equals("Dec")) {
+    		return;
+    	}
     	boolean added = false;
     	for (int i=0;i<closes.length-1 && i<10;i++) {
 			if (!added) {
@@ -572,6 +562,7 @@ public class BacktestController {
 					XYLineAndShapeRenderer rendereroscilator = new XYLineAndShapeRenderer(true, false);
 					TimeSeriesCollection oscilatordata = new TimeSeriesCollection(buildChartTimeSeries(series, indic1, indic1.toString()));
 					NumberAxis numberaxis = new NumberAxis(indic1.toString());
+					numberaxis.setAutoRangeIncludesZero(false);
 					XYPlot oscilatorPlot = new XYPlot(oscilatordata, domainAxis, numberaxis, rendereroscilator);
 					oscilators.add(oscilatorPlot);
 				} else {
@@ -602,6 +593,9 @@ public class BacktestController {
     	if (indicatorname.equals("ClosePriceIndicator")) {
 			return (Indicator) closeprice;
 		}
+    	if (indicatorname.equals("DecimalValue")) {
+    		 return (new ConstantIndicator<Decimal>((Decimal) parameters[0]));
+    	}
     	int i = 0;
 		System.out.println(series);
 		String[] requiredparam = IndicatorMaps.indicatorparameters.get(indicatorname);
@@ -932,13 +926,11 @@ public class BacktestController {
     }
     
     public void createFormGUI(Person person, int i, String code) {
-
     	if (code=="Select") {
     		return;
     	}
     	System.out.println("Code" + code);
     	if (code=="CP") {
-    		System.out.println("CPPP");
     		if (i==1) {
     			person.setIndic1Param(new Object[0]);
     			person.setIndicator1(code);
@@ -996,7 +988,7 @@ public class BacktestController {
     					noerror=false;
     				} else {
     					//Also have if/else to parse some inputs into decimal.
-    					if (IndicatorMaps.indicatorparameters.get(indicstring)[x].matches("K multiplier|alpha|beta|Acceleration factor|Max Acceleration|Acceleration Increment")) {
+    					if (IndicatorMaps.indicatorparameters.get(indicstring)[x].matches("K multiplier|alpha|beta|Acceleration factor|Max Acceleration|Acceleration Increment|Value")) {
     						parameters[x] = Decimal.valueOf(stringtext);
     					} else {
     					parameters[x] = Integer.valueOf(stringtext);
