@@ -88,8 +88,7 @@ public class DashboardController {
         
         TableColumn<Person, String> actionCol = new TableColumn<Person, String>("Action");
         Callback<TableColumn<Person, String>, TableCell<Person, String>> cellFactory
-                = //
-                new Callback<TableColumn<Person, String>, TableCell<Person, String>>() {
+                = new Callback<TableColumn<Person, String>, TableCell<Person, String>>() {
             @Override
             public TableCell<Person, String> call(final TableColumn<Person, String> param) {
                 final TableCell<Person, String> cell = new TableCell<Person, String>() {

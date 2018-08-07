@@ -26,6 +26,7 @@ public class RemoveOrder {
 			ArbitrageController.cancelArbitrageOrder(person.getOrderID());
 		} else if(ordertype.equals("livetrading")) {
 			LiveController.cancelLiveOrder(person.getOrderID());
+			//LiveController.show
 		}
 	}
 }

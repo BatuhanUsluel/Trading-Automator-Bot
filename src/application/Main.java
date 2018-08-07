@@ -40,40 +40,7 @@ public class Main extends Application {
 	        primaryStage.show();
 	        primaryStage.setResizable(false);
 	        Main.primaryStage = primaryStage;
-	        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-	            @Override
-	            public void handle(WindowEvent event) {
-	            	System.out.println("Closing2");
-	            	File licencetxtfile = new File("licencekey.txt");
-		    		File exchangetxtfile = new File("exchanges.txt");
-		    		File licencekeyencrypted = new File("licencekey.encrypted");
-		    		File exchangesencrypted = new File("exchanges.encrypted");
-		    		System.out.println("Pass: " + Controller.pass);
-		    		if (Controller.fileProcessor(Cipher.ENCRYPT_MODE, Controller.pass, licencetxtfile, licencekeyencrypted, 1)) {
-		    			Main.logger.log(Level.INFO, "Successfully encrypted licencekey into licencekey.encrypted");
-		    			if (licencetxtfile.delete()) {
-		    				Main.logger.log(Level.INFO, "Successfully deleted licencekey.txt");
-		    			} else {
-		    				Main.logger.log(Level.SEVERE, "Unable to delete licencekey.txt. Could be caused by the file being used");
-		    			}
-		    		} else {
-		    			Main.logger.log(Level.SEVERE, "Unable to encrypt licencekey.txt. Skipping deletion of licencekey.txt");
-		    		}
-		        	if (Controller.fileProcessor(Cipher.ENCRYPT_MODE, Controller.pass, exchangetxtfile, exchangesencrypted, 1)) {
-		        		Main.logger.log(Level.INFO, "Successfully encrypted exchanges.txt into exchanges.encrypted");
-		    			if (exchangetxtfile.delete()) {
-		    				Main.logger.log(Level.INFO, "Successfully deleted exchanges.txt");
-		    			} else {
-		    				Main.logger.log(Level.SEVERE, "Unable to delete exchanges.txt. Could be caused by the file being used");
-		    			}
-		        	} else {
-		        		Main.logger.log(Level.SEVERE, "Unable to encrypt exchanges.txt. Skipping deletion of exchanges.txt");
-		        	}
-		        	Main.logger.log(Level.INFO, "---------------------------------------------------------------------");
-		        	 Platform.exit();
-		             System.exit(0);
-	            }
-	        });
+	        
 	        Logger logger2 = Logger.getLogger(Main.class.getName());
 	        SimpleDateFormat format = new SimpleDateFormat("M-d_HH.mm.ss");
 	        FileHandler fh = new FileHandler("C:\\Users\\Batuhan Usluel\\Desktop\\LogFile_" + format.format(Calendar.getInstance().getTime()) + ".log");
