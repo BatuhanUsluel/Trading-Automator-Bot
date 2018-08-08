@@ -39,7 +39,7 @@ public class ShowInfo {
 		} else if(ordertype.equals("arbitrage")) {
 			showSpecificInfo(person.getOrderData());
 		} else if(ordertype.equals("livetrading")) {
-			//LiveController.showMenu(person.getOrderID());
+			LiveController.showMenu(person.getOrderID());
 		}
 	}
 

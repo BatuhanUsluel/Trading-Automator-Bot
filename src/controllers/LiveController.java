@@ -575,8 +575,7 @@ public class LiveController {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
-	}
+		}
 	}
 	@FXML
 	void saveStrategy(ActionEvent event) throws IOException, ClassNotFoundException  {
@@ -653,5 +652,19 @@ public class LiveController {
 	void removeExitRow(ActionEvent event) {
 		Person selectedItem = ExitTable.getSelectionModel().getSelectedItem();
 		ExitTable.getItems().remove(selectedItem);
+	}
+
+	public static void showMenu(String orderID) {
+		for (Map.Entry<Integer, LiveTrading> entry : LiveTradingMap.entrySet()) {
+		    int key = entry.getKey();
+			try {
+				if (key == Integer.parseInt(orderID)) {
+					LiveTrading value = entry.getValue();
+					value.showInfo();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

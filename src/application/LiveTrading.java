@@ -94,6 +94,8 @@ public class LiveTrading implements Runnable {
 	private int maxtimeframe=0;
 	private sTime STime;
 	private double volume;
+	private List<Bar> Bars;
+	private ArrayList<Bar> ticksarray;
 	public static TimeSeries series;
 	public static TradingRecord tradingRecord;
 	public LiveTrading(JSONObject json, ObservableList<Person> dataentry, ObservableList<Person> dataexit) throws JSONException {
@@ -223,16 +225,17 @@ public class LiveTrading implements Runnable {
 	public void recievedPreviousPrices(JSONObject jsonmessage) {
 		JSONArray returned = jsonmessage.getJSONArray("Return");
 		int lenght = returned.length();
-		Bar[] ticksarray = new Bar[lenght-1];
+		ArrayList<Bar> ticksarray = new ArrayList<Bar>();
+		//Bar[] ticksarray = new Bar[lenght-1];
 		Date date = new Date(Long.valueOf(returned.getJSONArray(0).getInt(0)));
     	ZonedDateTime endTime = date.toInstant().atZone(ZoneOffset.UTC);
     	int multiplier = IndicatorMaps.timeframes.get(timeframe);
     	for (int x=0;x<lenght-1;x++) {
     		JSONArray ohlcv = returned.getJSONArray(x);
-    		ticksarray[x] = (new BaseBar(endTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
+    		ticksarray.add(new BaseBar(endTime.plusMinutes(x*multiplier), (double) ohlcv.get(1), (double) ohlcv.get(2), (double) ohlcv.get(3), (double) ohlcv.get(4), (double) ohlcv.get(5)));
     	}
-    	List<Bar> Bars = Arrays.asList(ticksarray);
-    	TimeSeries series = new BaseTimeSeries("series",Bars);
+    	this.ticksarray = ticksarray;
+    	TimeSeries series = new BaseTimeSeries("series",ticksarray);
     	this.series=series;
     	
     	ClosePriceIndicator closeprice = new ClosePriceIndicator(series);
@@ -408,7 +411,8 @@ public class LiveTrading implements Runnable {
     			+ "\nLow: " + low.toString()
     			+ "\nClose: " + close.toString()
     			+ "\nVolume " + volume.toString());
-    	Bar bar = new BaseBar(time, (double) open, (double) high, (double) low, (double) close, (double) volume);
+    	int multiplier = IndicatorMaps.timeframes.get(timeframe);
+    	Bar bar = new BaseBar(time.plusMinutes(multiplier), (double) open, (double) high, (double) low, (double) close, (double) volume);
     	System.out.println("\nRecieved Price"
     			+ "\nCandle Start Time: " + time.toString()
     			+ "\nOpen: " + open.toString()
@@ -417,10 +421,8 @@ public class LiveTrading implements Runnable {
     			+ "\nClose: " + close.toString()
     			+ "\nVolume " + volume.toString());
     	System.out.println(bar.toString());
-    	TimeSeries tempseries = series;
-    	//tempseries.set
-    	tempseries.addBar(bar);
-    	series = tempseries;
+    	ticksarray.add(bar);
+    	series = new BaseTimeSeries("series",ticksarray);
 		int endIndex = series.getEndIndex();
 		if (tradingstrategy.shouldEnter(endIndex)) {
 			System.out.println("Strategy should ENTER on " + endIndex);
@@ -541,8 +543,6 @@ public class LiveTrading implements Runnable {
 	    Date enddate = Date.from(series.getLastBar().getEndTime().toInstant());
 	    DateAxis domainAxis = new DateAxis("Date");
 	    domainAxis.setRange(startdate, enddate);
-	    
-
         
 		for (Person exitrow : dataexit) {
 			Indicator indic1 = (Indicator) exitrow.getfirstindicator();
@@ -702,5 +702,10 @@ public class LiveTrading implements Runnable {
 	        }
 	        return chartTimeSeries;
 	}
+
+		public void showInfo() {
+			//Create the new 
+			
+		}
 	
 }
