@@ -3,6 +3,7 @@ import sys
 import time
 from threading import Thread
 import threading
+import hashlib
 import errno
 import ccxt
 import json

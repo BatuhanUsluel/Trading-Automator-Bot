@@ -16,6 +16,7 @@ import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
 import application.FxDialogs;
 import application.RemoveOrder;
+import application.ShowInfo;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -105,7 +106,6 @@ public class DashboardController {
                                 Person person = getTableView().getItems().get(getIndex());
                                 System.out.println(person.getRunning());
                                 if(!person.getRunning().equals("False")) {
-	                                person.setRunning("False");
 	                                long millis = System.currentTimeMillis();
 	                            	Date date = new Date(millis);
 	                            	SimpleDateFormat format = new SimpleDateFormat("dd/MM hh:mm:ss", Locale.US);
@@ -135,11 +135,52 @@ public class DashboardController {
             }
         };
         actionCol.setCellFactory(cellFactory);
+        
+        TableColumn<Person, String> infoCol = new TableColumn<Person, String>("Info");
+        Callback<TableColumn<Person, String>, TableCell<Person, String>> infoCellFactory
+                = new Callback<TableColumn<Person, String>, TableCell<Person, String>>() {
+            @Override
+            public TableCell<Person, String> call(final TableColumn<Person, String> param) {
+                final TableCell<Person, String> cell = new TableCell<Person, String>() {
+                    final Button btn = new Button("info");
+                    @Override
+                   
+                    public void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                            setText(null);
+                        } else {
+                            btn.setOnAction(event -> {
+                                Person person = getTableView().getItems().get(getIndex());
+                                System.out.println(person.getRunning());
+	                                System.out.println(person.getOrderID());
+	                                btn.setVisible(false);
+	                                try {
+										ShowInfo.showInfo(person);
+								    	//filter.executeFilter();
+								    	//filter = new TableFilter<Person>(tableView);
+								    	tableView.refresh();
+									} catch (JSONException e) {
+										e.printStackTrace();
+									}
+                            });
+                            setGraphic(btn);
+                            setText(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+        infoCol.setCellFactory(infoCellFactory);
+        
+        
         System.out.println("TABLE30!");
         String css = this.getClass().getResource("/assets/tableview.css").toExternalForm();
         tableView.getStylesheets().setAll(css);
         tableView.setItems(data);
-        tableView.getColumns().addAll(OrderTypeCol,actionCol, BasePairCol, AltPairCol,ExchangesCol,StartTimeCol,RunningCol,EndTimeCol,OrderIDCol);
+        tableView.getColumns().addAll(OrderTypeCol,actionCol, infoCol, BasePairCol, AltPairCol,ExchangesCol,StartTimeCol,RunningCol,EndTimeCol,OrderIDCol);
         TextArea textArea = new TextArea();
 	   	pane.setMasterNode(tableView);
 	   	pane.setDetailNode(textArea);

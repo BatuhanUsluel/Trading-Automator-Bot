@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.*;
@@ -31,7 +32,7 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
-		try {		
+		try {	   
 	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Sample.fxml"));
 	        AnchorPane rootLayout = loader.load();
 	        Scene scene = new Scene(rootLayout);

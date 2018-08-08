@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="borderpane" prefHeight="650.0" prefWidth="920.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LiveTradingShowMenu">
+   <center>
+      <AnchorPane fx:id="anchorpane" prefHeight="650.0" prefWidth="925.0" BorderPane.alignment="CENTER" />
+   </center>
+   <bottom>
+      <AnchorPane prefHeight="118.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" BorderPane.alignment="CENTER">
+         <children>
+            <VBox layoutY="4.0" prefHeight="128.0" prefWidth="920.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <HBox fx:id="hbox1" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="tpl" text="Total Profit:" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="tp" prefHeight="31.0" prefWidth="65.0" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="ntl" text="No. of Trades:" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="nt" prefHeight="31.0" prefWidth="52.0" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="ptrl" text="Profitable Trades Ratio:" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="ptr" prefHeight="31.0" prefWidth="65.0" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="mdl" text="Max. drawdown: " textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="md" prefHeight="31.0" prefWidth="65.0" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox fx:id="hbox2" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="rrrl" text="Reward-risk ratio:" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="rrr" prefHeight="31.0" prefWidth="65.0" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="bhl" text="Buy-and-hold:" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="bh" prefHeight="31.0" prefWidth="65.0" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="svbhpl" text="Strategy vs buy-and-hold profit:" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="svbhp" prefHeight="31.0" prefWidth="65.0" textFill="#4adeff">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Label>
+                        <JFXButton prefHeight="57.0" prefWidth="129.0" text="Stop" textFill="#ff5353">
+                           <font>
+                              <Font size="27.0" />
+                           </font>
+                        </JFXButton>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </bottom>
+</BorderPane>

@@ -114,6 +114,7 @@ public class PendingOrder implements Runnable {
 						System.out.println(BuyingOrder.toString());
 						this.orderplaced = true;
 						person.addOrderData("Trigger Price has been hit for buy order, order has been placed!\n-------------------------------------------\n Stopping Pending Order.");
+						person.setRunning("False");
 					} else {
 						System.out.println("Trigger Price for BUY is: "+ (this.priceorder*(1+(0.01 * this.percent))) + " which is lower than current price: " + price + "\n");
 						person.addOrderData("Trigger Price is: "+ (this.priceorder*(1+(0.01*this.percent))) + ", lower than current price: " + price);
@@ -124,6 +125,7 @@ public class PendingOrder implements Runnable {
 						System.out.println(SellingOrder.toString());
 						this.orderplaced = true;
 						person.addOrderData("Trigger Price has been hit for sell order, order has been placed!\n-------------------------------------------\n Stopping Pending Order.");
+						person.setRunning("False");
 					} else {
 						System.out.println("Trigger Price for SELL is: "+ (this.priceorder*(1-this.percent)) + " which is higher than current price: " + price);
 						person.addOrderData("Trigger Price is: "+ (this.priceorder*(1-this.percent)) + ", higher than current price: " + price + "\n");

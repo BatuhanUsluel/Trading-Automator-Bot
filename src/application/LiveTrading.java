@@ -1,7 +1,11 @@
 package application;
 
+import java.awt.BasicStroke;
+import java.awt.Dimension;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,10 +14,26 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.net.ntp.TimeStamp;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
+import org.jfree.chart.plot.Marker;
+import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.CandlestickRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.time.Minute;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.xy.DefaultHighLowDataset;
+import org.jfree.data.xy.OHLCDataset;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,15 +59,22 @@ import org.ta4j.core.trading.rules.IsEqualRule;
 import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
+import controllers.BacktestController;
 import controllers.DashboardController;
 import controllers.IndicatorMaps;
 import controllers.Indicators;
 import controllers.NTPTime;
 import controllers.Person;
 import controllers.TradingRules;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 public class LiveTrading implements Runnable {
+	public static JFreeChart chart;
+	private static ChartViewer viewer;
 	private JSONObject json;
 	private controllers.DashboardController.Person person;
 	private String base;
@@ -67,8 +94,8 @@ public class LiveTrading implements Runnable {
 	private int maxtimeframe=0;
 	private sTime STime;
 	private double volume;
-	private TimeSeries series;
-	private TradingRecord tradingRecord;
+	public static TimeSeries series;
+	public static TradingRecord tradingRecord;
 	public LiveTrading(JSONObject json, ObservableList<Person> dataentry, ObservableList<Person> dataexit) throws JSONException {
 		this.json = json;
 		this.dataentry = dataentry;
@@ -93,7 +120,7 @@ public class LiveTrading implements Runnable {
 		
 		sTime STime = new sTime();
 		this.STime=STime;
-		String[] servers = new String[] {"pool.ntp.org","0.pool.ntp.org","1.pool.ntp.org","2.pool.ntp.org","3.pool.ntp.org"};
+		String[] servers = new String[] {"pool.ntp.org","0.pool.ntp.org"};
 		//String[] servers = new String[] {"pool.ntp.org","0.pool.ntp.org"};
 		TimeStamp[] timestamps = NTPTime.runNTP(servers);
 		Long totaltimestamp = 0L;
@@ -364,9 +391,11 @@ public class LiveTrading implements Runnable {
 	
 	public void recievedLiveTrading(JSONObject jsonmessage){
 		JSONArray ohlcv = jsonmessage.getJSONArray("Return").getJSONArray(0);
-		
-		Date date = new Date(Long.valueOf(ohlcv.getInt(0)));
+		System.out.println("Long: " + ohlcv.getLong(0));
+		Date date = new Date(ohlcv.getLong(0));
+		System.out.println("Date: " + date.toString());
     	ZonedDateTime time = date.toInstant().atZone(ZoneOffset.UTC);
+    	System.out.println("Zoned Date Time: " + time);
     	Object open = ohlcv.get(1);
     	Object high = ohlcv.get(2);
     	Object low = ohlcv.get(3);
@@ -380,7 +409,18 @@ public class LiveTrading implements Runnable {
     			+ "\nClose: " + close.toString()
     			+ "\nVolume " + volume.toString());
     	Bar bar = new BaseBar(time, (double) open, (double) high, (double) low, (double) close, (double) volume);
-    	series.addBar(bar);
+    	System.out.println("\nRecieved Price"
+    			+ "\nCandle Start Time: " + time.toString()
+    			+ "\nOpen: " + open.toString()
+    			+ "\nHigh: " + high.toString()
+    			+ "\nLow: " + low.toString()
+    			+ "\nClose: " + close.toString()
+    			+ "\nVolume " + volume.toString());
+    	System.out.println(bar.toString());
+    	TimeSeries tempseries = series;
+    	//tempseries.set
+    	tempseries.addBar(bar);
+    	series = tempseries;
 		int endIndex = series.getEndIndex();
 		if (tradingstrategy.shouldEnter(endIndex)) {
 			System.out.println("Strategy should ENTER on " + endIndex);
@@ -454,7 +494,7 @@ public class LiveTrading implements Runnable {
 					classes[ii] = parameters[ii].getClass();
 				}
 			}
-			Class myClass = Class.forName(IndicatorMaps.indicatorclasspaths.get(indicatorname));
+			Class myClass = Class.forName("org.ta4j.core.indicators." + IndicatorMaps.indicatorclasspaths.get(indicatorname));
 	        Constructor constructor = myClass.getDeclaredConstructor(classes);
 	        Object indicator = constructor.newInstance(parameters);
 	        System.out.println("Create  " + indicator.toString());
@@ -467,13 +507,200 @@ public class LiveTrading implements Runnable {
 	    }
 	
 	public void stopOrder() {
-		for (Trade trade : tradingRecord.getTrades()) {
-        	System.out.println(trade.toString());
-		}
 		System.out.println("cancel live order!!!");
 		person.addOrderData("\nLive Trading has been manually canceled from dashboard.\n-------------------------------------------\n Stopping");
 		this.cancled = true;
 	}
-	
+
+	public void showMenu() {
+		//CHART
+		int barcount = series.getBarCount();
+        Date[] dates = new Date[barcount];
+        double[] opens = new double[barcount];
+        double[] highs = new double[barcount];
+        double[] lows = new double[barcount];
+        double[] closes = new double[barcount];
+        double[] volumes = new double[barcount];
+        int x = 0;
+        for (Bar bar : series.getBarData()) {
+            dates[x] = new Date(bar.getEndTime().toEpochSecond() * 1000);
+            opens[x] = bar.getOpenPrice().doubleValue();
+            highs[x] = bar.getMaxPrice().doubleValue();
+            lows[x] = bar.getMinPrice().doubleValue();
+            closes[x] = bar.getClosePrice().doubleValue();
+            volumes[x] = bar.getVolume().doubleValue();
+        	x++;
+        }
+		TimeSeriesCollection indicatordataset = new TimeSeriesCollection();
+		OHLCDataset ohlcdataset = new DefaultHighLowDataset( exchange  + " - "+ base + "/" + alt, dates, highs, lows, opens, closes, volumes);
+
+		HashMap<String, Object[]> usedindicators = new HashMap<String, Object[]>();
+        ArrayList<XYPlot> oscilators = new ArrayList<XYPlot>();
+
+		Date startdate =Date.from(series.getFirstBar().getBeginTime().toInstant());
+	    Date enddate = Date.from(series.getLastBar().getEndTime().toInstant());
+	    DateAxis domainAxis = new DateAxis("Date");
+	    domainAxis.setRange(startdate, enddate);
+	    
+
+        
+		for (Person exitrow : dataexit) {
+			Indicator indic1 = (Indicator) exitrow.getfirstindicator();
+			Indicator indic2 = (Indicator) exitrow.getsecondindicator();
+			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset, series, exitrow.getIndicator1(), exitrow.getIndic1Param(), usedindicators);
+			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset, series, exitrow.getIndicator2(), exitrow.getIndic2Param(), usedindicators);
+		}
+		
+		for (Person entryrow : dataentry) {
+			Indicator indic1 = (Indicator) entryrow.getfirstindicator();
+			Indicator indic2 = (Indicator) entryrow.getsecondindicator();
+			boolean added=false;
+			addindicatortochart(indic1, oscilators, closes, domainAxis, indicatordataset, series, entryrow.getIndicator1(), entryrow.getIndic1Param(), usedindicators);
+			addindicatortochart(indic2, oscilators, closes, domainAxis, indicatordataset, series,  entryrow.getIndicator2(), entryrow.getIndic2Param(), usedindicators);
+		}
+
+        // Candlestick rendering
+        CandlestickRenderer renderer = new CandlestickRenderer();
+        renderer.setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_SMALLEST);
+        NumberAxis priceAxis= new NumberAxis("Price");
+        priceAxis.setAutoRangeIncludesZero(false);
+        XYPlot XYPlotCandleStick = new XYPlot(ohlcdataset, domainAxis, priceAxis, renderer);
+        
+        //Indicator Dataset
+        int index = 1; 
+        XYPlotCandleStick.setDataset(index, indicatordataset); 
+        XYPlotCandleStick.mapDatasetToRangeAxis(index, 0); 
+        XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer(true, false); 
+        renderer2.setSeriesPaint(index, java.awt.Color.BLUE); 
+        XYPlotCandleStick.setRenderer(index, renderer2);
+
+        //Build Combined Plot
+        CombinedDomainXYPlot mainPlot = new CombinedDomainXYPlot(domainAxis);
+        mainPlot.add(XYPlotCandleStick,90);
+
+        for (XYPlot plot : oscilators) {
+        	 System.out.println("adding oscilator");
+        	 mainPlot.add(plot,20);
+        }
+       // double lowestLow = getLowestLow(lows);
+        //double highestHigh = getHighestHigh(highs);
+        JFreeChart finalchart = new JFreeChart("Backtesting Chart", null, mainPlot, true);
+        XYPlot plot = XYPlotCandleStick;
+        //finalchart.getXYPlot().getRangeAxis().setRange(lowestLow*0.95, highestHigh*1.05);
+        //Add buy & sell trades to chart
+        for (Trade trade : tradingRecord.getTrades()) {
+        	System.out.println(trade.toString());
+            // Buy signal
+            double buySignalTickTime = new Minute(Date.from(series.getBar(trade.getEntry().getIndex()).getEndTime().toInstant())).getFirstMillisecond();
+            Marker buyMarker = new ValueMarker(buySignalTickTime);
+            buyMarker.setPaint(java.awt.Color.GREEN);
+            buyMarker.setLabel("B");
+            buyMarker.setLabelPaint(java.awt.Color.GREEN);
+            buyMarker.setStroke(new BasicStroke(2));
+            plot.addDomainMarker(buyMarker);
+            // Sell signal
+            double sellSignalTickTime = new Minute(Date.from(series.getBar(trade.getExit().getIndex()).getEndTime().toInstant())).getFirstMillisecond();
+            Marker sellMarker = new ValueMarker(sellSignalTickTime);
+            sellMarker.setPaint(java.awt.Color.RED);
+            sellMarker.setLabel("S");
+            sellMarker.setLabelPaint(java.awt.Color.RED);
+            sellMarker.setStroke(new BasicStroke(2));
+            plot.addDomainMarker(sellMarker);
+        }
+        
+        // Chart panel
+        ChartPanel panel = new ChartPanel(finalchart);
+        panel.setFillZoomRectangle(true);
+        panel.setMouseWheelEnabled(true);
+        panel.setPreferredSize(new Dimension(1024, 400));
+        ChartViewer viewer = new ChartViewer(finalchart);
+        
+        LiveTrading.chart=finalchart;
+        LiveTrading.viewer=viewer;
+        Platform.runLater(new Runnable() {
+            public void run() {
+		        FXMLLoader fxmlLoader = new FXMLLoader();
+		        fxmlLoader.setLocation(BacktestController.class.getResource("/liveshowmenu.fxml"));
+		        Scene scene;
+				try {
+					scene = new Scene(fxmlLoader.load(), 1000, 700);
+			        Stage stage = new Stage();
+			        stage.setTitle("LiveTrading Results");
+			        stage.setScene(scene);
+			        stage.show();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        }});
+	}
+
+	 private static void addindicatortochart(Indicator indic1, ArrayList<XYPlot> oscilators, double[] closes, DateAxis domainAxis, TimeSeriesCollection indicatordataset, TimeSeries series, String indicatorcode, Object[] parameters, HashMap<String, Object[]> usedindicators) {
+	    	System.out.println("indiccode: " + indicatorcode);
+	    	if (indicatorcode.equals("Dec")) {
+	    		return;
+	    	}
+	    	boolean allequals=false;
+	    	System.out.println("checking contains");
+	    	if (usedindicators.containsKey(indicatorcode)) {
+	    		System.out.println("contains indicaator");
+	    		allequals=true;
+	    		int x = 0;
+	    		for (Object object : usedindicators.get(indicatorcode)) {
+	    			System.out.println("looping");
+	    			if (!parameters[x].equals(object)) {
+	    				System.out.println("not equal");
+	    				allequals=false;
+	    			}
+	    			x++;
+	    		}
+	    	}
+	    	if (allequals==true) {
+	    		System.out.println("all equals");
+	    		return;
+	    	}
+	    	boolean added = false;
+	    	for (int i=0;i<closes.length-1 && i<10;i++) {
+				if (!added) {
+				Decimal close = Decimal.valueOf(closes[i]);
+				System.out.println(close.toString());
+				Object indicvalue = indic1.getValue(i);
+				System.out.println(indicvalue.getClass());
+				if (indicvalue.getClass()==Decimal.class) {
+					System.out.println("decimall");
+					Decimal indicvalued = (Decimal) indicvalue;
+					if (close.multipliedBy(2).isLessThan(indicvalued) || close.multipliedBy(0.5).isGreaterThan(indicvalued)) {
+						added=true;
+						System.out.println("indicator entry1 IS oscilator");
+						XYLineAndShapeRenderer rendereroscilator = new XYLineAndShapeRenderer(true, false);
+						TimeSeriesCollection oscilatordata = new TimeSeriesCollection(buildChartTimeSeries(series, indic1, indic1.toString()));
+						NumberAxis numberaxis = new NumberAxis(indic1.toString());
+						numberaxis.setAutoRangeIncludesZero(false);
+						XYPlot oscilatorPlot = new XYPlot(oscilatordata, domainAxis, numberaxis, rendereroscilator);
+						oscilators.add(oscilatorPlot);
+						usedindicators.put(indicatorcode, parameters);
+					} else {
+						System.out.println("indicator entry1 NOT oscilator");
+					}
+				} else {
+					System.out.println("not decimal");
+				}
+				} else {
+					System.out.println("already added");
+				}
+			}
+			if (!added) {
+				indicatordataset.addSeries(buildChartTimeSeries(series, indic1, indic1.toString()));
+				usedindicators.put(indicatorcode, parameters);
+			}
+		}
+		private static org.jfree.data.time.TimeSeries buildChartTimeSeries(TimeSeries tickSeries, Indicator<Decimal> indicator, String name) {
+	        org.jfree.data.time.TimeSeries chartTimeSeries = new org.jfree.data.time.TimeSeries(name);
+	        for (int i = 0; i < tickSeries.getBarCount(); i++) {
+	        	Bar tick = tickSeries.getBar(i);
+	            chartTimeSeries.add(new Minute(Date.from(tick.getEndTime().toInstant())), indicator.getValue(i).toDouble());
+	        }
+	        return chartTimeSeries;
+	}
 	
 }
