@@ -13,6 +13,8 @@ import application.Exchanges;
 import application.FillOrderBook;
 import application.FxDialogs;
 import application.Main;
+import application.PendingOrder;
+import application.QuickBuy;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
@@ -94,7 +96,9 @@ public class FillbookController {
 	    		System.out.println(run);
 				if (run.equals("Run")) {
 					Main.logger.log(Level.INFO, "Running fill order book");
-					FillOrderBook.fillOrderBook(base, alt, startprice,endprice, balanceused, nooforders, BuySell, exchange);
+			    	FillOrderBook fillorderbook = new FillOrderBook(base, alt, startprice,endprice, balanceused, nooforders, BuySell, exchange);
+			    	Thread t = new Thread(fillorderbook);
+			    	t.start();
 				} else {
 					Main.logger.log(Level.INFO, "Average order has been canceled from dialog");
 				}

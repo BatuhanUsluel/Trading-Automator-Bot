@@ -21,15 +21,34 @@ import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
 
-public class FillOrderBook {
-	public static void fillOrderBook(String base, String alt, String startpriceS, String endpriceS, String balanceusedS, String noofordersS, String buysell, String exchangeS) throws NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException, JSONException {
+public class FillOrderBook implements Runnable {
+	
+	private String buysell;
+	private String exchangeS;
+	private String endpriceS;
+	private String noofordersS;
+	private String balanceusedS;
+	private String startpriceS;
+	private String alt;
+	private String base;
+	public FillOrderBook(String base, String alt, String startpriceS, String endpriceS, String balanceusedS, String noofordersS, String buysell, String exchangeS) {
+		this.base=base;
+		this.alt=alt;
+		this.startpriceS=startpriceS;
+		this.endpriceS=endpriceS;
+		this.balanceusedS=balanceusedS;
+		this.noofordersS=noofordersS;
+		this.buysell=buysell;
+		this.exchangeS=exchangeS;
+	}
+	
+	@Override
+	public void run() {
 		double startprice = Double.parseDouble(startpriceS);
 		double endprice = Double.parseDouble(endpriceS);
 		double balanceused = Double.parseDouble(balanceusedS);
 		double nooforders = Double.parseDouble(noofordersS);
 		Exchange exchange = Exchanges.exchangemap.get(exchangeS);
-		
-		
 		double volumeperorder = balanceused/nooforders;
 		double currentprice = startprice;
 		CurrencyPair pair = new CurrencyPair(alt,base);
