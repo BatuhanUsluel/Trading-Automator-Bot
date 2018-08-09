@@ -13,6 +13,7 @@ import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.trade.LimitOrder;
+import org.knowm.xchange.dto.trade.MarketOrder;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
@@ -36,8 +37,11 @@ public class TrailingStop implements Runnable {
 	private boolean buy;
 	private Exchange exchange;
 	private JSONObject json;
+	private boolean above;
+	private String buysell;
+	private OrderType ordertype;
 	
-	public TrailingStop(String base, String alt, String volume, String exchangeS, String trail, String buysell, JSONObject json) {
+	public TrailingStop(String base, String alt, String volume, String exchangeS, String trail, String buysell, String abovebelow, JSONObject json) {
 		this.base = base;
 		this.alt=alt;
 		this.volume = Double.parseDouble(volume);
@@ -45,12 +49,20 @@ public class TrailingStop implements Runnable {
 		this.exchange = Exchanges.exchangemap.get(exchangeS);
 		this.trail = Double.parseDouble(trail);
 		this.pair = new CurrencyPair(alt,base);
+		this.buysell=buysell;
 		if (buysell.equals("Buy")) {
+			this.ordertype = OrderType.BID;
 			this.buy=true;
 		} else if (buysell.equals("Sell")) {
+			this.ordertype = OrderType.ASK;
 			this.buy=false;
 		}
 		this.json=json;
+		if(abovebelow.equals("Above Price")) {
+			this.above = true;
+		} else {
+			this.above = false;
+		}
 	}
 	public void run() {
     		Main.logger.log(Level.INFO, "Running trailing stop");
@@ -91,54 +103,48 @@ public class TrailingStop implements Runnable {
 		double price;
 		try {
 			price = exchange.getMarketDataService().getTicker(pair).getBid().doubleValue();
-				if (firstrun==true) {
-					if (buy==true) {
-						double altvolume = volume/(price+trail);
-						person.addOrderData("First run\nCurrent price: " + price + "\nPlacing Buy Order @ " + round((price+trail),6) + "\n");
-						LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
-						System.out.println(LastOrder);
-						lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
+				if (firstrun) {
+					if (above) { //Above Price
+						person.addOrderData("First run\nCurrent price: " + price + "\nWill " + buysell + " if price hits " + round((price+trail),6) + "\n");
 						prevprice = price;
-					} else {
-						person.addOrderData("First run\nCurrent price: " + price + "\nSell order price: " + round((price-trail),6) +"\n");
+					} else { //Below Price
+						person.addOrderData("First run\nCurrent price: " + price + "\nWill " + buysell + " if price hits: " + round((price-trail),6) +"\n");
 						prevprice = price;
 					}
 					firstrun=false;
-				} else {
-					if (buy==true) {
-						if (LastOrder.getStatus()== Order.OrderStatus.PARTIALLY_FILLED ) {
-							person.addOrderData("Order has already been partially filled, not moving order\n");
-						} else if(LastOrder.getStatus() == Order.OrderStatus.FILLED) {
-							person.addOrderData("Order has been filled! Stopping TrailingStop\n");
-							run=false;
-						} else {
+				} else { //Not first
+					if (above) { //Above
 							if (price<prevprice) {
-								person.addOrderData("Price has decreased. Changing price of buy.\nPrevious Lowest Price: " + prevprice + "\nCurrent lowest price: " + price + "\nNew buy order price: " + round((price+trail),8) + "\n");
-								
-								exchange.getTradeService().cancelOrder(lastorder);
-								double altvolume = volume/(price+trail);
-								LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
-								lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
+								person.addOrderData("Price has decreased. Changing price of order.\nPrevious Lowest Price: " + prevprice + "\nCurrent lowest price: " + price + "\nNew order price: " + round((price+trail),8) + "\n");
 								prevprice = price;
+							} else if (price>=prevprice+trail) {
+								person.addOrderData("Order activation price has been reached");
+								double altvolume = volume/(price);
+								MarketOrder marketOrder = new MarketOrder(ordertype, new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair);
+								person.addOrderData(marketOrder.toString());
+								person.addOrderData("Sending Market Order to exchange");
+								String orderReturnValue = exchange.getTradeService().placeMarketOrder(marketOrder);
+								person.addOrderData(orderReturnValue);
+								run=false;
 							} else {
-								person.addOrderData("Price hasn't decreased.\nLowest price: " + prevprice + "\nCurrent price: " + price + "\nBuy order price: " + (prevprice+trail) + "\n");
-								System.out.println("Price:" + price);
-								System.out.println("PrevPrice: " +prevprice);
+								person.addOrderData("Price hasn't decreased.\nLowest price: " + prevprice + "\nCurrent price: " + price + "\nOrder price: " + (prevprice+trail) + "\n");
 							}
-						}
-					} else {
+							
+					} else { //Below
 						if (price>prevprice) {
-							person.addOrderData("Price has increased. Changing price of sell.\nPrevious Highest Price: " + prevprice + "\nCurrent highest price: " + price + "\nNew sell order price: " + (price-trail) + "\n");
+							person.addOrderData("Price has increased. Changing price of order.\nPrevious Highest Price: " + prevprice + "\nCurrent highest price: " + price + "\nNew order price: " + (price-trail) + "\n");
 							prevprice = price;
 						} else if (price<=prevprice-trail) {
+							person.addOrderData("Order activation price has been reached");
 							double altvolume = volume/(price);
-							LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
-							System.out.println(SellingOrder);
-							lastorder = exchange.getTradeService().placeLimitOrder(SellingOrder);
+							MarketOrder marketOrder = new MarketOrder(ordertype, new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair);
+							person.addOrderData(marketOrder.toString());
+							person.addOrderData("Sending Market Order to exchange");
+							String orderReturnValue = exchange.getTradeService().placeMarketOrder(marketOrder);
+							person.addOrderData(orderReturnValue);
 							run=false;
 						} else {
-							person.addOrderData("Price hasn't increased.\nHighest price: " + prevprice + "\nCurrent price: " + price + "\nSell order price: " + round((prevprice-trail),6) + "\n");
-							System.out.println("Price hasn't increased. Keeping sell at same price");
+							person.addOrderData("Price hasn't increased.\nHighest price: " + prevprice + "\nCurrent price: " + price + "\nOrder price: " + round((prevprice-trail),6) + "\n");
 						}
 					}
 				}
@@ -150,12 +156,6 @@ public class TrailingStop implements Runnable {
 	public void stopOrder() {
 		person.addOrderData("\nTrailing Stop order has been manually stopped from dashboard.\n-------------------------------------------\n Stopping Trailing Stop.");
 		run=false;
-		try {
-			exchange.getTradeService().cancelOrder(lastorder);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	public static double round(double value, int places) {
 	    if (places < 0) throw new IllegalArgumentException();
