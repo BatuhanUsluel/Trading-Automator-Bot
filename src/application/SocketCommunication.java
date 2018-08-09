@@ -129,25 +129,6 @@ public class SocketCommunication {
 												}
 										}
 										break;
-									case "pendingOrder":
-										Main.logger.log(Level.INFO, "Recieved prices for pending order");
-										HashMap<JSONObject, PendingOrder> hashmappending = PendingController.PendingOrderMap;
-										for (Entry<JSONObject, PendingOrder> entry : hashmappending.entrySet()) {
-											JSONObject key = entry.getKey();
-												if ((key.getString("base").equals(jsonmessage.getString("base")))
-													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
-													&& (key.getString("request").equals(jsonmessage.getString("request")))
-													&& (key.getString("priceorder").equals(jsonmessage.getString("priceorder")))
-													&& (key.getString("volume").equals(jsonmessage.getString("volume")))
-													&& (key.getString("percent").equals(jsonmessage.getString("percent")))
-													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
-													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
-													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
-														PendingOrder value = entry.getValue();
-														value.recievedPendingOrder(jsonmessage);
-												}
-										}
-										break;
 									case "marketMaking":
 										Main.logger.log(Level.INFO, "Recieved prices for market making");
 										HashMap<JSONObject, MarketMaking> hashmapmarket = MarketController.marketMakingMap;

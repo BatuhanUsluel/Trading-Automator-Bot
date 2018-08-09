@@ -1,4 +1,5 @@
 package application;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -76,37 +77,9 @@ public class PendingOrder implements Runnable {
         try {
             while (orderplaced!=true && ordercanceled!=true) {
             	person.addOrderData("\nRequesting price\n");
-            		JSONObject jsonrun = this.json;
-					jsonrun.put("millis", System.currentTimeMillis());
-            		OrdersPending.add(jsonrun);
-                	System.out.println(jsonrun);
-                	SocketCommunication.out.print(jsonrun.toString());
-                	SocketCommunication.out.flush();
-            	TimeUnit.SECONDS.sleep(60);
-            }
-		} catch (InterruptedException | JSONException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void recievedPendingOrder(JSONObject message) throws JSONException  {
-		System.out.println("Recieved PendingOrder Message!");
-		for (int i = 0; i < OrdersPending.size(); i++) {
-			JSONObject listitem = OrdersPending.get(i);
-			if ((listitem.getString("base").equals(message.getString("base")))
-			&& (listitem.getString("alt").equals(message.getString("alt")))
-			&& (listitem.getString("request").equals(message.getString("request")))
-			&& (listitem.getString("volume").equals(message.getString("volume")))
-			&& (listitem.getString("priceorder").equals(message.getString("priceorder")))
-			&& (listitem.getString("percent").equals(message.getString("percent")))
-			&& (listitem.getString("Exchanges").equals(message.getString("Exchanges")))
-			&& (listitem.getString("licenceKey").equals(message.getString("licenceKey")))
-			&& (listitem.getString("buysell").equals(message.getString("buysell")))
-			&& listitem.getLong("millisstart") == (message.getLong("millisstart"))
-			&& listitem.getLong("millis") == (message.getLong("millis"))) {
-				OrdersPending.remove(listitem);
-				person.addOrderData("Recieved price\n");
-				double price = Double.parseDouble(message.getString("price"));
+            	CurrencyPair pair = new CurrencyPair(alt,base);
+            	double price = exchange.getMarketDataService().getTicker(pair).getBid().doubleValue();
+				person.addOrderData("Recieved price: " + price);
 				if (ordercanceled!=true) {
 				if (this.buy==true) { //Buying order
 					if((this.priceorder*(1+this.percent))>=price) { //Buying order activated
@@ -132,9 +105,16 @@ public class PendingOrder implements Runnable {
 					}
 				  }
 				}
-			}
+            	TimeUnit.SECONDS.sleep(60);
+            }
+		} catch (InterruptedException | JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
+
 	
 	public void stopOrder() {
 		System.out.println("cancelPendingOrder!!");
