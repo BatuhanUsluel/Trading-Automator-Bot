@@ -12,6 +12,7 @@ import application.Exchanges;
 import application.FxDialogs;
 import application.Main;
 import application.QuickBuy;
+import application.TrailingStop;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -64,12 +65,12 @@ public class QuickbuyController {
     		stringBuilder.append(percent + " is not a valid number(percent).\n");
     	}
     	if (noerror==true) {
-    		QuickBuy.sendQuickPriceRequest(base,alt,exchange, Double.parseDouble(volume), Double.parseDouble(percent));
+    		QuickBuy QuickBuyClass = new QuickBuy();
+    		QuickBuyClass.runOrder(base,alt,exchange, Double.parseDouble(volume), Double.parseDouble(percent));
         	Main.logger.log(Level.INFO, "Sending quick buy price request");
     	} else {
 			String finalString = stringBuilder.toString();
 			FxDialogs.showError(null, finalString);
-	}	
-	
+    	}	
 	}    
 }

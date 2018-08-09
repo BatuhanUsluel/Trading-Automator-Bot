@@ -67,10 +67,6 @@ public class SocketCommunication {
 									JSONObject jsonmessage = new JSONObject(message);
 									String request = jsonmessage.getString("request");
 									switch (request) {
-									case "quickBuy":
-										Main.logger.log(Level.INFO, "Recieved quickbuy prices");
-										QuickBuy.recievedQuickBuyMessage(jsonmessage);
-										break;
 									case "arbitrageOrder":
 										Main.logger.log(Level.INFO, "Recieved arbitrage prices");
 										HashMap<JSONObject, ArbitrageOrder> arbitrageMap = ArbitrageController.ArbitrageOrderMap;
