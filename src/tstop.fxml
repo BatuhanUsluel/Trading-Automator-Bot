@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TrailingController">
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TrailingController">
    <children>
       <Label layoutX="76.0" layoutY="66.0" prefHeight="42.0" prefWidth="115.0" text="Base Pair:" textFill="#3592dd">
          <font>
@@ -39,7 +39,7 @@
             <Font size="26.0" />
          </font>
       </Label>
-      <Label layoutX="462.0" layoutY="141.0" prefHeight="42.0" prefWidth="94.0" text="Trail By:" textFill="#3592dd">
+      <Label layoutX="461.0" layoutY="219.0" prefHeight="42.0" prefWidth="94.0" text="Trail By:" textFill="#3592dd">
          <font>
             <Font size="26.0" />
          </font>
@@ -50,23 +50,23 @@
          </font>
       </TextField>
       <Separator layoutX="80.0" layoutY="329.0" prefHeight="9.0" prefWidth="115.0" />
-      <TextField fx:id="TStopTrail" layoutX="457.0" layoutY="175.0" prefHeight="44.0" prefWidth="134.0" promptText="0.05" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+      <TextField fx:id="TStopTrail" layoutX="456.0" layoutY="253.0" prefHeight="44.0" prefWidth="134.0" promptText="0.05" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
          <font>
             <Font size="19.0" />
          </font>
       </TextField>
-      <Separator layoutX="471.0" layoutY="207.0" prefHeight="9.0" prefWidth="115.0" />
-      <JFXButton fx:id="RunTStop" layoutX="674.0" layoutY="270.0" onAction="#trailingStop" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
+      <Separator layoutX="470.0" layoutY="285.0" prefHeight="9.0" prefWidth="115.0" />
+      <JFXButton fx:id="RunTStop" layoutX="673.0" layoutY="348.0" onAction="#trailingStop" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
          <font>
             <Font size="33.0" />
          </font>
       </JFXButton>
-      <Label layoutX="461.0" layoutY="263.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#4adeff">
+      <Label layoutX="460.0" layoutY="341.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#4adeff">
          <font>
             <Font size="23.0" />
          </font>
       </Label>
-      <JFXComboBox fx:id="TStopExchange" editable="true" focusColor="#8397d3" layoutX="466.0" layoutY="305.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <JFXComboBox fx:id="TStopExchange" editable="true" focusColor="#8397d3" layoutX="465.0" layoutY="383.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
       <Separator fx:id="sepVertical" layoutX="426.0" layoutY="10.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="0.0" style="-fx-opacity: 0.8;" />
       <JFXRadioButton fx:id="TStopSell" layoutX="457.0" layoutY="72.0" style="-jfx-selected-color: #ee9494; -jfx-unselected-color: WHITE;" text="Sell" textFill="WHITE">
          <font>
@@ -77,6 +77,19 @@
          </toggleGroup>
       </JFXRadioButton>
       <JFXRadioButton fx:id="TStopBuy" layoutX="456.0" layoutY="34.0" selected="true" style="-jfx-selected-color: #2acc76; -jfx-unselected-color: WHITE;" text="Buy" textFill="WHITE" toggleGroup="$TStopToggleBS">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </JFXRadioButton>
+      <JFXRadioButton fx:id="AbovePrice" layoutX="457.0" layoutY="162.0" style="-jfx-selected-color: #ee9494; -jfx-unselected-color: WHITE;" text="Above Price" textFill="WHITE">
+         <font>
+            <Font size="25.0" />
+         </font>
+         <toggleGroup>
+            <ToggleGroup fx:id="BelowAbove" />
+         </toggleGroup>
+      </JFXRadioButton>
+      <JFXRadioButton fx:id="BelowPrice" layoutX="456.0" layoutY="124.0" selected="true" style="-jfx-selected-color: #2acc76; -jfx-unselected-color: WHITE;" text="Below Price" textFill="WHITE" toggleGroup="$BelowAbove">
          <font>
             <Font size="25.0" />
          </font>

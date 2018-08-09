@@ -113,9 +113,8 @@ public class TrailingStop implements Runnable {
 							run=false;
 						} else {
 							if (price<prevprice) {
-								person.addOrderData("Changing price of buy. New order @ " + price+trail + "\n");
-								person.addOrderData("Price has decreased. Changing price of buy.\nPrevious Lowest Price: " + prevprice + "\nCurrent lowest price: " + price + "\nNew buy order price: " + (price+trail) + "\n");
-								System.out.println("---------------------------CHANGING BUY----------------------");
+								person.addOrderData("Price has decreased. Changing price of buy.\nPrevious Lowest Price: " + prevprice + "\nCurrent lowest price: " + price + "\nNew buy order price: " + round((price+trail),8) + "\n");
+								
 								exchange.getTradeService().cancelOrder(lastorder);
 								double altvolume = volume/(price+trail);
 								LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
@@ -123,7 +122,6 @@ public class TrailingStop implements Runnable {
 								prevprice = price;
 							} else {
 								person.addOrderData("Price hasn't decreased.\nLowest price: " + prevprice + "\nCurrent price: " + price + "\nBuy order price: " + (prevprice+trail) + "\n");
-								System.out.println("---------------------------NOT TRADING BUY----------------------");
 								System.out.println("Price:" + price);
 								System.out.println("PrevPrice: " +prevprice);
 							}
@@ -131,10 +129,8 @@ public class TrailingStop implements Runnable {
 					} else {
 						if (price>prevprice) {
 							person.addOrderData("Price has increased. Changing price of sell.\nPrevious Highest Price: " + prevprice + "\nCurrent highest price: " + price + "\nNew sell order price: " + (price-trail) + "\n");
-							System.out.println("---------------------------CHANGING PREVPRICE SELL - " + price + "   " + prevprice);
 							prevprice = price;
 						} else if (price<=prevprice-trail) {
-							person.addOrderData("--------------------------------------------\nPlacing sell order now! \nStopping TrailingStop\n--------------------------------------------");
 							double altvolume = volume/(price);
 							LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
 							System.out.println(SellingOrder);
@@ -154,6 +150,12 @@ public class TrailingStop implements Runnable {
 	public void stopOrder() {
 		person.addOrderData("\nTrailing Stop order has been manually stopped from dashboard.\n-------------------------------------------\n Stopping Trailing Stop.");
 		run=false;
+		try {
+			exchange.getTradeService().cancelOrder(lastorder);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public static double round(double value, int places) {
 	    if (places < 0) throw new IllegalArgumentException();
