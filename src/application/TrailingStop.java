@@ -19,7 +19,7 @@ import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
-public class TrailingStop {
+public class TrailingStop implements Runnable {
 	ArrayList<JSONObject> OrdersTrailing = new ArrayList<JSONObject>();
 	boolean run;
 	boolean firstrun = true;
@@ -27,38 +27,56 @@ public class TrailingStop {
 	double prevprice;
 	LimitOrder LastOrder;
 	Person person;
-	public void runOrder(JSONObject message) {
+	private String base;
+	private String alt;
+	private double volume;
+	private String exchangeS;
+	private double trail;
+	private CurrencyPair pair;
+	private boolean buy;
+	private Exchange exchange;
+	private JSONObject json;
+	
+	public TrailingStop(String base, String alt, String volume, String exchangeS, String trail, String buysell, JSONObject json) {
+		this.base = base;
+		this.alt=alt;
+		this.volume = Double.parseDouble(volume);
+		this.exchangeS = exchangeS;
+		this.exchange = Exchanges.exchangemap.get(exchangeS);
+		this.trail = Double.parseDouble(trail);
+		this.pair = new CurrencyPair(alt,base);
+		if (buysell.equals("Buy")) {
+			this.buy=true;
+		} else if (buysell.equals("Sell")) {
+			this.buy=false;
+		}
+		this.json=json;
+	}
+	public void run() {
     		Main.logger.log(Level.INFO, "Running trailing stop");
-			final JSONObject messagefinal = message;
 			Thread thread = new Thread(new Runnable() {
 				public void run() {
 				run=true;
 				DashboardController dash = new DashboardController();
 	        	try {
-					person = dash.newOrder(message);
+					person = dash.newOrder(json);
 					person.addOrderData("Starting Trailing Stop\n"
-					+ String.format("%-10s:%10s\n","Base",message.getString("base"))
-					+ String.format("%-10s:%10s\n","Alt",message.getString("alt"))
-					+ String.format("%-10s:%10s\n","Volume", message.getString("volume"))
-					+ String.format("%-10s:%10s\n","Exchange", message.getString("Exchanges"))
-					+ String.format("%-10s:%10s\n","Trail", message.getString("trail"))
-					+ String.format("%-10s:%10s\n","Order Type",message.getString("buysell"))
+					+ String.format("%-10s:%10s\n","Base",base)
+					+ String.format("%-10s:%10s\n","Alt", alt)
+					+ String.format("%-10s:%10s\n","Volume", volume)
+					+ String.format("%-10s:%10s\n","Exchange", exchangeS)
+					+ String.format("%-10s:%10s\n","Trail", trail)
+					+ String.format("%-10s:%10s\n","Order Type", buy)
 					+ "--------------------------------------\n");
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 
 	            try {
-					//int loop = Integer.parseInt(message.getString("loop"));
 		            while (run==true) {
 		            		person.addOrderData("\nRequesting price\n");
-		            		System.out.println("Sending Order Request");
-		            		messagefinal.put("millis", System.currentTimeMillis());
-		                	OrdersTrailing.add(messagefinal);
-		                	System.out.println(messagefinal);
-		                	SocketCommunication.out.print(messagefinal.toString());
-		                	SocketCommunication.out.flush();
-		            	TimeUnit.SECONDS.sleep(20);
+		            		checkPrice();
+		            	TimeUnit.MINUTES.sleep(5);
 		            }
 				} catch (InterruptedException | JSONException e) {
 					e.printStackTrace();
@@ -69,51 +87,20 @@ public class TrailingStop {
 	    thread.start();
 	}
 	
-	public void recievedTrailingStop(JSONObject message) throws JSONException, NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
-		
-		for (int i = 0; i < OrdersTrailing.size(); i++) {
-			JSONObject listitem = OrdersTrailing.get(i);
-			if ((listitem.getString("base").equals(message.getString("base")))
-			&& (listitem.getString("alt").equals(message.getString("alt")))
-			&& (listitem.getString("request").equals(message.getString("request")))
-			&& (listitem.getString("volume").equals(message.getString("volume")))
-			&& (listitem.getString("trail").equals(message.getString("trail")))
-			&& (listitem.getString("buysell").equals(message.getString("buysell")))
-			&& (listitem.getString("Exchanges").equals(message.getString("Exchanges")))
-			&& (listitem.getString("licenceKey").equals(message.getString("licenceKey")))
-			&& listitem.getLong("millisstart") == (message.getLong("millisstart"))
-			&& listitem.getLong("millis") == (message.getLong("millis"))) {
-				OrdersTrailing.remove(listitem);
-				person.addOrderData("Recieved price\n");
-				String basecoin = listitem.getString("base");
-				String altcoin = listitem.getString("alt");
-				String exchangeString = listitem.getString("Exchanges");
-				Exchange exchange = Exchanges.exchangemap.get(exchangeString);
-				String buystring = listitem.getString("buysell");
-				boolean buy = true;
-				if (buystring.equals("Buy")) {
-					buy=true;
-				} else if (buystring.equals("Sell")) {
-					buy=false;
-				} else {
-					System.out.println("error!");
-				}
-				double volume = Double.parseDouble(listitem.getString("volume"));
-				double trail = Double.parseDouble(listitem.getString("trail"));
-				double price = Double.parseDouble(message.getString("price"));
-				CurrencyPair pair = new CurrencyPair(altcoin,basecoin);
-				
+	public void checkPrice() {
+		double price;
+		try {
+			price = exchange.getMarketDataService().getTicker(pair).getBid().doubleValue();
 				if (firstrun==true) {
-					
 					if (buy==true) {
+						double altvolume = volume/(price+trail);
 						person.addOrderData("First run\nCurrent price: " + price + "\nPlacing Buy Order @ " + round((price+trail),6) + "\n");
-						LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
+						LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
 						System.out.println(LastOrder);
 						lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
 						prevprice = price;
 					} else {
 						person.addOrderData("First run\nCurrent price: " + price + "\nSell order price: " + round((price-trail),6) +"\n");
-						System.out.println("---------------------------TRADING FIRST RUN SELL----------------------");
 						prevprice = price;
 					}
 					firstrun=false;
@@ -130,10 +117,9 @@ public class TrailingStop {
 								person.addOrderData("Price has decreased. Changing price of buy.\nPrevious Lowest Price: " + prevprice + "\nCurrent lowest price: " + price + "\nNew buy order price: " + (price+trail) + "\n");
 								System.out.println("---------------------------CHANGING BUY----------------------");
 								exchange.getTradeService().cancelOrder(lastorder);
-								LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
+								double altvolume = volume/(price+trail);
+								LastOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price+trail).setScale(8, RoundingMode.HALF_DOWN));
 								lastorder = exchange.getTradeService().placeLimitOrder(LastOrder);
-								System.out.println("Price:" + price);
-								System.out.println("PrevPrice: " +prevprice);
 								prevprice = price;
 							} else {
 								person.addOrderData("Price hasn't decreased.\nLowest price: " + prevprice + "\nCurrent price: " + price + "\nBuy order price: " + (prevprice+trail) + "\n");
@@ -149,8 +135,8 @@ public class TrailingStop {
 							prevprice = price;
 						} else if (price<=prevprice-trail) {
 							person.addOrderData("--------------------------------------------\nPlacing sell order now! \nStopping TrailingStop\n--------------------------------------------");
-							System.out.println("---------------------------SELLING!!!----------------------");
-							LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
+							double altvolume = volume/(price);
+							LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
 							System.out.println(SellingOrder);
 							lastorder = exchange.getTradeService().placeLimitOrder(SellingOrder);
 							run=false;
@@ -158,12 +144,13 @@ public class TrailingStop {
 							person.addOrderData("Price hasn't increased.\nHighest price: " + prevprice + "\nCurrent price: " + price + "\nSell order price: " + round((prevprice-trail),6) + "\n");
 							System.out.println("Price hasn't increased. Keeping sell at same price");
 						}
-						
 					}
 				}
-			}
-		}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+	
 	public void stopOrder() {
 		person.addOrderData("\nTrailing Stop order has been manually stopped from dashboard.\n-------------------------------------------\n Stopping Trailing Stop.");
 		run=false;

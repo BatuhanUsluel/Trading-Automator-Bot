@@ -89,25 +89,6 @@ public class SocketCommunication {
 										BacktestController.recievedBackTest(jsonmessage);
 										System.out.println(message);
 										break;
-									case "trailingStop":
-										Main.logger.log(Level.INFO, "Recieved prices for trailing stop");
-										HashMap<JSONObject, TrailingStop> hashmaptrailing = TrailingController.TrailingStopMap;
-										for (Entry<JSONObject, TrailingStop> entry : hashmaptrailing.entrySet()) {
-										    JSONObject key = entry.getKey();
-												if ((key.getString("base").equals(jsonmessage.getString("base")))
-													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
-													&& (key.getString("request").equals(jsonmessage.getString("request")))
-													&& (key.getString("volume").equals(jsonmessage.getString("volume")))
-													&& (key.getString("trail").equals(jsonmessage.getString("trail")))
-													&& (key.getString("buysell").equals(jsonmessage.getString("buysell")))
-													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
-													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
-													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
-														TrailingStop value = entry.getValue();
-														value.recievedTrailingStop(jsonmessage);
-												}
-										}
-										break;
 									case "marketMaking":
 										Main.logger.log(Level.INFO, "Recieved prices for market making");
 										HashMap<JSONObject, MarketMaking> hashmapmarket = MarketController.marketMakingMap;

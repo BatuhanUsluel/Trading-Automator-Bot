@@ -98,9 +98,9 @@ public void initialize(){
 		    	trailingStop.put("orderid", value);
 		    	trailingStop.put("endtime","N/A");
 		    	trailingStop.put("running","True");
-		    	TrailingStop trailingstopclass = new TrailingStop();
-		    	trailingstopclass.runOrder(trailingStop);
-		    	TrailingStopMap.put(trailingStop, trailingstopclass);
+		    	TrailingStop trailingstopclass = new TrailingStop(base,alt,volume,exchange,trail, buysell, trailingStop);
+		    	Thread t = new Thread(trailingstopclass);
+		    	t.start();
 			} else {
 				Main.logger.log(Level.INFO, "Trailing stop has been canceled from dialog");
 			}
