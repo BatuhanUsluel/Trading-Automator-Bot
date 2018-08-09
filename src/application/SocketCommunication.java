@@ -89,27 +89,6 @@ public class SocketCommunication {
 										BacktestController.recievedBackTest(jsonmessage);
 										System.out.println(message);
 										break;
-									case "averageTrading":
-										Main.logger.log(Level.INFO, "Recieved prices for average trading");								
-										HashMap<JSONObject, AverageTrading> hashmapaverage = AveragetradingController.AverageTradingMap;
-										for (Entry<JSONObject, AverageTrading> entry : hashmapaverage.entrySet()) {
-										    JSONObject key = entry.getKey();
-												if ((key.getString("base").equals(jsonmessage.getString("base")))
-													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
-													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
-													&& (key.getString("request").equals(jsonmessage.getString("request")))
-													&& (key.getString("coinstotrade").equals(jsonmessage.getString("coinstotrade")))
-													&& (key.getString("volumeperorder").equals(jsonmessage.getString("volumeperorder")))
-													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
-													&& (key.getString("atbid").equals(jsonmessage.getString("atbid")))
-													&& (key.getString("buy").equals(jsonmessage.getString("buy")))
-													&& (key.getString("loop").equals(jsonmessage.getString("loop")))
-													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
-														AverageTrading value = entry.getValue();
-														value.recievedAverageTrade(jsonmessage);
-												}
-										}
-										break;
 									case "trailingStop":
 										Main.logger.log(Level.INFO, "Recieved prices for trailing stop");
 										HashMap<JSONObject, TrailingStop> hashmaptrailing = TrailingController.TrailingStopMap;

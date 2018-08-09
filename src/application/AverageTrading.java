@@ -8,8 +8,10 @@ import java.util.logging.Level;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
+import org.knowm.xchange.dto.marketdata.Ticker;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
@@ -29,22 +31,17 @@ public class AverageTrading  implements Runnable  {
 	private boolean ordercanceled = false;
 
 	private String alt;
-
 	private String exchangestring;
-
-	private Object exchange;
-
+	private Exchange exchange;
 	private String buystring;
-
 	private boolean buy;
-
 	private String base;
-
 	private double volume;
+	private String atbidstring;
+	private boolean bid;
 
 	public AverageTrading(JSONObject json) throws JSONException {
 		this.json = json;
-
 	}
 	
 	public void run() {
@@ -65,6 +62,12 @@ public class AverageTrading  implements Runnable  {
 			this.volume = Double.parseDouble(json.getString("volumeperorder"));
 			this.exchange = Exchanges.exchangemap.get(exchangestring);
 			this.buystring= json.getString("buy");
+			this.atbidstring = json.getString("atbid");
+			if (atbidstring.equals("At Bid")) {
+				this.bid = true;
+			} else {
+				this.bid = false;
+			}
 			if (buystring.equals("Buy")) {
 				this.buy=true;
 			} else if (buystring.equals("Sell")) {
@@ -85,16 +88,16 @@ public class AverageTrading  implements Runnable  {
             while (run==true && ordercanceled!=true) {
             	person.addOrderData("\nSending price request\n");
         		if (coinstotrade>total+volume) {
-        			priceRequest(json);
+        			getPrice();
         			total = total+volume;
         			System.out.println("Total: " + total + "\nCoins2trade: " + coinstotrade + "\nOrdersize: " + volume);
         		} else {
         			double newordersize = coinstotrade-total;
-        			JSONObject jsonnew = json.put("volumeperorder", String.valueOf(newordersize));
-        			priceRequest(jsonnew);
         			volume = newordersize;
         			total = total+volume;
+        			getPrice();
         			run=false;
+        			person.setRunning("False");
         		}
             	System.out.println("Waiting for " + loop);
             	TimeUnit.SECONDS.sleep(loop);
@@ -107,41 +110,35 @@ public class AverageTrading  implements Runnable  {
 		}
         
 	}
-	
-    public void priceRequest(JSONObject JSONObject) throws JSONException {
-    	JSONObject.put("millis", System.currentTimeMillis());
-    	Orders.add(JSONObject);
-    	SocketCommunication.out.print(JSONObject.toString());
-    	SocketCommunication.out.flush();
-    }
     
-	public void recievedAverageTrade(JSONObject message) throws JSONException, NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
-		System.out.println("Recieved AVERAGEE");
-		System.out.println(Orders.toString());
-		for (int i = 0; i < Orders.size(); i++) {
-			JSONObject listitem = Orders.get(i);
-			if (listitem.getLong("millis") == (message.getLong("millis"))) {
-				Orders.remove(listitem);
-            	person.addOrderData("Recieved price request\n");
-
-				double price = Double.parseDouble(message.getString("price"));
-				
-				if (ordercanceled!=true) {
-					CurrencyPair pair = new CurrencyPair(alt,base);
-					if (buy==true) {
-						LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
-						System.out.println(BuyingOrder);
-						//String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
-		            	person.addOrderData("Placing buy order @ " + price + " with volume: " + volume + "\n");
-					} else {
-						LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
-						System.out.println(SellingOrder);
-						//String limitOrderReturnValueSELL = exchange.getTradeService().placeLimitOrder(SellingOrder);
-						person.addOrderData("Placing sell order @ " + price + " with volume: " + volume + "\n");
-					}
+	public void getPrice() {
+		CurrencyPair pair = new CurrencyPair(alt,base);
+		Ticker ticker;
+		try {
+			ticker = exchange.getMarketDataService().getTicker(pair);
+			double price;
+			if (bid) {
+				price = ticker.getBid().doubleValue();
+			} else {
+				price = ticker.getAsk().doubleValue();
+			}
+			
+			if (ordercanceled!=true) {
+				if (buy) {
+					LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
+					System.out.println(BuyingOrder);
+					//String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+	            	person.addOrderData("Placing buy order @ " + price + " with volume: " + volume + "\n");
+				} else {
+					LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(volume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(price).setScale(8, RoundingMode.HALF_DOWN));
+					System.out.println(SellingOrder);
+					//String limitOrderReturnValueSELL = exchange.getTradeService().placeLimitOrder(SellingOrder);
+					person.addOrderData("Placing sell order @ " + price + " with volume: " + volume + "\n");
 				}
 			}
-		}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}	
 	
 	public void stopOrder() {
