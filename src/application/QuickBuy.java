@@ -23,9 +23,23 @@ import org.knowm.xchange.dto.trade.LimitOrder;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
-public class QuickBuy {
+public class QuickBuy implements Runnable{
 	
-    public void runOrder(String base, String alt, String ExchangeString, double btcvolume, double buypercent) {
+	private String base;
+	private String alt;
+	private String ExchangeString;
+	private double btcvolume;
+	private double buypercent;
+
+	public QuickBuy(String base, String alt, String ExchangeString, double btcvolume, double buypercent) {
+		this.base=base;
+		this.alt=alt;
+		this.ExchangeString=ExchangeString;
+		this.btcvolume=btcvolume;
+		this.buypercent=buypercent;
+	}
+	@Override
+    public void run() {
     	long millis = System.currentTimeMillis();
     	Random rand = new Random(); 
     	int value = rand.nextInt(1000000000); 
@@ -54,26 +68,26 @@ public class QuickBuy {
 					+ String.format("%-10s:%10s\n","Volume", btcvolume)
 					+ String.format("%-10s:%10s\n","Buy Percent", buypercent)
 					+ String.format("%-10s:%10s\n","Exchange", ExchangeString) + "--------------------------------------\n");			
-
-    	CurrencyPair pair = new CurrencyPair(alt,base);
-    	double ask = exchange.getMarketDataService().getTicker(pair).getAsk().doubleValue();
-    	double buyprice = ask*((buypercent/100)+1);
-		System.out.println(buyprice);
-		double altvolume = btcvolume/buyprice;
-		LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN));
-		if (btcvolume>0.0001) {
-			person.addOrderData("Placing buy order for " + btcvolume + base + "(" + new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN) + alt + ") @ price: " + new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN) + "\n");
-			FxDialogs.showInformation(null, "Order Placed");
-			Main.logger.log(Level.INFO, "Placed quick buy order");
-			String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
-		} else {
-			FxDialogs.showInformation(null, "BTC Volume too low(below 0.0001). Unable to place order");
-			Main.logger.log(Level.WARNING, "QuickBuy: BTC Volume too low(below 0.0001). Unable to place order");		}
-		
-	} catch (JSONException e1) {
-		e1.printStackTrace();
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
+	
+	    	CurrencyPair pair = new CurrencyPair(alt,base);
+	    	double ask = exchange.getMarketDataService().getTicker(pair).getAsk().doubleValue();
+	    	double buyprice = ask*((buypercent/100)+1);
+			System.out.println(buyprice);
+			double altvolume = btcvolume/buyprice;
+			LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN));
+			if (btcvolume>0.0001) {
+				person.addOrderData("Placing buy order for " + btcvolume + base + "(" + new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN) + alt + ") @ price: " + new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN) + "\n");
+				FxDialogs.showInformation(null, "Order Placed");
+				Main.logger.log(Level.INFO, "Placed quick buy order");
+				String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+			} else {
+				FxDialogs.showInformation(null, "BTC Volume too low(below 0.0001). Unable to place order");
+				Main.logger.log(Level.WARNING, "QuickBuy: BTC Volume too low(below 0.0001). Unable to place order");
+			}	
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 }

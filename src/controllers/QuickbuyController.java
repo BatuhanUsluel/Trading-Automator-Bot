@@ -65,8 +65,9 @@ public class QuickbuyController {
     		stringBuilder.append(percent + " is not a valid number(percent).\n");
     	}
     	if (noerror==true) {
-    		QuickBuy QuickBuyClass = new QuickBuy();
-    		QuickBuyClass.runOrder(base,alt,exchange, Double.parseDouble(volume), Double.parseDouble(percent));
+    		QuickBuy QuickBuyClass = new QuickBuy(base,alt,exchange, Double.parseDouble(volume), Double.parseDouble(percent));
+	    	Thread t = new Thread(QuickBuyClass);
+	    	t.start();
         	Main.logger.log(Level.INFO, "Sending quick buy price request");
     	} else {
 			String finalString = stringBuilder.toString();
