@@ -86,14 +86,8 @@ public class FillOrderBook implements Runnable {
 			e1.printStackTrace();
 		}
 		while (currentprice<=endprice) {
-			//FIX ORDER SIZE WITH BASE/ALT!!
-			//FIX ORDER SIZE WITH BASE/ALT!!
-			//FIX ORDER SIZE WITH BASE/ALT!!
-			//FIX ORDER SIZE WITH BASE/ALT!!
-			//FIX ORDER SIZE WITH BASE/ALT!!
-			//FIX ORDER SIZE WITH BASE/ALT!!
-			//Place order @ currentprice with balanceperorder
-			LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(volumeperorder).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(currentprice).setScale(8, RoundingMode.HALF_DOWN));
+			double altvolume = volumeperorder/currentprice;
+			LimitOrder SellingOrder = new LimitOrder((OrderType.ASK), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(currentprice).setScale(8, RoundingMode.HALF_DOWN));
 			person.addOrderData(SellingOrder.toString() + "\n");
 			//String limitOrderReturnValueSELL = exchange.getTradeService().placeLimitOrder(SellingOrder);
 			//System.out.println("Limit Order return value SELL: " + limitOrderReturnValueSELL);
