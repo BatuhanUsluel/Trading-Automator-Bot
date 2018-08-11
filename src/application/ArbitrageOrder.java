@@ -2,8 +2,20 @@ package application;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,7 +25,9 @@ import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.account.Wallet;
+import org.knowm.xchange.dto.marketdata.Ticker;
 import org.knowm.xchange.dto.trade.LimitOrder;
+import org.knowm.xchange.dto.trade.MarketOrder;
 import org.knowm.xchange.service.account.AccountService;
 
 import controllers.DashboardController;
@@ -56,148 +70,216 @@ public class ArbitrageOrder implements Runnable{
 		} catch (JSONException e1) {
 			e1.printStackTrace();
 		}
-    	SocketCommunication.out.print(json);
-    	SocketCommunication.out.flush();
-		}
-	
-	public void recievedArbitrageOrder(JSONObject message) throws JSONException, IOException, InterruptedException {
-		if (ordercanceled!=true) {
-		System.out.println(message.toString());
-		JSONObject object = message.getJSONObject("Returned");
-		System.out.println(object.toString());
-		double highestbid = 0,lowestask = 0,highestbidvol=0,lowestaskvol=0;
-		Exchange highestbidex = null;
-		Exchange lowestaskex = null;
-		String highestbidexstring = null;
-		String lowestaskexstring = null;
-		boolean firstrun=true;
-		for (String exchange : exchangestotal) {
-			Exchange realexchange = Exchanges.exchangemap.get(exchange);
-			JSONObject object2 = (JSONObject) object.get(exchange);
-			System.out.println(exchange);
-			JSONArray bidarray = object2.getJSONArray("Bid");
-			double bid = bidarray.getDouble(0);
-			JSONArray askarray = object2.getJSONArray("Ask");
-			double ask = askarray.getDouble(0);
-			if (firstrun==true) {
-				highestbid=bid;
-				highestbidvol=bidarray.getDouble(1);
-				highestbidex = realexchange;
-				highestbidexstring = exchange;
-				
-				lowestask=bid;
-				lowestaskvol=askarray.getDouble(1);
-				lowestaskex = realexchange;
-				lowestaskexstring = exchange;
-			} else {
-				if (bid>highestbid) {
-					highestbid=bid;
-					highestbidvol=bidarray.getDouble(1);
-					highestbidex = realexchange;
-					highestbidexstring = exchange;
-				}
-				if (ask<lowestask) {
-					lowestask=ask;
-					lowestaskvol=askarray.getDouble(1);
-					lowestaskex = realexchange;
-					lowestaskexstring = exchange;
-				}
-			}
-			firstrun=false;
-		}
-		person.addOrderData("\n\nHighest Bid: " + highestbid + " with volume " + highestbidvol + " on exchange " + highestbidexstring);
-		person.addOrderData("\nLowest Ask: " + lowestask + " with volume " + lowestaskvol + " on exchange " + lowestaskexstring);
-		if ((highestbid/lowestask)>minarb) {
-			person.addOrderData("\nArbitrage is " + (highestbid/lowestask) + " which is higher than the minimum " + minarb + ". Executing Trade");
-			ArrayList<Thread> balanceThreads = new ArrayList<Thread>();
-			final Exchange newlowestaskex = lowestaskex;
-			final Exchange newhighestbidex = highestbidex;
-			//Get base balance from exchange with lowest ask
-	    	Thread basethread = new Thread() {
-	    	    public void run() {
-	    			AccountService baseaccount = newlowestaskex.getAccountService();
-					try {
-						Wallet basewallet = baseaccount.getAccountInfo().getWallet();
-						balancesClass.baseBalance = basewallet.getBalance(base).getAvailable();
-						person.addOrderData("\nBase balance on exchange " + newlowestaskex.toString() + " is " + balancesClass.baseBalance);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-	    			
-	    	    }
-	    	};
-	    	basethread.setDaemon(true);
-	    	basethread.start();
-	    	balanceThreads.add(basethread);
+    	while (ordercanceled!=true) {
 
-			//Get alt balance from exchange with highest bid
-	    	Thread altthread = new Thread() {
-	    	    public void run() {
-	    			AccountService altaccount = newhighestbidex.getAccountService();
-	    			Wallet altwallet;
-					try {
-						altwallet = altaccount.getAccountInfo().getWallet();
-						balancesClass.altBalance = altwallet.getBalance(base).getAvailable();
-						person.addOrderData("\nAlt balance on exchange " + newhighestbidex.toString() + " is " + balancesClass.altBalance);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-	    	    }
-	    	};
-	    	altthread.setDaemon(true);
-	    	altthread.start();
-	    	balanceThreads.add(altthread);
-			
-	    	for (int i = 0; i < balanceThreads.size(); i++) 
-	        {
-	    		balanceThreads.get(i).join(); 
-	        }
-	    	
-	    	//Volume Calculation
-    		double tradeSize = Math.min(highestbidvol,lowestaskvol);
+    		try {
+    		LinkedList<bidClass> bidClasses= new LinkedList<bidClass>();
+    		LinkedList<askClass> askClasses= new LinkedList<askClass>();
     		
-	        if (tradeSize>balancesClass.altBalance.doubleValue()) {
-	        	person.addOrderData("\nNot enough alt balance, reducing alt volume to: " + tradeSize);
-	        	tradeSize=balancesClass.altBalance.doubleValue();
+    		
+    		ArrayList<Thread> threads = new ArrayList<Thread>();
+    		for (Exchange exchange : exchanges) {
+    			bidClass bid = new bidClass();
+    			askClass ask = new askClass();
+    			Thread tickerthread = new Thread() {
+    	    	    public void run() {
+					Ticker ticker;
+					try {
+						ticker = exchange.getMarketDataService().getTicker(pair);
+						
+						bid.bid=ticker.getBid().doubleValue();
+						bid.bidvolume=ticker.getBidSize().doubleValue();
+						bid.exchange=exchange;
+						
+						
+						ask.ask=ticker.getAsk().doubleValue();
+						ask.askvolume=ticker.getAskSize().doubleValue();
+						ask.exchange=exchange;
+						
+						bidClasses.add(bid);
+						askClasses.add(ask);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+    	    	    }
+    			};
+    			
+    			tickerthread.setDaemon(true);
+    			tickerthread.start();
+    			threads.add(tickerthread);
+    			
+    			Thread basebalances = new Thread() {
+    	    	    public void run() {
+    	    	    	AccountService baseaccount = exchange.getAccountService();
+						try {
+							Wallet basewallet = baseaccount.getAccountInfo().getWallet();
+							double basebalance =  basewallet.getBalance(base).getAvailable().doubleValue();
+							bid.basebalance = basebalance;
+							ask.basebalance = basebalance;
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+    	    	    }
+    			};
+    			basebalances.setDaemon(true);
+    			basebalances.start();
+    			threads.add(basebalances);
+    			
+    			Thread altbalances = new Thread() {
+    	    	    public void run() {
+    	    	    	AccountService baseaccount = exchange.getAccountService();
+						try {
+							Wallet basewallet = baseaccount.getAccountInfo().getWallet();
+							double basebalance =  basewallet.getBalance(alt).getAvailable().doubleValue();
+							bid.altbalance = basebalance;
+							ask.altbalance = basebalance;
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+    	    	    }
+    			};
+    			altbalances.setDaemon(true);
+    			altbalances.start();
+    			threads.add(altbalances);
+    		}
+    		
+	    	for (int i = 0; i < threads.size(); i++) 
+	        {
+	    		threads.get(i);
 	        }
-	        
-	        if (balancesClass.baseBalance.doubleValue()<(tradeSize*lowestask)){
-	        	tradeSize=balancesClass.baseBalance.doubleValue()/lowestask;
-	        	person.addOrderData("\nNot enough base balance, reducing alt volume to: " + tradeSize);
-	        }
-
-	    	//Execute Trades
-	    	LimitOrder buyfromaskorder = new LimitOrder((OrderType.BID), new BigDecimal(tradeSize), this.pair, null, null, new BigDecimal(lowestask));
-	    	person.addOrderData("\n" + buyfromaskorder.toString());
-			//Object buyfromask = highestbidex.getTradeService().placeLimitOrder(buyfromaskorder);
-			
-	    	LimitOrder selltobidorder = new LimitOrder((OrderType.ASK), new BigDecimal(tradeSize), this.pair, null, null, new BigDecimal(highestbid));
-	    	person.addOrderData("\n" + selltobidorder.toString());
-			//Object selltobid = lowestaskex.getTradeService().placeLimitOrder(selltobidorder);
 	    	
-	    	person.addOrderData("Placed orders!");
+    		for (bidClass bid : bidClasses) {
+    			System.out.println(bid.exchange.toString() + ": " + bid.bid + " , " + bid.bidvolume);
+    		}
+    		System.out.println("ask");
+    		for (askClass ask : askClasses) {
+    			System.out.println(ask.exchange.toString() + ": " + ask.ask + " , " + ask.askvolume);
+    		}
+    		System.out.println("order");
+    		Collections.sort(bidClasses);
+    		Collections.sort(askClasses);
+    		for (bidClass bid : bidClasses) {
+    			System.out.println(bid.exchange.toString() + ": " + bid.bid + " , " + bid.bidvolume);
+    		}
+    		for (askClass ask : askClasses) {
+    			System.out.println(ask.exchange.toString() + ": " + ask.ask + " , " + ask.askvolume);
+    		}
+    		LinkedList<exchangesAndOrders> exchangesandorders= new LinkedList<exchangesAndOrders>();
+    		
+    		while(bidClasses.getFirst().bid*minarb>askClasses.getFirst().ask) {
+    			bidClass bidc = bidClasses.getFirst();
+    			askClass askc = askClasses.getFirst();
+    			double bidprice = bidc.bid;
+    			double bidvolume = bidc.bidvolume;
+    			double askprice = askc.ask;
+    			double askvolume = askc.askvolume;
+    			Exchange bidexchange = bidc.exchange;
+    			Exchange askexchange = askc.exchange;
+    			double bidexchangealtbal = bidc.altbalance;
+    			double askexchangebasebal = askc.basebalance;
+    	    	
+    	    	//Volume Calculation
+    			double tradeSize = Double.min(askvolume, bidvolume);
+    			boolean reducedbid = false;
+        		boolean reducedask = false;
+    	        if (tradeSize>bidexchangealtbal) {
+    	        	person.addOrderData("\nNot enough alt balance, reducing alt volume to: " + tradeSize);
+    	        	tradeSize=bidexchangealtbal;
+    	        	reducedbid=true;
+    	        }
+    	        
+    	        if (askexchangebasebal<(tradeSize*askprice)){
+    	        	tradeSize=askexchangebasebal/askprice;
+    	        	person.addOrderData("\nNot enough base balance, reducing alt volume to: " + tradeSize);
+    	        	reducedask=true;
+    	        }
+    	        
+    	        MarketOrder buyfromaskorder = new MarketOrder((OrderType.BID), new BigDecimal(tradeSize), this.pair);
+    	        MarketOrder selltobidorder = new MarketOrder((OrderType.ASK), new BigDecimal(tradeSize), this.pair);
+    	        exchangesAndOrders BidOrder = new exchangesAndOrders(askexchange, buyfromaskorder);
+    	        exchangesAndOrders AskOrder = new exchangesAndOrders(bidexchange, selltobidorder);
+    	        exchangesandorders.add(BidOrder);
+    	        exchangesandorders.add(AskOrder);
+    	        bidc.bidvolume = bidc.bidvolume - tradeSize;
+    	        askc.askvolume = askc.askvolume - tradeSize;
+    	        if (bidc.bidvolume <= 0.00000001) {
+    	        	bidClasses.removeFirst();
+    	        } else if (reducedbid) {
+    	        	bidClasses.removeFirst();
+    	        }
+    	        if (askc.askvolume <= 0.00000001) {
+    	        	askClasses.removeFirst();
+    	        } else if (reducedask) {
+    	        	askClasses.removeFirst();
+    	        }
+    		}
 			
-		} else {
-			person.addOrderData("\nArbitrage is " + (highestbid/lowestask) + " which is lower than the required " + minarb);
-		}
-		}
+			for (exchangesAndOrders order : exchangesandorders) {
+				String returned = order.placeOrder();
+				System.out.println(returned);
+			}
+    		
+    		} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		try {
+				TimeUnit.SECONDS.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
 	}
-	
-    private static class balancesClass {
-        public static BigDecimal baseBalance;
-        public static BigDecimal altBalance;
-    }
     
 	public void stopOrder() {
 		person.addOrderData("\nArbitrage Order has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Arbitrage Bot.");
 		this.ordercanceled = true;
-		JSONObject jsoncancel = this.json;
-		try {
-			jsoncancel.put("cancel","True");
-		} catch (JSONException e) {
-			e.printStackTrace();
+	}
+	
+	public class bidClass implements Comparable<bidClass>{
+		 public double altbalance;
+		 public double basebalance;
+		 public Exchange exchange;
+		 public double bid;
+		 public double bidvolume;
+		@Override
+		public int compareTo(bidClass bidclass) {
+			return Double.compare(bidclass.bid,this.bid);
 		}
-    	SocketCommunication.out.print(jsoncancel);
-    	SocketCommunication.out.flush();
+
+	}
+	public class askClass implements Comparable<askClass>{
+		 public double basebalance;
+		 public double altbalance;
+		 public Exchange exchange;
+		 public double ask;
+		 public double askvolume;
+			@Override
+			public int compareTo(askClass askclass) {
+				return Double.compare(this.ask,askclass.ask);
+			}
+
+	}
+	
+	public class exchangesAndOrders {
+		public Exchange exchange;
+		public MarketOrder marketorder;
+		public exchangesAndOrders(Exchange exchange, MarketOrder marketorder) {
+			this.exchange=exchange;
+			this.marketorder=marketorder;
+		}
+		public String placeOrder() throws IOException {
+			String orderreturn = exchange.getTradeService().placeMarketOrder(marketorder);
+			return orderreturn;
+		}
+	}
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    BigDecimal bd = new BigDecimal(value);
+	    bd = bd.setScale(places, RoundingMode.HALF_DOWN);
+	    return bd.doubleValue();
 	}
 }

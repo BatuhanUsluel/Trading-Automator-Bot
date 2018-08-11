@@ -67,23 +67,6 @@ public class SocketCommunication {
 									JSONObject jsonmessage = new JSONObject(message);
 									String request = jsonmessage.getString("request");
 									switch (request) {
-									case "arbitrageOrder":
-										Main.logger.log(Level.INFO, "Recieved arbitrage prices");
-										HashMap<JSONObject, ArbitrageOrder> arbitrageMap = ArbitrageController.ArbitrageOrderMap;
-										for (Entry<JSONObject, ArbitrageOrder> entry : arbitrageMap.entrySet()) {
-											JSONObject key = entry.getKey();
-												if ((key.getString("base").equals(jsonmessage.getString("base")))
-													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
-													&& (key.getString("MinArbitrage").equals(jsonmessage.getString("MinArbitrage")))
-													&& (key.getString("request").equals(jsonmessage.getString("request")))
-													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
-													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))
-													&& key.getLong("orderid") == (jsonmessage.getLong("orderid"))) {
-														ArbitrageOrder value = entry.getValue();
-														value.recievedArbitrageOrder(jsonmessage);
-												}
-										}
-										break;
 									case "Historic":
 										Main.logger.log(Level.INFO, "Recieved historic prices");
 										BacktestController.recievedBackTest(jsonmessage);
