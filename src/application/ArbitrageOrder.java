@@ -76,6 +76,9 @@ public class ArbitrageOrder implements Runnable{
     		LinkedList<bidClass> bidClasses= new LinkedList<bidClass>();
     		LinkedList<askClass> askClasses= new LinkedList<askClass>();
     		
+    		CountDownLatch doneSignal = new CountDownLatch(exchanges.size()*3);
+    		List<Future<?>> tasks = new ArrayList<Future<?>>();
+    		ExecutorService executor = Executors.newFixedThreadPool(exchanges.size()*3);    		
     		
     		ArrayList<Thread> threads = new ArrayList<Thread>();
     		for (Exchange exchange : exchanges) {
@@ -98,16 +101,14 @@ public class ArbitrageOrder implements Runnable{
 						
 						bidClasses.add(bid);
 						askClasses.add(ask);
+						doneSignal.countDown();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
     	    	    }
     			};
-    			
-    			tickerthread.setDaemon(true);
-    			tickerthread.start();
-    			threads.add(tickerthread);
+    			tasks.add(executor.submit(tickerthread));
     			
     			Thread basebalances = new Thread() {
     	    	    public void run() {
@@ -117,14 +118,13 @@ public class ArbitrageOrder implements Runnable{
 							double basebalance =  basewallet.getBalance(base).getAvailable().doubleValue();
 							bid.basebalance = basebalance;
 							ask.basebalance = basebalance;
+							doneSignal.countDown();
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
     	    	    }
     			};
-    			basebalances.setDaemon(true);
-    			basebalances.start();
-    			threads.add(basebalances);
+    			tasks.add(executor.submit(basebalances));
     			
     			Thread altbalances = new Thread() {
     	    	    public void run() {
@@ -134,20 +134,24 @@ public class ArbitrageOrder implements Runnable{
 							double basebalance =  basewallet.getBalance(alt).getAvailable().doubleValue();
 							bid.altbalance = basebalance;
 							ask.altbalance = basebalance;
+							doneSignal.countDown();
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
     	    	    }
     			};
-    			altbalances.setDaemon(true);
-    			altbalances.start();
-    			threads.add(altbalances);
+    			tasks.add(executor.submit(altbalances));
     		}
     		
-	    	for (int i = 0; i < threads.size(); i++) 
-	        {
-	    		threads.get(i);
-	        }
+    		doneSignal.await(5, TimeUnit.SECONDS);
+    		if (doneSignal.getCount() > 0) {
+    		    for (Future<?> fut : tasks) {
+	    		    if (!fut.isDone()) {
+	    		        System.out.println("Task " + fut + " has not finshed!");
+	    		        fut.cancel(true);
+	    		    }
+    		    }
+    		}
 	    	
     		for (bidClass bid : bidClasses) {
     			System.out.println(bid.exchange.toString() + ": " + bid.bid + " , " + bid.bidvolume);
@@ -221,6 +225,9 @@ public class ArbitrageOrder implements Runnable{
 			}
     		
     		} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
