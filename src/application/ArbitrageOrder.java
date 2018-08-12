@@ -71,7 +71,6 @@ public class ArbitrageOrder implements Runnable{
 			e1.printStackTrace();
 		}
     	while (ordercanceled!=true) {
-
     		try {
     		LinkedList<bidClass> bidClasses= new LinkedList<bidClass>();
     		LinkedList<askClass> askClasses= new LinkedList<askClass>();
@@ -79,8 +78,7 @@ public class ArbitrageOrder implements Runnable{
     		CountDownLatch doneSignal = new CountDownLatch(exchanges.size()*3);
     		List<Future<?>> tasks = new ArrayList<Future<?>>();
     		ExecutorService executor = Executors.newFixedThreadPool(exchanges.size()*3);    		
-    		
-    		ArrayList<Thread> threads = new ArrayList<Thread>();
+
     		for (Exchange exchange : exchanges) {
     			bidClass bid = new bidClass();
     			askClass ask = new askClass();
