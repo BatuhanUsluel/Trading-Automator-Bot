@@ -52,6 +52,7 @@ public class MarketMaking implements Runnable {
 	private TradeService tradeExchange;
 
 	private LimitOrder prevaskorderlimit;
+	private LimitOrder prevbidorderlimit;
 	private Currency basecurrency;
 
 
@@ -148,7 +149,7 @@ public class MarketMaking implements Runnable {
 		Thread altBalanceThread = new Thread() {
     	    public void run() {
     	    	try {
-    	    		TimeUnit.MILLISECONDS.sleep(5);
+    	    		TimeUnit.MILLISECONDS.sleep(2);
 					altBalance = accountExchange.getAccountInfo().getWallet().getBalance(altcurrency).getTotal();
 					doneSignal.countDown();
 				} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
@@ -164,9 +165,13 @@ public class MarketMaking implements Runnable {
 		Thread tickerThread = new Thread() {
     	    public void run() {
     	    	try {
+    	    		TimeUnit.MILLISECONDS.sleep(4);
 					ticker = marketExchange.getTicker(pair);
 					doneSignal.countDown();
 				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -227,7 +232,7 @@ public class MarketMaking implements Runnable {
 				prevaskorderlimit = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
 				prevaskprice = SellPrice.doubleValue();
 				prevaskvolume = SellVolume.doubleValue();
-				prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
+				placeorder(prevaskorderlimit, true);
 				person.addOrderData("\nPlaced sell order @ " + SellPrice + " for volume: " + SellVolume);
 			} else {
 				person.addOrderData("\nOrder size for sell too low");
@@ -245,10 +250,10 @@ public class MarketMaking implements Runnable {
 				BuyVolume = baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN).multiply(new BigDecimal(0.99));
 			}
 			if (BuyVolume.doubleValue()>0.0001) {
-				prevaskorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
+				prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
 				prevbidprice = BuyPrice.doubleValue();
 				prevbidvolume = BuyVolume.doubleValue();
-				prevbidorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
+				placeorder(prevbidorderlimit, false);
 				person.addOrderData("\nPlaced buy order @ " + BuyPrice + " for volume: " + BuyVolume);
 			} else {
 				person.addOrderData("\nOrder size for buy too low");
@@ -256,6 +261,28 @@ public class MarketMaking implements Runnable {
 		}
 	}	
 	
+	private void placeorder(LimitOrder placeorder, boolean sell) {
+		Thread placeOrderThread = new Thread() {
+    	    public void run() {
+				try {
+					if (sell) {
+						prevaskorder = tradeExchange.placeLimitOrder(placeorder);
+					} else {
+						TimeUnit.MILLISECONDS.sleep(2);
+						prevbidorder = tradeExchange.placeLimitOrder(placeorder);
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    	    }
+		};
+		placeOrderThread.start();
+	}
+
 	private void cancelorders(boolean bid, boolean ask) {
 		if (bid) {
 			Thread cancelThreadbid = new Thread() {
