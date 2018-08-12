@@ -3,8 +3,13 @@ package application;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
@@ -24,6 +29,7 @@ import org.knowm.xchange.service.trade.TradeService;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
+import si.mazi.rescu.HttpStatusIOException;
 
 public class MarketMaking implements Runnable {
 
@@ -32,24 +38,19 @@ public class MarketMaking implements Runnable {
 	private String alt;
 	private CurrencyPair pair;
 	private double spread;
-	private double MaxBal;
-	private double MinBal;
+	private BigDecimal maxaltbalance;
+	private BigDecimal minaltbalance;
 	private Exchange exchange;
 	private boolean ordercanceled=false;
-	private double prevbid;
-	private double prevask;
 	private String prevbidorder;
 	private String prevaskorder;
-	private boolean firstrun=true;
 	private double distancefrombest = 0.00000001;
 	private Person person;
-	private int loop;
 
 	private AccountService accountExchange;
 	private MarketDataService marketExchange;
 	private TradeService tradeExchange;
 
-	private LimitOrder prevbidorderlimit;
 	private LimitOrder prevaskorderlimit;
 	private Currency basecurrency;
 
@@ -58,35 +59,22 @@ public class MarketMaking implements Runnable {
 
 
 	private String spreadstring;
-	private BigDecimal prevbuyprice=new BigDecimal(0);
-	private BigDecimal prevsellprice=new BigDecimal(0);
 	private String MaxBalString;
-
+    private BigDecimal baseBalance;
+    private BigDecimal altBalance;
 
 	private String MinBalString;
-
+	private Ticker ticker = null;
 
 	private String exchangeString;
-
-
-	private long millisstart;
-	private boolean gotbalance;
-	private boolean gotBasebalance;
-	private boolean gotAltbalance;
 	
 	public static HashMap<java.lang.Long, BigDecimal> BaseBalance = new HashMap<java.lang.Long, BigDecimal>();
 	public static HashMap<java.lang.Long, BigDecimal> AltBalance = new HashMap<java.lang.Long, BigDecimal>();
+	
 	public MarketMaking(JSONObject json) throws JSONException {
 		this.json = json;
 	}
 	
-   public void gotBaseBalance() {
-	     this.gotBasebalance=true;
-	   }
-	   
-   public void gotAltBalance() {
-	     this.gotAltbalance=true;
-	   }
 	@Override
 	public void run() {
 		try {
@@ -100,10 +88,9 @@ public class MarketMaking implements Runnable {
 			this.spreadstring = this.json.getString("spread");
 			this.MaxBalString = this.json.getString("MaxBal");
 			this.MinBalString = this.json.getString("MinBal");
-			this.millisstart = this.json.getLong("millisstart");
 			this.spread = Double.parseDouble(spreadstring);
-			this.MaxBal = Double.parseDouble(MaxBalString);
-			this.MinBal = Double.parseDouble(MinBalString);
+			this.maxaltbalance = new BigDecimal(MaxBalString);
+			this.minaltbalance = new BigDecimal(MinBalString);
 			this.exchangeString = this.json.getString("Exchanges");
 			this.exchange = Exchanges.exchangemap.get(exchangeString);
 			System.out.println(exchange);
@@ -117,52 +104,13 @@ public class MarketMaking implements Runnable {
 					+ String.format("%-10s:%10s\n","Alt", alt)
 					+ String.format("%-10s:%10s\n","Min Spread", spread)
 					+ String.format("%-10s:%10s\n","Exchange", this.json.getString("Exchanges"))
-					+ String.format("%-10s:%10s\n","Max Balance", MaxBal)
-					+ String.format("%-10s:%10s\n","Min Balance", MinBal) + "--------------------------------------\n") ;
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (NotAvailableFromExchangeException e) {
-			e.printStackTrace();
-		} catch (NotYetImplementedForExchangeException e) {
-			e.printStackTrace();
-		} catch (ExchangeException e) {
-			e.printStackTrace();
-		}
-        try {
-    		person.addOrderData("Sending price request\n");
-        	System.out.println("Json: "  + json);
-        	SocketCommunication.out.print(json);
-        	SocketCommunication.out.flush();
-			Thread baseBalance = new Thread() {
-	    	    public void run() {
-	    	    	try {
-						balancesU.baseBalance = accountExchange.getAccountInfo().getWallet().getBalance(basecurrency).getTotal();
-						gotBaseBalance();
-					} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
-							| ExchangeException | IOException e) {
-						e.printStackTrace();
-					}
-	    	    }
-			};
-			baseBalance.setDaemon(true);
-			baseBalance.start();
-			Thread altBalance = new Thread() {
-	    	    public void run() {
-	    	    	try {
-	    	    		TimeUnit.MILLISECONDS.sleep(5);
-						balancesU.altBalance = accountExchange.getAccountInfo().getWallet().getBalance(altcurrency).getTotal();
-						gotAltBalance();
-					} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
-							| ExchangeException | IOException e) {
-						e.printStackTrace();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-	    	    }
-			};
-			altBalance.setDaemon(true);
-			altBalance.start();
+					+ String.format("%-10s:%10s\n","Max Balance", maxaltbalance)
+					+ String.format("%-10s:%10s\n","Min Balance", minaltbalance) + "--------------------------------------\n") ;
+
+			while (ordercanceled!=true) {
+				trade();
+				TimeUnit.SECONDS.sleep(10);
+			}
 
 		} catch (NotAvailableFromExchangeException e) {
 			e.printStackTrace();
@@ -170,207 +118,178 @@ public class MarketMaking implements Runnable {
 			e.printStackTrace();
 		} catch (ExchangeException e) {
 			e.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
-	public void recievedMarketOrder(JSONObject message) throws JSONException, NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException, InterruptedException  {
-		System.out.println("Recieved market order Message!");
-			
-			if ((base.equals(message.getString("base")))
-			&& (alt.equals(message.getString("alt")))
-			&& (spreadstring.toString().equals(message.getString("spread")))
-			&& (MaxBalString.equals(message.getString("MaxBal")))
-			&& (MinBalString.equals(message.getString("MinBal")))
-			&& (exchangeString.equals(message.getString("Exchanges")))
-			&& millisstart == (message.getLong("millisstart"))
-			&& ordercanceled==false) {
-				double bid1 = Double.parseDouble((message.getJSONObject("Returned").getString("Bid1")));
-				double ask1 = Double.parseDouble((message.getJSONObject("Returned").getString("Ask1")));
-				double ask2 = Double.parseDouble((message.getJSONObject("Returned").getString("Ask2")));
-				double bid2 = Double.parseDouble((message.getJSONObject("Returned").getString("Bid2")));
-				
-				while(gotBasebalance!=true && gotAltbalance!=true) {
-					TimeUnit.MILLISECONDS.sleep(10);
+	
+	public void trade() throws IOException {
+		CountDownLatch doneSignal = new CountDownLatch(3);
+		List<Future<?>> tasks = new ArrayList<Future<?>>();
+		ExecutorService executor = Executors.newFixedThreadPool(3); 
+		Thread baseBalanceThread = new Thread() {
+    	    public void run() {
+    	    	try {
+					baseBalance = accountExchange.getAccountInfo().getWallet().getBalance(basecurrency).getTotal();
+					doneSignal.countDown();
+				} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
+						| ExchangeException | IOException e) {
+					e.printStackTrace();
 				}
-				gotBasebalance=false;
-				gotAltbalance=false;
-				
-				Thread baseBalance = new Thread() {
-		    	    public void run() {
-		    	    	try {
-		    	    		TimeUnit.SECONDS.sleep(4);
-							balancesU.baseBalance = accountExchange.getAccountInfo().getWallet().getBalance(basecurrency).getTotal();
-							gotBaseBalance();
-						} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
-								| ExchangeException | IOException e) {
-							e.printStackTrace();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-		    	    }
-				};
-				baseBalance.setDaemon(true);
-				baseBalance.start();
-				
-				Thread altBalance = new Thread() {
-		    	    public void run() {
-		    	    	try {
-		    	    		TimeUnit.MILLISECONDS.sleep(4005);
-							balancesU.altBalance = accountExchange.getAccountInfo().getWallet().getBalance(altcurrency).getTotal();
-							gotAltBalance();
-						} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
-								| ExchangeException | IOException e) {
-							e.printStackTrace();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-		    	    }
-				};
-				altBalance.setDaemon(true);
-				altBalance.start();
-				
-		        person.addOrderData("\nFirst run== " + firstrun);
-				if (firstrun==true) {
-					if((ask1-bid1)>spread) {
-						BigDecimal BuyPrice = new BigDecimal(bid1+distancefrombest).setScale(8, RoundingMode.HALF_UP);
-						BigDecimal SellPrice = new BigDecimal(ask1-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
-						BigDecimal BuyVolume = (balancesU.baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN));
-						BigDecimal SellVolume = balancesU.altBalance.setScale(8, RoundingMode.HALF_DOWN);
-						person.addOrderData("\nFirst run");
-						prevbuyprice = BuyPrice;
-						prevsellprice = SellPrice;
-						if (BuyVolume.doubleValue()>0.0001) {
-							person.addOrderData("\nBid1: " + bid1 + " Bid2: " + bid2 + "\nPlacing buy order @ " + BuyPrice + "with volume: " + BuyVolume);
-							prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
-							//prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
-						} else {
-							person.addOrderData("\nOrder size for buy too low");
-						}
-						if (SellVolume.doubleValue()>0.0001) {
-							person.addOrderData("\nAsk1: " + ask1 + " Ask2: " + ask2 + "\nPlacing sell order @ " + SellPrice  + "with volume: " + SellVolume);
-							prevaskorderlimit  = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
-							//prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
-						} else {
-							person.addOrderData("\nOrder size for sell too low");
-						}
-						firstrun=false;
-						person.addOrderData("\nFirst run= " + firstrun);
-					} else {
-						//System.out.println("Minspread: " + spread + " is HIGHER than Current spread: " + (ask1-bid1));
-						//System.out.println((ask1-bid1)<spread);
-						person.addOrderData("\nSpread is: " + (ask1-bid1) + " which is lower than minimum spread: " + spread);
-					}
-				} else {
-					if((ask1-bid1)<spread) {
-						person.addOrderData("\nSpread is: " + (ask1-bid1) + " which is lower than minimum spread: " + spread);
-						tradeExchange.cancelOrder(prevbidorder);
-						tradeExchange.cancelOrder(prevaskorder);
-						firstrun=true;
-					} else {
-						boolean wait = false;
-						if (bid2+distancefrombest<(prevbuyprice.doubleValue()) || (bid2+distancefrombest>(prevbuyprice.doubleValue()))) {
-							try {
-								tradeExchange.cancelOrder(prevbidorder);
-							} catch (java.lang.Exception e) {
-								System.out.println("Exception!");
-							}
-							wait=true;
-						}
-						if((ask2-distancefrombest>(prevsellprice.doubleValue())) || (ask2-distancefrombest<(prevsellprice.doubleValue()))) {
-							try {
-								tradeExchange.cancelOrder(prevaskorder);
-							} catch (java.lang.Exception e) {
-								System.out.println("Exception!");
-							}
-							wait=true;
-						}
-						
-						if (wait==true) {
-							person.addOrderData("\nWaiting to make sure orders are canceled");
-							TimeUnit.MILLISECONDS.sleep(2000);
-						}
-						
-						if (bid2+distancefrombest<(prevbuyprice.doubleValue())) {
-							person.addOrderData("\nBuy order price is too high, canceling and placing new order");
-							BigDecimal BuyPrice = new BigDecimal(bid2+distancefrombest).setScale(8, RoundingMode.HALF_UP);
-							BigDecimal BuyVolume = (balancesU.baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN)).multiply(new BigDecimal(0.99));
-							prevbuyprice = BuyPrice;
-							if (BuyVolume.doubleValue()>0.0001) {
-								prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
-								person.addOrderData("Placed buy order @ " + BuyPrice + "for volume: " + BuyVolume);
-								//prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
-							} else {
-								person.addOrderData("Order size for buy too low");
-							}
-						} else if (bid2+distancefrombest>(prevbuyprice.doubleValue())) {
-							person.addOrderData("\nBuy order price is too low, canceling and placing new order");
-							BigDecimal BuyPrice = new BigDecimal(bid1+distancefrombest).setScale(8, RoundingMode.HALF_UP);
-							BigDecimal BuyVolume = (balancesU.baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN)).multiply(new BigDecimal(0.99));
-							prevbuyprice = BuyPrice;
-							if (BuyVolume.doubleValue()>0.0001) {
-								prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, new BigDecimal(bid1+distancefrombest));
-								person.addOrderData("\nPlaced buy order @ " + BuyPrice + "for volume: " + BuyVolume);
-								//prevbidorder = tradeExchange.placeLimitOrder(prevbidorderlimit);
-							} else {
-								person.addOrderData("Order size for buy too low");
-							}
-						} else {
-							person.addOrderData("\nNot changing buy order");
-						}
-						
-						if (ask2-distancefrombest>(prevsellprice.doubleValue())) {
-							person.addOrderData("\nSell order price is too low, canceling and placing new order");
-							BigDecimal SellPrice = new BigDecimal(ask2-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
-							BigDecimal SellVolume = balancesU.altBalance.multiply(new BigDecimal(0.99));
-							prevsellprice = SellPrice;
-							if (SellVolume.doubleValue()>0.0001) {
-								prevaskorderlimit = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
-								person.addOrderData("\nPlaced sell order @ " + SellPrice + "for volume: " + SellVolume);
-								//prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
-							} else {
-								person.addOrderData("Order size for sell too low");
-							}
-						} else if (ask2-distancefrombest<(prevsellprice.doubleValue())) {
-							person.addOrderData("\nSell order price is too high, canceling and placing new order");
-							BigDecimal SellPrice = new BigDecimal(ask1-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
-							BigDecimal SellVolume = balancesU.altBalance.multiply(new BigDecimal(0.99));
-							prevsellprice = SellPrice;
-							if (SellVolume.doubleValue()>0.0001) {
-								prevaskorderlimit = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
-								person.addOrderData("\nPlaced sell order @ " + SellPrice + "for volume: " + SellVolume);
-								//prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
-							} else {
-								person.addOrderData("Order size for sell too low");
-							}
-						} else {
-							person.addOrderData("\nNot changing sell order");
-						}
-					}
+    	    }
+		};
+		tasks.add(executor.submit(baseBalanceThread));
+		
+		Thread altBalanceThread = new Thread() {
+    	    public void run() {
+    	    	try {
+    	    		TimeUnit.MILLISECONDS.sleep(5);
+					altBalance = accountExchange.getAccountInfo().getWallet().getBalance(altcurrency).getTotal();
+					doneSignal.countDown();
+				} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException
+						| ExchangeException | IOException e) {
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
+    	    }
+		};
+		tasks.add(executor.submit(altBalanceThread));
+		
+		Thread tickerThread = new Thread() {
+    	    public void run() {
+    	    	try {
+					ticker = marketExchange.getTicker(pair);
+					doneSignal.countDown();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    	    }
+		};
+		tasks.add(executor.submit(tickerThread));
+		
+		try {
+			doneSignal.await(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (doneSignal.getCount() > 0) {
+		    for (Future<?> fut : tasks) {
+    		    if (!fut.isDone()) {
+    		        person.addOrderData("Did not recieve values from exchange in under 5 seconds, quitting this loop");
+    		        fut.cancel(true);
+    		        return;
+    		    }
+		    }
+		}
+		System.out.println("ticker: " + ticker.toString());
+		double askprice = ticker.getAsk().doubleValue();
+		double bidprice = ticker.getBid().doubleValue();
+		double askvolume;
+		double bidvolume;
+		if (ticker.getAskSize()==null || ticker.getBidSize()==null) {
+			System.out.println("order sizes are null");
+			askvolume = 0;
+			bidvolume = 0;
+		} else {
+			askvolume = ticker.getAskSize().doubleValue();
+			bidvolume = ticker.getBidSize().doubleValue();
+		}
+
+		double prevaskprice = 0;
+		double prevaskvolume = 0;
+		double prevbidprice = 0;
+		double prevbidvolume = 0;
+		double currentspread = (askprice-bidprice);
+		if(currentspread<spread) {
+			person.addOrderData("\nSpread is: " + currentspread + " which is lower than minimum spread: " + spread);
+			try {
+			tradeExchange.cancelOrder(prevbidorder);
+			tradeExchange.cancelOrder(prevaskorder);
+			} catch (Exception e) {
+				
+			}
+			return;
+		} else {
+			person.addOrderData("\nSpread is: " + askprice/bidprice);
+		}
+		
+		if (askprice==prevaskprice && askvolume <= prevaskvolume) {
+			person.addOrderData("\nNot changing sell order");
+		} else {
+			//Different order, place new trade, cancel previous
+			try {
+			tradeExchange.cancelOrder(prevaskorder);
+			} catch (Exception e) {
+				
+			}
+			BigDecimal SellPrice = new BigDecimal(askprice-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
+			BigDecimal SellVolume = altBalance.setScale(8, RoundingMode.HALF_DOWN).subtract(minaltbalance);
+			if (SellVolume.doubleValue()>0.0001) {
+				prevaskorderlimit = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
+				prevaskprice = SellPrice.doubleValue();
+				prevaskvolume = SellVolume.doubleValue();
+				prevaskorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
+				person.addOrderData("\nPlaced sell order @ " + SellPrice + " for volume: " + SellVolume);
+			} else {
+				person.addOrderData("\nOrder size for sell too low");
 			}
 		}
-	
+		
+		if (bidprice==prevbidprice && bidvolume <= prevbidvolume) {
+			person.addOrderData("\nNot changing buy order");
+		} else {
+			//Different order, place new trade, cancel previous
+			try {
+			tradeExchange.cancelOrder(prevbidorder);
+			} catch (Exception e) {
+				
+			}
+			BigDecimal BuyPrice = new BigDecimal(bidprice+distancefrombest).setScale(8, RoundingMode.HALF_UP);
+			BigDecimal BuyVolume = maxaltbalance.subtract(altBalance);
+			if (BuyVolume.doubleValue()>baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN).doubleValue()) {
+				BuyVolume = baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN).multiply(new BigDecimal(0.99));
+			}
+			if (BuyVolume.doubleValue()>0.0001) {
+				prevaskorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
+				prevbidprice = BuyPrice.doubleValue();
+				prevbidvolume = BuyVolume.doubleValue();
+				prevbidorder = tradeExchange.placeLimitOrder(prevaskorderlimit);
+				person.addOrderData("\nPlaced buy order @ " + BuyPrice + " for volume: " + BuyVolume);
+			} else {
+				person.addOrderData("\nOrder size for buy too low");
+			}
+		}
+	}	
 	
 	public static void testtheMarket() throws NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
 		List<CurrencyPair> currencylist = Exchanges.exchangemap.get("poloniex").getExchangeSymbols();
 		for (CurrencyPair curr : currencylist) {
 			try {
-			Ticker ticker = Exchanges.exchangemap.get("poloniex").getMarketDataService().getTicker(curr);
+				TimeUnit.MILLISECONDS.sleep(100);
+			Ticker ticker = Exchanges.exchangemap.get("bittrex").getMarketDataService().getTicker(curr);
 			BigDecimal volume = ticker.getVolume().multiply(ticker.getLast());
 			BigDecimal profit = ticker.getAsk().divide(ticker.getBid(),8,RoundingMode.HALF_UP);
-			if (profit.doubleValue()>1.007 && volume.doubleValue()>20 && ticker.getCurrencyPair().counter.toString().equals("BTC")) {
+			if (profit.doubleValue()>1.005 && volume.doubleValue()>10 && ticker.getCurrencyPair().counter.toString().equals("BTC")) {
 				System.out.println(profit + " Volume: "+ volume + " Pair: " + ticker.getCurrencyPair().toString());
 			}
 			} catch (ExchangeException e) {
 				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (HttpStatusIOException e) {
+				System.out.println("test");
 			}
 		}
 	}
-    private static class balancesU {
-    	public java.lang.Long time;
-        public static BigDecimal baseBalance;
-        public static BigDecimal altBalance;
-    }
     
 	public void stopOrder() {
 		System.out.println("cancel Market Making order!!!");
@@ -384,14 +303,5 @@ public class MarketMaking implements Runnable {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		JSONObject jsoncancel = this.json;
-		try {
-			jsoncancel.put("cancel","True");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-    	SocketCommunication.out.print(jsoncancel);
-    	SocketCommunication.out.flush();
-	}
-	
+	}	
 }

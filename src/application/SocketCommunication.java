@@ -72,25 +72,6 @@ public class SocketCommunication {
 										BacktestController.recievedBackTest(jsonmessage);
 										System.out.println(message);
 										break;
-									case "marketMaking":
-										Main.logger.log(Level.INFO, "Recieved prices for market making");
-										HashMap<JSONObject, MarketMaking> hashmapmarket = MarketController.marketMakingMap;
-										for (Entry<JSONObject, MarketMaking> entry : hashmapmarket.entrySet()) {
-											JSONObject key = entry.getKey();
-												if ((key.getString("base").equals(jsonmessage.getString("base")))
-													&& (key.getString("alt").equals(jsonmessage.getString("alt")))
-													&& (key.getString("spread").equals(jsonmessage.getString("spread")))
-													&& (key.getString("MaxBal").equals(jsonmessage.getString("MaxBal")))
-													&& (key.getString("MinBal").equals(jsonmessage.getString("MinBal")))
-													&& (key.getString("Exchanges").equals(jsonmessage.getString("Exchanges")))
-													&& (key.getString("request").equals(jsonmessage.getString("request")))
-													&& (key.getString("licenceKey").equals(jsonmessage.getString("licenceKey")))
-													&& key.getLong("millisstart") == (jsonmessage.getLong("millisstart"))) {
-														MarketMaking value = entry.getValue();
-														value.recievedMarketOrder(jsonmessage);
-												}
-										}
-										break;
 									case "prevlive":
 										Main.logger.log(Level.INFO, "Recieved prices live trading(historical)");
 										HashMap<Integer, LiveTrading> livemap = LiveController.LiveTradingMap;
@@ -124,10 +105,7 @@ public class SocketCommunication {
 										e.printStackTrace();
 						           } catch (JSONException e) {
 										e.printStackTrace();
-									} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
+									}
 						          }
 						    	});
 				    	t.setDaemon(true);

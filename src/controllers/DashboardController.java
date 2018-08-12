@@ -38,8 +38,6 @@ public class DashboardController {
 	public static ObservableList<Person> data =  FXCollections.observableArrayList();
 	@FXML
     public void initialize(){
-		
-        System.out.println("TEST!ASDADSA");
         try {
 			tableEnable();
 		} catch (NotAvailableFromExchangeException e) {
