@@ -210,12 +210,7 @@ public class MarketMaking implements Runnable {
 		double currentspread = (askprice-bidprice);
 		if(currentspread<spread) {
 			person.addOrderData("\nSpread is: " + currentspread + " which is lower than minimum spread: " + spread);
-			try {
-			tradeExchange.cancelOrder(prevbidorder);
-			tradeExchange.cancelOrder(prevaskorder);
-			} catch (Exception e) {
-				
-			}
+			cancelorders(true,true);
 			return;
 		} else {
 			person.addOrderData("\nSpread is: " + askprice/bidprice);
@@ -225,11 +220,7 @@ public class MarketMaking implements Runnable {
 			person.addOrderData("\nNot changing sell order");
 		} else {
 			//Different order, place new trade, cancel previous
-			try {
-			tradeExchange.cancelOrder(prevaskorder);
-			} catch (Exception e) {
-				
-			}
+			cancelorders(false,true);
 			BigDecimal SellPrice = new BigDecimal(askprice-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
 			BigDecimal SellVolume = altBalance.setScale(8, RoundingMode.HALF_DOWN).subtract(minaltbalance);
 			if (SellVolume.doubleValue()>0.0001) {
@@ -247,11 +238,7 @@ public class MarketMaking implements Runnable {
 			person.addOrderData("\nNot changing buy order");
 		} else {
 			//Different order, place new trade, cancel previous
-			try {
-			tradeExchange.cancelOrder(prevbidorder);
-			} catch (Exception e) {
-				
-			}
+			cancelorders(true,false);
 			BigDecimal BuyPrice = new BigDecimal(bidprice+distancefrombest).setScale(8, RoundingMode.HALF_UP);
 			BigDecimal BuyVolume = maxaltbalance.subtract(altBalance);
 			if (BuyVolume.doubleValue()>baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN).doubleValue()) {
@@ -269,6 +256,39 @@ public class MarketMaking implements Runnable {
 		}
 	}	
 	
+	private void cancelorders(boolean bid, boolean ask) {
+		if (bid) {
+			Thread cancelThreadbid = new Thread() {
+	    	    public void run() {
+					try {
+						tradeExchange.cancelOrder(prevbidorder);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (Exception e) {
+						
+					}
+	    	    }
+			};
+			cancelThreadbid.start();
+		}
+		if (ask) {
+			Thread cancelThreadask = new Thread() {
+	    	    public void run() {
+					try {
+						tradeExchange.cancelOrder(prevaskorder);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (Exception e) {
+						
+					}
+	    	    }
+			};
+			cancelThreadask.start();
+		}		
+	}
+
 	public static void testtheMarket() throws NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
 		List<CurrencyPair> currencylist = Exchanges.exchangemap.get("poloniex").getExchangeSymbols();
 		for (CurrencyPair curr : currencylist) {
@@ -295,13 +315,6 @@ public class MarketMaking implements Runnable {
 		System.out.println("cancel Market Making order!!!");
 		person.addOrderData("\nMarket Making has been manually canceled from dashboard.\n-------------------------------------------\n Stopping Market Making.");
 		this.ordercanceled = true;
-		try {
-			tradeExchange.cancelOrder(prevbidorder);
-			tradeExchange.cancelOrder(prevaskorder);
-		} catch (NotAvailableFromExchangeException | NotYetImplementedForExchangeException | ExchangeException
-				| IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		cancelorders(true,true);
 	}	
 }
