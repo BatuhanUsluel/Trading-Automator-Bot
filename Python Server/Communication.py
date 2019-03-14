@@ -7,7 +7,6 @@ import hashlib
 import errno
 import ccxt
 import json
-import asciichartpy
 import json
 from datetime import datetime
 
@@ -232,7 +231,7 @@ def main():
 			ohlcv = exchange.fetch_ohlcv(symbol, timeframe, from_timestamp, candle)
 			sendMessage = data.rstrip()[:-1] + ",\"Return\":" + json.dumps(ohlcv) + "}\r\n"
 		except Exception as ex:
-			print ex
+			print (ex)
 			sendMessage = data.rstrip()[:-1] + ",\"Error\":" + json.dumps(ex.message) + "}\r\n"
 		conn.send(sendMessage.encode('UTF-8'))
 	def prev_live(exchange, d, conn, data):

@@ -44,7 +44,7 @@ public class Main extends Application {
 	        
 	        Logger logger2 = Logger.getLogger(Main.class.getName());
 	        SimpleDateFormat format = new SimpleDateFormat("M-d_HH.mm.ss");
-	        FileHandler fh = new FileHandler("C:\\Users\\Batuhan Usluel\\Desktop\\LogFile_" + format.format(Calendar.getInstance().getTime()) + ".log");
+	        FileHandler fh = new FileHandler("C:\\Users\\Batuhan\\Desktop\\LogFile_" + format.format(Calendar.getInstance().getTime()) + ".log");
 	        logger2.addHandler(fh);
 	        fh.setFormatter(new SimpleFormatter() {
 	            private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";

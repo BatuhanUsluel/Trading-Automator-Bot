@@ -500,6 +500,7 @@ public class LiveController {
         String css = this.getClass().getResource("/assets/formgui.css").toExternalForm();
         hbox.getStylesheets().add(css);
         JFXButton button = new JFXButton("Done");
+        button.setStyle("-fx-background-color: white;-fx-text-fill: black;-jfx-button-type: RAISED;");
         System.out.println(indicstring);
         String[] parametersstring = IndicatorMaps.indicatorparameters.get(indicstring);
         TextField[] TextFields = new TextField[parametersstring.length];

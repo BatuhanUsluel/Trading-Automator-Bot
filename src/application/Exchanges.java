@@ -38,7 +38,7 @@ public class Exchanges {
 		exchangecodemap.put("gatecoin", "org.knowm.xchange.gatecoin.GatecoinExchange");
 		exchangecodemap.put("gdax", "org.knowm.xchange.gdax.GDAXExchange");
 		exchangecodemap.put("geminiv1", "org.knowm.xchange.gemini.v1.GeminiExchange");
-		exchangecodemap.put("hitbtc", "org.knowm.xchange.hitbtc.HitbtcExchange");
+		exchangecodemap.put("hitbtc", "org.knowm.xchange.hitbtc.v2.HitbtcExchange");
 		exchangecodemap.put("huobi", "org.knowm.xchange.huobi.HuobiExchange");
 		exchangecodemap.put("kraken", "org.knowm.xchange.kraken.KrakenExchange");	
 		exchangecodemap.put("liqui", "org.knowm.xchange.liqui.LiquiExchange");

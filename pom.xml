@@ -93,20 +93,8 @@
 	
 	<dependency>
   		<groupId>org.knowm.xchange</groupId>
-  		<artifactId>xchange-poloniex</artifactId>
-  		<version>4.3.7</version>
-	</dependency>
-	
-	<dependency>
-  		<groupId>org.knowm.xchange</groupId>
-  		<artifactId>xchange-coinmarketcap</artifactId>
-  		<version>4.3.7</version>
-	</dependency>
-	
-	<dependency>
-  		<groupId>org.knowm.xchange</groupId>
-  		<artifactId>xchange-bittrex</artifactId>
-  		<version>4.3.7</version>
+  		<artifactId>xchange-examples</artifactId>
+  		<version>4.3.10</version>
 	</dependency>
 	
 	<dependency>
