@@ -13,6 +13,7 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.logging.Level;
 
@@ -20,8 +21,12 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.codec.binary.Hex;
 import org.json.JSONException;
 
 import com.jfoenix.controls.JFXButton;
@@ -94,10 +99,15 @@ public class Controller {
     @FXML
     private void LogIn(ActionEvent event) throws IOException, JSONException, InterruptedException, NoSuchAlgorithmException
     {
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
         String password = Pass.getText();
-    	messageDigest.update(password.getBytes());
-    	String encryptedString = new String(messageDigest.digest());
+        String salt = "1234";
+        int iterations = 10000;
+        int keyLength = 512;
+        char[] passwordChars = password.toCharArray();
+        byte[] saltBytes = salt.getBytes();
+
+        byte[] hashedBytes = hashPassword(passwordChars, saltBytes, iterations, keyLength);
+        String encryptedString = Hex.encodeHexString(hashedBytes);
 		File licencetxtfile = new File("licencekey.txt");
 		File exchangetxtfile = new File("exchanges.txt");
 		File licencekeyencrypted = new File("licencekey.encrypted");
@@ -141,8 +151,13 @@ public class Controller {
         	Main.logger.log(Level.INFO, "password.hashed file found");
             FileReader fileReader = new FileReader("password.hashed");
             BufferedReader bufferedReader =  new BufferedReader(fileReader);
-
-        	if (encryptedString.equals(bufferedReader.readLine())) { //If file exists & the password is correct
+            String readpass = bufferedReader.readLine();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+            	readpass = readpass + line;
+            }
+            
+        	if (encryptedString.equals(readpass)) { //If file exists & the password is correct
         		
         		if (licencetxtfile.isFile()) {
         			if (licencetxtfile.length()==0) {
@@ -190,6 +205,8 @@ public class Controller {
                 ex.createExchanges();
                 SocketCommunication.setup();
         	} else { //If file exists but the password is incorrect
+        		System.out.println("Encrypted String: " +encryptedString);
+        		System.out.println("File String: " + readpass);
         		FxDialogs.showError("Invalid password", "Hashed password does not match password.hashed.");
         		Main.logger.log(Level.WARNING, "Invalid password for login. Hashed password does not match password.hashed. If you wish to use a new password, delete the password.hashed file");
         	}
@@ -278,6 +295,19 @@ public class Controller {
    	    	return false;
                }
         }
+    
+    public static byte[] hashPassword( final char[] password, final byte[] salt, final int iterations, final int keyLength ) {
+
+        try {
+            SecretKeyFactory skf = SecretKeyFactory.getInstance( "PBKDF2WithHmacSHA512" );
+            PBEKeySpec spec = new PBEKeySpec( password, salt, iterations, keyLength );
+            SecretKey key = skf.generateSecret( spec );
+            byte[] res = key.getEncoded( );
+            return res;
+        } catch ( NoSuchAlgorithmException | InvalidKeySpecException e ) {
+            throw new RuntimeException( e );
+        }
+    }
 }
 
 
