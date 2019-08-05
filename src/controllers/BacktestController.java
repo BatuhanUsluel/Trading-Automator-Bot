@@ -416,6 +416,7 @@ public class BacktestController {
     	}
     	System.out.println(totalentryrule.toString());
     	Strategy tradingstrategy =  new BaseStrategy(totalentryrule,totalexitrule);
+    	System.out.println(series);
     	TimeSeriesManager seriesManager = new TimeSeriesManager(series);
 		TradingRecord tradingRecord = seriesManager.run(tradingstrategy);
 		System.out.println("TC: " + tradingRecord.getTradeCount() + "GT:  " + series.getBarCount());

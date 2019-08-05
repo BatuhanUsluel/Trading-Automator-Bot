@@ -50,24 +50,6 @@
          </font>
       </TextField>
       <Separator layoutX="80.0" layoutY="329.0" prefHeight="9.0" prefWidth="115.0" />
-      <TextField fx:id="TStopTrail" layoutX="456.0" layoutY="253.0" prefHeight="44.0" prefWidth="134.0" promptText="0.05" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </TextField>
-      <Separator layoutX="470.0" layoutY="285.0" prefHeight="9.0" prefWidth="115.0" />
-      <JFXButton fx:id="RunTStop" layoutX="673.0" layoutY="348.0" onAction="#trailingStop" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
-         <font>
-            <Font size="33.0" />
-         </font>
-      </JFXButton>
-      <Label layoutX="460.0" layoutY="341.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#4adeff">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
-      <JFXComboBox fx:id="TStopExchange" editable="true" focusColor="#8397d3" layoutX="465.0" layoutY="383.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
-      <Separator fx:id="sepVertical" layoutX="426.0" layoutY="10.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="0.0" style="-fx-opacity: 0.8;" />
       <JFXRadioButton fx:id="TStopSell" layoutX="457.0" layoutY="72.0" style="-jfx-selected-color: #ee9494; -jfx-unselected-color: WHITE;" text="Sell" textFill="WHITE">
          <font>
             <Font size="25.0" />
@@ -94,5 +76,23 @@
             <Font size="25.0" />
          </font>
       </JFXRadioButton>
+      <TextField fx:id="TStopTrail" layoutX="456.0" layoutY="253.0" prefHeight="44.0" prefWidth="134.0" promptText="0.05" style="-fx-background-color: #3e4047; -fx-border-color: #3e4047; -fx-text-inner-color: WHITE;">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </TextField>
+      <JFXComboBox fx:id="TStopExchange" editable="true" focusColor="#8397d3" layoutX="465.0" layoutY="383.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" unFocusColor="WHITE" />
+      <Separator layoutX="470.0" layoutY="285.0" prefHeight="9.0" prefWidth="115.0" />
+      <JFXButton fx:id="RunTStop" layoutX="673.0" layoutY="348.0" onAction="#trailingStop" prefHeight="59.0" prefWidth="147.0" style="-fx-background-color: #2986d3;" text="Run" textFill="WHITE">
+         <font>
+            <Font size="33.0" />
+         </font>
+      </JFXButton>
+      <Label layoutX="460.0" layoutY="341.0" prefHeight="42.0" prefWidth="115.0" text="Exchange:" textFill="#4adeff">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+      <Separator fx:id="sepVertical" layoutX="426.0" layoutY="10.0" orientation="VERTICAL" prefHeight="606.0" prefWidth="0.0" style="-fx-opacity: 0.8;" />
    </children>
 </AnchorPane>

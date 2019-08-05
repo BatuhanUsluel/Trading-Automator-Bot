@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.QuickbuyController">
+<AnchorPane prefHeight="606.0" prefWidth="920.0" style="-fx-background-color: #3e4047;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.QuickbuyController">
    <children>
       <Label layoutX="81.0" layoutY="43.0" prefHeight="42.0" prefWidth="115.0" text="Base Pair:" textFill="#3592dd">
          <font>
@@ -53,6 +53,7 @@
             <Font size="19.0" />
          </font>
       </TextField>
+      <JFXComboBox fx:id="qEx" editable="true" layoutX="77.0" layoutY="500.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" />
       <Separator layoutX="78.0" layoutY="426.0" prefHeight="9.0" prefWidth="23.0" />
       <Label layoutX="101.0" layoutY="403.0" text="\%" textFill="WHITE">
          <font>
@@ -78,6 +79,5 @@
             <Font size="23.0" />
          </font>
       </Label>
-      <JFXComboBox fx:id="qEx" editable="true" layoutX="77.0" layoutY="500.0" promptText="Exchange" style="-fx-text-inner-color: WHITE;" />
    </children>
 </AnchorPane>

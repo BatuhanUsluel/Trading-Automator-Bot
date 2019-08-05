@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.binance.service.BinanceCancelOrderParams;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
@@ -26,6 +27,7 @@ import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import org.knowm.xchange.service.account.AccountService;
 import org.knowm.xchange.service.marketdata.MarketDataService;
 import org.knowm.xchange.service.trade.TradeService;
+import org.knowm.xchange.service.trade.params.CancelOrderParams;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
@@ -44,7 +46,7 @@ public class MarketMaking implements Runnable {
 	private boolean ordercanceled=false;
 	private String prevbidorder;
 	private String prevaskorder;
-	private double distancefrombest = 0.00000001;
+	private double distancefrombest = 0.000001;
 	private Person person;
 
 	private AccountService accountExchange;
@@ -107,9 +109,18 @@ public class MarketMaking implements Runnable {
 					+ String.format("%-10s:%10s\n","Exchange", this.json.getString("Exchanges"))
 					+ String.format("%-10s:%10s\n","Max Balance", maxaltbalance)
 					+ String.format("%-10s:%10s\n","Min Balance", minaltbalance) + "--------------------------------------\n") ;
-
+			BigDecimal new_v = new BigDecimal(0.002592);
+			prevaskorderlimit = new LimitOrder((OrderType.BID), new BigDecimal(1), this.pair, null, null, new_v.setScale(6, RoundingMode.HALF_DOWN));
+			placeorder(prevaskorderlimit, false);
+			TimeUnit.SECONDS.sleep(2);
+			System.out.println("Placed order, id: " + prevbidorder);
+			TimeUnit.SECONDS.sleep(5);
+			System.out.println("ID: " + prevbidorder);
+			CancelOrder.cancelOrder(prevbidorder, pair, exchangeString, tradeExchange);
+			System.out.println("canceled");
+//			testtheMarket();
 			while (ordercanceled!=true) {
-				trade();
+//				trade();
 				TimeUnit.SECONDS.sleep(10);
 			}
 
@@ -119,17 +130,20 @@ public class MarketMaking implements Runnable {
 			e.printStackTrace();
 		} catch (ExchangeException e) {
 			e.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	
-	public void trade() throws IOException {
+	double prevaskprice = 0;
+	double prevaskvolume = 0;
+	double prevbidprice = 0;
+	double prevbidvolume = 0;
+	public void trade() throws IOException, InterruptedException {
 		CountDownLatch doneSignal = new CountDownLatch(3);
 		List<Future<?>> tasks = new ArrayList<Future<?>>();
 		ExecutorService executor = Executors.newFixedThreadPool(3); 
@@ -208,11 +222,8 @@ public class MarketMaking implements Runnable {
 			bidvolume = ticker.getBidSize().doubleValue();
 		}
 
-		double prevaskprice = 0;
-		double prevaskvolume = 0;
-		double prevbidprice = 0;
-		double prevbidvolume = 0;
-		double currentspread = (askprice-bidprice);
+
+		double currentspread = askprice/bidprice;
 		if(currentspread<spread) {
 			person.addOrderData("\nSpread is: " + currentspread + " which is lower than minimum spread: " + spread);
 			cancelorders(true,true);
@@ -221,14 +232,17 @@ public class MarketMaking implements Runnable {
 			person.addOrderData("\nSpread is: " + askprice/bidprice);
 		}
 		
-		if (askprice==prevaskprice && askvolume <= prevaskvolume) {
+
+		if (askprice==prevaskprice) {
 			person.addOrderData("\nNot changing sell order");
 		} else {
 			//Different order, place new trade, cancel previous
 			cancelorders(false,true);
-			BigDecimal SellPrice = new BigDecimal(askprice-distancefrombest).setScale(8, RoundingMode.HALF_DOWN);
+			TimeUnit.SECONDS.sleep((long) 0.5);
+			BigDecimal SellPrice = new BigDecimal(askprice-distancefrombest).setScale(6, RoundingMode.HALF_DOWN);
 			BigDecimal SellVolume = altBalance.setScale(8, RoundingMode.HALF_DOWN).subtract(minaltbalance);
 			if (SellVolume.doubleValue()>0.0001) {
+				SellVolume = SellVolume.setScale(2, RoundingMode.FLOOR);
 				prevaskorderlimit = new LimitOrder((OrderType.ASK), SellVolume, this.pair, null, null, SellPrice);
 				prevaskprice = SellPrice.doubleValue();
 				prevaskvolume = SellVolume.doubleValue();
@@ -239,17 +253,21 @@ public class MarketMaking implements Runnable {
 			}
 		}
 		
-		if (bidprice==prevbidprice && bidvolume <= prevbidvolume) {
+		System.out.println("Bid Price: " + bidprice);
+		System.out.println("My bid price: " + prevbidprice);		
+		if (bidprice==prevbidprice) {
 			person.addOrderData("\nNot changing buy order");
 		} else {
 			//Different order, place new trade, cancel previous
 			cancelorders(true,false);
-			BigDecimal BuyPrice = new BigDecimal(bidprice+distancefrombest).setScale(8, RoundingMode.HALF_UP);
+			TimeUnit.SECONDS.sleep((long) 0.5);
+			BigDecimal BuyPrice = new BigDecimal(bidprice+distancefrombest).setScale(6, RoundingMode.HALF_UP);
 			BigDecimal BuyVolume = maxaltbalance.subtract(altBalance);
 			if (BuyVolume.doubleValue()>baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN).doubleValue()) {
 				BuyVolume = baseBalance.divide(BuyPrice,8,RoundingMode.HALF_DOWN).multiply(new BigDecimal(0.99));
 			}
 			if (BuyVolume.doubleValue()>0.0001) {
+				BuyVolume = BuyVolume.setScale(2, RoundingMode.FLOOR);
 				prevbidorderlimit = new LimitOrder((OrderType.BID), BuyVolume, this.pair, null, null, BuyPrice);
 				prevbidprice = BuyPrice.doubleValue();
 				prevbidvolume = BuyVolume.doubleValue();
@@ -285,10 +303,17 @@ public class MarketMaking implements Runnable {
 
 	private void cancelorders(boolean bid, boolean ask) {
 		if (bid) {
+			prevbidprice = 0;
 			Thread cancelThreadbid = new Thread() {
 	    	    public void run() {
 					try {
-						tradeExchange.cancelOrder(prevbidorder);
+						if (prevbidorder!=null) {
+							System.out.println("Canceling bid: " + prevbidorder);
+							CancelOrderParams t = new BinanceCancelOrderParams(pair, prevbidorder);
+							System.out.println(tradeExchange.cancelOrder(t));
+						} else {
+							System.out.println("No prev bid order to cancel");
+						}
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -300,10 +325,17 @@ public class MarketMaking implements Runnable {
 			cancelThreadbid.start();
 		}
 		if (ask) {
+			prevaskprice = 0;
 			Thread cancelThreadask = new Thread() {
 	    	    public void run() {
 					try {
-						tradeExchange.cancelOrder(prevaskorder);
+						if (prevaskorder!=null) {
+							System.out.println("Canceling ask: " + prevaskorder);
+							CancelOrderParams t = new BinanceCancelOrderParams(pair, prevaskorder);
+							System.out.println(tradeExchange.cancelOrder(t));
+						} else {
+							System.out.println("No prev ask order to cancel");
+						}
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -317,11 +349,11 @@ public class MarketMaking implements Runnable {
 	}
 
 	public static void testtheMarket() throws NotAvailableFromExchangeException, NotYetImplementedForExchangeException, ExchangeException, IOException {
-		List<CurrencyPair> currencylist = Exchanges.exchangemap.get("poloniex").getExchangeSymbols();
+		List<CurrencyPair> currencylist = Exchanges.exchangemap.get("binance").getExchangeSymbols();
 		for (CurrencyPair curr : currencylist) {
 			try {
 				TimeUnit.MILLISECONDS.sleep(100);
-			Ticker ticker = Exchanges.exchangemap.get("bittrex").getMarketDataService().getTicker(curr);
+			Ticker ticker = Exchanges.exchangemap.get("binance").getMarketDataService().getTicker(curr);
 			BigDecimal volume = ticker.getVolume().multiply(ticker.getLast());
 			BigDecimal profit = ticker.getAsk().divide(ticker.getBid(),8,RoundingMode.HALF_UP);
 			if (profit.doubleValue()>1.005 && volume.doubleValue()>10 && ticker.getCurrencyPair().counter.toString().equals("BTC")) {

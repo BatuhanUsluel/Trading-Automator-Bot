@@ -23,6 +23,7 @@ import org.knowm.xchange.dto.trade.LimitOrder;
 
 import controllers.DashboardController;
 import controllers.DashboardController.Person;
+import javafx.application.Platform;
 public class QuickBuy implements Runnable{
 	
 	private String base;
@@ -77,9 +78,15 @@ public class QuickBuy implements Runnable{
 			LimitOrder BuyingOrder = new LimitOrder((OrderType.BID), new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN), pair, null, null, new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN));
 			if (btcvolume>0.0001) {
 				person.addOrderData("Placing buy order for " + btcvolume + base + "(" + new BigDecimal(altvolume).setScale(8, RoundingMode.HALF_DOWN) + alt + ") @ price: " + new BigDecimal(buyprice).setScale(8, RoundingMode.HALF_DOWN) + "\n");
-				FxDialogs.showInformation(null, "Order Placed");
-				Main.logger.log(Level.INFO, "Placed quick buy order");
 				String limitOrderReturnValueBUY = exchange.getTradeService().placeLimitOrder(BuyingOrder);
+				Platform.runLater(new Runnable(){
+					@Override
+					public void run() {
+						FxDialogs.showInformation(null, "Order Placed");
+						
+					}					
+				});
+				Main.logger.log(Level.INFO, "Placed quick buy order");
 			} else {
 				FxDialogs.showInformation(null, "BTC Volume too low(below 0.0001). Unable to place order");
 				Main.logger.log(Level.WARNING, "QuickBuy: BTC Volume too low(below 0.0001). Unable to place order");

@@ -120,7 +120,7 @@ public class PortifolioController {
 			Main.logger.log(Level.SEVERE, "cmc file not found");
 		}
 
-		if (!everything.isEmpty()) {
+		if (everything!=null && !(everything.isEmpty())) {
 			jsonObject = new JsonParser().parse(everything).getAsJsonObject();
 			JsonObject metadata = jsonObject.get("metadata").getAsJsonObject();
 			long time = metadata.get("usertime").getAsLong();
