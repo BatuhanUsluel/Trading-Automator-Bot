@@ -39,7 +39,6 @@ def main():
 	def readconnection(conn):
 		print('new connection')
 		while 1:
-			# !!!!Check logic, probably mistakes with multiple connections!!!!
 			try:
 				data_raw = (conn.recv(1024))
 				data = data_raw.decode("utf-8")
@@ -106,7 +105,6 @@ def main():
 				elif (request == "averageTrading"):
 					print('printing request:')
 					print(d['request'])
-					#ex = getattr(ccxt, d['Exchanges'])
 					ex = getattr(ccxt, d['Exchanges'])
 					exchange = ex()
 					averageTrading_thread = Thread(target=average_Trading, args=(exchange, d, conn, data))

@@ -72,6 +72,14 @@ public class Controller {
 		 @FXML private JFXButton fobook;
 		 @FXML private JFXButton Portifolio;
 
+	
+	 @FXML
+	    public void initialize(){
+		 System.out.println("setting default");
+		 if (LoggedIn!=null) {
+			 LoggedIn.setDefaultButton(true);
+		 }
+	 }
 	@FXML
     private void handleChangeView(ActionEvent event) {
     	System.out.println("Changing");

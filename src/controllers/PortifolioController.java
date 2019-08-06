@@ -36,6 +36,7 @@ import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.account.Balance;
+import org.knowm.xchange.dto.account.Wallet;
 import org.knowm.xchange.dto.marketdata.Ticker;
 
 import com.dslplatform.json.DslJson;
@@ -47,6 +48,7 @@ import com.google.gson.JsonParser;
 
 import application.Exchanges;
 import application.Main;
+import controllers.PortifolioController.Person;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -99,45 +101,14 @@ public class PortifolioController {
 	@FXML
 	public void initialize() throws IOException, JSONException, InterruptedException{
 		ObservableList<Person> data =  FXCollections.observableArrayList();
-		ArrayList<Thread> threads = new ArrayList<Thread>();
-		String everything = null;
-		try {
-		BufferedReader br = new BufferedReader(new FileReader("cmc.txt"));
-			try {
-			    StringBuilder sb = new StringBuilder();
-			    String line = br.readLine();
-	
-			    while (line != null) {
-			        sb.append(line);
-			        sb.append(System.lineSeparator());
-			        line = br.readLine();
-			    }
-			    everything = sb.toString();
-			} finally {
-			    br.close();
-			}
-		} catch (FileNotFoundException e) {
-			Main.logger.log(Level.SEVERE, "cmc file not found");
-		}
-
-		if (everything!=null && !(everything.isEmpty())) {
-			jsonObject = new JsonParser().parse(everything).getAsJsonObject();
-			JsonObject metadata = jsonObject.get("metadata").getAsJsonObject();
-			long time = metadata.get("usertime").getAsLong();
-			long currenttime = System.currentTimeMillis();
-			if (time+604800000L<currenttime) {
-				jsonObject = getCmcListings();
-			}
-		} else {
-			jsonObject = getCmcListings();
-		}
-		
+		ArrayList<Thread> threads = new ArrayList<Thread>();	
 		//BTC TICKER
 	    Thread btcticker = new Thread(new Runnable() {
 	        public void run()
 	        {
 	        	try {
-		        	URL url = new URL("https://api.coinmarketcap.com/v2/ticker/1");
+	        		System.out.println("TICKER");
+		        	URL url = new URL("https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false");
 		    		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		    		con.getResponseCode();
 		    		BufferedReader in;
@@ -148,18 +119,27 @@ public class PortifolioController {
 		    		while ((inputLine = in.readLine()) != null) {
 		    		    content.append(inputLine);
 		    		}
-		    		System.out.println(content);
 		    		in.close();
 		    		con.disconnect();
 		    		JsonParser parser = new JsonParser();
 		    		Object obj = parser.parse(content.toString());
 		    		JSONObject objJsonObject = new JSONObject(obj.toString());
-		    		JSONObject btcusd = objJsonObject.getJSONObject("data").getJSONObject("quotes").getJSONObject("USD");
-		    		BTCValues.Dbtcusdprice = btcusd.getDouble("price");
-		    		BTCValues.DHourChange = btcusd.getDouble("percent_change_1h");
-		    		BTCValues.DDayChange = btcusd.getDouble("percent_change_24h");
-		    		BTCValues.DWeekChange = btcusd.getDouble("percent_change_7d");
-		    		
+		    		JSONObject marketdata = objJsonObject.getJSONObject("market_data");
+		    		BTCValues.Dbtcusdprice = marketdata.getJSONObject("current_price").getDouble("usd");;
+		    		BTCValues.DHourChange = marketdata.getDouble("price_change_percentage_14d");
+		    		BTCValues.DDayChange = marketdata.getDouble("price_change_percentage_24h");
+		    		BTCValues.DWeekChange = marketdata.getDouble("price_change_percentage_7d");
+		    		GlobalData.Dmarketcap = marketdata.getJSONObject("market_cap").getDouble("usd");
+		    		GlobalData.volume = marketdata.getJSONObject("total_volume").getDouble("usd");
+		    		ObservableList<Person> list = tablebalance.getItems();
+		    		int i = 0;
+		    		for (Person p : list) {
+		    			p.setUSDWorth(String.valueOf((Double.valueOf(p.getBTCWorth()) * BTCValues.Dbtcusdprice)));
+		    			p.setDollarPrice(String.valueOf(Double.valueOf(p.getPrice())*BTCValues.Dbtcusdprice));
+		    			System.out.println("Dollar price: " + String.valueOf(Double.valueOf(p.getPrice())*BTCValues.Dbtcusdprice));
+		    			list.set(i, p);
+		    			i++;
+		    		}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -171,12 +151,11 @@ public class PortifolioController {
 	    });  
 	    btcticker.start();
 	    threads.add(btcticker);
-	    //ETH TICKER
 	  	    Thread ethticker = new Thread(new Runnable() {
 	  	        public void run()
 	  	        {
 	  	        	try {
-	  		        	URL url = new URL("https://api.coinmarketcap.com/v2/ticker/1027");
+	  		        	URL url = new URL("https://api.coingecko.com/api/v3/global");
 	  		    		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 	  		    		con.getResponseCode();
 	  		    		BufferedReader in;
@@ -189,11 +168,10 @@ public class PortifolioController {
 	  		    		}
 	  		    		in.close();
 	  		    		con.disconnect();
-	  		    		JsonObject jsonObject = new JsonParser().parse(content.toString()).getAsJsonObject();
-	  		    		JsonObject ethusd = jsonObject.get("data").getAsJsonObject().get("quotes").getAsJsonObject().get("USD").getAsJsonObject();
-	  		    		ETHValues.price = ethusd.get("price").getAsDouble();
-	  		    		ETHValues.daychange = ethusd.get("percent_change_24h").getAsDouble();
-	  		    		
+	  		    		JsonParser parser = new JsonParser();
+			    		Object obj = parser.parse(content.toString());
+			    		JSONObject objJsonObject = new JSONObject(obj.toString());
+	  		    		GlobalData.percentofmcap = objJsonObject.getJSONObject("data").getJSONObject("market_cap_percentage").getDouble("btc");
 	  				} catch (IOException e) {
 	  					// TODO Auto-generated catch block
 	  					e.printStackTrace();
@@ -205,42 +183,6 @@ public class PortifolioController {
 	  	    });  
 	  	  ethticker.start();
 	  	  threads.add(ethticker);
-		//GLOBAL DATA
-	    Thread globaldata = new Thread(new Runnable() {
-	        public void run()
-	        {
-	        	try {
-					URL url = new URL("https://api.coinmarketcap.com/v2/global/");
-					HttpURLConnection con = (HttpURLConnection) url.openConnection();
-					con.setDoOutput(true);
-					int responseCode = con.getResponseCode();
-					BufferedReader in = new BufferedReader(
-					new InputStreamReader(con.getInputStream()));
-					String inputLine;
-					StringBuffer content = new StringBuffer();
-					while ((inputLine = in.readLine()) != null) {
-					    content.append(inputLine);
-					}
-					System.out.println(content);
-					in.close();
-					con.disconnect();
-					JsonParser parser = new JsonParser();
-					Object obj = parser.parse(content.toString());
-					JSONObject objJsonObject = new JSONObject(obj.toString());
-					GlobalData.percentofmcap = objJsonObject.getJSONObject("data").getDouble("bitcoin_percentage_of_market_cap");
-					GlobalData.Dmarketcap = objJsonObject.getJSONObject("data").getJSONObject("quotes").getJSONObject("USD").getDouble("total_market_cap");
-					GlobalData.volume = objJsonObject.getJSONObject("data").getJSONObject("quotes").getJSONObject("USD").getDouble("total_volume_24h");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	        }
-	    });
-	    globaldata.start();
-	    threads.add(globaldata);
 	       new Thread() {
 	            public void run() {
 	            	DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
@@ -260,15 +202,7 @@ public class PortifolioController {
 	                    	Volume.setText("$" + addCommasToNumericString(df.format(GlobalData.volume)));
 	                		marketcap.setText("$" + addCommasToNumericString(df.format(GlobalData.Dmarketcap)));
 	                		Percent.setText(percentdecimal.format(GlobalData.percentofmcap) + "%");
-	                		ETHUSD.setText(pricedecimal.format(ETHValues.price));
 	                		Color CustomRed = Color.valueOf("#d05b5b");
-	                		 if (ETHValues.daychange>0) {
-	                			 	ETHUSDChange.setTextFill(Color.GREEN);
-	                			 	ETHUSDChange.setText("+" + (df.format((ETHValues.daychange))+ "%"));
-	                			} else {
-	                				ETHUSDChange.setTextFill(CustomRed);
-	                				ETHUSDChange.setText(" " + (df.format((ETHValues.daychange))+ "%"));
-	                			}
 	                		if (BTCValues.DHourChange>0) {
 	                			HourChange.setTextFill(Color.GREEN);
 	                			HourChange.setText("+" + (df.format(BTCValues.DHourChange))+ "%");
@@ -305,8 +239,7 @@ public class PortifolioController {
 		ArrayList<Thread> exchangethreads = new ArrayList<Thread>();
 		ArrayList<Thread> changethreads = new ArrayList<Thread>();
 		//Get balances from each exchanges for all currencies and add them to hashmap, with currency being the key and the btc worth being the value(double)
-		HashMap<Currency, Double> balancepercurrency = new HashMap<Currency, Double>();
-		HashMap<Currency, Double> changepercurrency = new HashMap<Currency, Double>();
+		HashMap<Currency, Double[]> balancepercurrency = new HashMap<Currency, Double[]>();
 		for (Entry<String, Exchange> entry : Exchanges.exchangemap.entrySet()) {
 		    String ExchangeString = entry.getKey();
 		    System.out.println("Looping for exchange: " + ExchangeString);
@@ -314,61 +247,21 @@ public class PortifolioController {
 		    Thread exchangethread = new Thread(new Runnable() {
 		    public void run() {
 			    Map<Currency, Balance> balancemap;
+			    Map<String, Wallet> walletmap;
 				try {
-					balancemap = Exchange.getAccountService().getAccountInfo().getWallet().getBalances();
+					walletmap = Exchange.getAccountService().getAccountInfo().getWallets();
+					for (Entry<String, Wallet> entry3 : walletmap.entrySet()) {
+						Wallet wallet = entry3.getValue();
+						balancemap = wallet.getBalances();
+					
 				    for (Entry<Currency, Balance> entry2 : balancemap.entrySet()) {
 				    	Currency currency = entry2.getKey();
-				    	Balance balance = entry2.getValue();
-				    	if (changepercurrency.get(currency)==null && balance.getTotal().doubleValue()>0) {
-				    		changepercurrency.put(currency, Double.valueOf(0));
-				    		 Thread changethread = new Thread(new Runnable() {
-				                public void run() {        	
-										try {
-										int id = 0;
-										for (JsonElement y : jsonObject.get("data").getAsJsonArray()) {
-											JsonObject yjson = y.getAsJsonObject();
-											String symbol = yjson.get("symbol").getAsString();
-											if (symbol.equals(currency.toString())) {
-												id = yjson.get("id").getAsInt();
-												break;
-											}
-										}
-										if (id!=0) {
-										URL url = new URL("https://api.coinmarketcap.com/v2/ticker/" + id);
-					  		    		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-					  		    		con.getResponseCode();
-					  		    		BufferedReader in;
-					  					in = new BufferedReader(
-					  					new InputStreamReader(con.getInputStream()));
-					  		    		String inputLine;
-					  		    		StringBuffer content = new StringBuffer();
-					  		    		while ((inputLine = in.readLine()) != null) {
-					  		    		    content.append(inputLine);
-					  		    		}
-					  		    		in.close();
-					  		    		con.disconnect();
-					  		    		JsonObject jsonObject = new JsonParser().parse(content.toString()).getAsJsonObject();
-					  		    		JsonObject prices = jsonObject.get("data").getAsJsonObject().get("quotes").getAsJsonObject().get("USD").getAsJsonObject();
-					  		    		double change = prices.get("percent_change_24h").getAsDouble();
-					  		    		changepercurrency.put(currency, change);
-										} else {
-											
-										}
-										} catch (IOException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										}
-				    			    }
-				    		 });
-				    		 changethreads.add(changethread);
-				    		 changethread.start();
-				    		 
-				    	}
-				    	
-				    	if (balance.getTotal().doubleValue()>0) {
+				    	Balance balance = entry2.getValue();				    	
+		            	BigDecimal last = null;
+		            	if (balance.getTotal().doubleValue()>0) {
 					    	BigDecimal btcbalance = null;
 					    	if (currency.toString()!="BTC") {
-					    		BigDecimal last;
+					    		
 								try {
 									Ticker ticker = Exchange.getMarketDataService().getTicker(new CurrencyPair(currency.toString(), "BTC"));
 									last = ticker.getLast();									
@@ -379,14 +272,19 @@ public class PortifolioController {
 								
 					    	} else {
 					    		btcbalance = balance.getTotal();
+					    		last=new BigDecimal("1");
 					    	}
 							if (balancepercurrency.get(currency) != null) {
-								balancepercurrency.put(currency, (balancepercurrency.get(currency)+btcbalance.doubleValue()));
+								Double[] array = balancepercurrency.get(currency);
+								Double[] newarray = {(double) array[0] + btcbalance.doubleValue(), array[1], (double) array[2] + balance.getTotal().doubleValue()};
+								balancepercurrency.put(currency, newarray);
 							} else {
-								balancepercurrency.put(currency, btcbalance.doubleValue());
+								Double[] array = {btcbalance.doubleValue(),last.doubleValue(),balance.getTotal().doubleValue()};
+								balancepercurrency.put(currency, array);
 							}
 				    	}
 				    }
+				}
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -396,10 +294,11 @@ public class PortifolioController {
 		    exchangethreads.add(exchangethread);
 		}
 
-		DecimalFormat btcbalancedf = new DecimalFormat("###########.########", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-
 		TableColumn<Person, String> CurrencyCol = new TableColumn<Person, String>("Currency");
 		CurrencyCol.setCellValueFactory(new PropertyValueFactory<>("Currency"));
+		
+		TableColumn<Person, String> AmmountCol = new TableColumn<Person, String>("Ammount");
+		AmmountCol.setCellValueFactory(new PropertyValueFactory<>("Ammount"));
         
         TableColumn<Person, String> BTCWorthCol = new TableColumn<Person, String>("BTC Worth");
         BTCWorthCol.setCellValueFactory(new PropertyValueFactory<>("BTCWorth"));
@@ -410,16 +309,22 @@ public class PortifolioController {
         TableColumn<Person, String> PercentCol = new TableColumn<Person, String>("% Of Balance");
         PercentCol.setCellValueFactory(new PropertyValueFactory<>("Percent"));
         
-        TableColumn<Person, String> ChangeCol = new TableColumn<Person, String>("24H Change");
-        ChangeCol.setCellValueFactory(new PropertyValueFactory<>("Change"));
+        TableColumn<Person, String> PriceCol = new TableColumn<Person, String>("Price (BTC)");
+        PriceCol.setCellValueFactory(new PropertyValueFactory<>("Price"));
+        
+        TableColumn<Person, String> DollarPriceCol = new TableColumn<Person, String>("Price ($)");
+        DollarPriceCol.setCellValueFactory(new PropertyValueFactory<>("DollarPrice"));
+        
         String css = this.getClass().getResource("/assets/tableview.css").toExternalForm();
         tablebalance.getStylesheets().setAll(css);
-        tablebalance.getColumns().addAll(CurrencyCol,BTCWorthCol, USDWorthCol, PercentCol,ChangeCol);
+        tablebalance.getColumns().addAll(CurrencyCol,AmmountCol,BTCWorthCol, USDWorthCol, PercentCol,PriceCol, DollarPriceCol);
+        DecimalFormat btcbalancedf = new DecimalFormat("###########.########", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+    	DecimalFormat pricedecimalchart = new DecimalFormat("#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+    	DecimalFormat pricedecimal = new DecimalFormat("$#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+    	DecimalFormat percentdecimal = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
         new Thread() {
             public void run() {
-            	DecimalFormat pricedecimalchart = new DecimalFormat("#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-            	DecimalFormat pricedecimal = new DecimalFormat("$#########.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-            	DecimalFormat percentdecimal = new DecimalFormat("##.#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+            	
             	for (Thread thread : exchangethreads) {
     		        try {
     					thread.join();
@@ -431,13 +336,15 @@ public class PortifolioController {
                 Platform.runLater(new Runnable() {
                     public void run() {
             			double total=0;		
-            			for (double value : balancepercurrency.values()) {
-            				 total+=value;
+            			for (Double[] value : balancepercurrency.values()) {
+            				 total += value[0];
             			}
-            			for (Entry<Currency, Double> entry : balancepercurrency.entrySet()) {
+            			for (Entry<Currency, Double[]> entry : balancepercurrency.entrySet()) {
             				Currency Currency = entry.getKey();
-            				Double value = entry.getValue();
-            				data.add(new Person(Currency.toString(), btcbalancedf.format(value), pricedecimalchart.format(value*BTCValues.Dbtcusdprice), percentdecimal.format((value/total)*100),"N/A"));
+            				Double[] value = entry.getValue();
+            				System.out.println("Current btc: " + BTCValues.Dbtcusdprice);
+            				System.out.println("BTC Price: " + value[1]);
+            				data.add(new Person(Currency.toString(), value[2].toString(), btcbalancedf.format(value[0]), pricedecimalchart.format(value[0]*BTCValues.Dbtcusdprice), percentdecimal.format((value[0]/total)*100),value[1].toString(), String.valueOf((value[1]*BTCValues.Dbtcusdprice))));
             			}
                     	balance.setText(btcbalancedf.format(total) + " BTC");
             			usdbalance.setText("USD: " + pricedecimal.format(BTCValues.Dbtcusdprice*total));
@@ -461,11 +368,6 @@ public class PortifolioController {
 						e.printStackTrace();
 					}
                 }
-                for (Person person : data) {
-                	Currency currency = new Currency(person.getCurrency());
-                	double change = changepercurrency.get(currency);
-                	person.setChange(Double.toString(change));
-                }
                 Platform.runLater(new Runnable() {
                     public void run() {
                     	tablebalance.refresh();
@@ -474,30 +376,7 @@ public class PortifolioController {
             }
         }.start();
 	}
-	private JsonObject getCmcListings() throws IOException {
-		Main.logger.log(Level.INFO, "Getting listings from cmc");
-		URL url = new URL("https://api.coinmarketcap.com/v2/listings/");
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setDoOutput(true);
-		int responseCode = con.getResponseCode();
-		BufferedReader in = new BufferedReader(
-		new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer content = new StringBuffer();
-		while ((inputLine = in.readLine()) != null) {
-		    content.append(inputLine);
-		}
-		String contentstring = content.toString();
-		in.close();
-		con.disconnect();
-		JsonObject jsonObject = new JsonParser().parse(contentstring).getAsJsonObject();
-		jsonObject.get("metadata").getAsJsonObject().addProperty("usertime", System.currentTimeMillis());
-		try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-	              new FileOutputStream("cmc.txt"), "utf-8"))) {
-			writer.write(jsonObject.toString());
-		}
-		return jsonObject;
-	}
+
 	private String addCommasToNumericString (String digits)
 	{
 	    String result = "";
@@ -518,18 +397,25 @@ public class PortifolioController {
 	
 	public static class Person {
 		private final String Currency;
+		private final String Ammount;
     	private final String BTCWorth;
-    	private final String USDWorth;
+    	private String USDWorth;
     	private final String Percent;
-    	private String Change;
-    	private Person(String Currency,String BTCWorth,String USDWorth, String Percent, String Change) {
+    	private final String Price;
+    	private String DollarPrice;
+    	private Person(String Currency, String Ammount, String BTCWorth,String USDWorth, String Percent, String Price, String DollarPrice) {
     		this.Currency = Currency;
+    		this.Ammount=Ammount;
 			this.BTCWorth  = BTCWorth;
 			this.USDWorth = USDWorth;
 			this.Percent = Percent;
-			this.Change = Change;
+			this.Price=Price;
+			this.DollarPrice=DollarPrice;
     	}
     	
+    	 public String getAmmount() {
+    		 return Ammount;
+    	 }
     	 public String getCurrency() {
              return Currency;
          }
@@ -542,11 +428,20 @@ public class PortifolioController {
     	 public String getPercent() {
              return Percent;
          }
-    	 public String getChange() {
-             return Change;
-         }
-    	 public void setChange(String Change) {
-            this.Change=Change;
-         }
+    	 public String getPrice() {
+    		 return Price;
+    	 }
+
+    	 public String getDollarPrice() {
+    		 return DollarPrice;
+    	 }
+    	 
+    	 public void setUSDWorth(String USDWorth) {
+    		 this.USDWorth=USDWorth;
+    	 }
+    	 
+    	 public void setDollarPrice(String DollarPrice) {
+    		 this.DollarPrice=DollarPrice;
+    	 }
 	}
 }
