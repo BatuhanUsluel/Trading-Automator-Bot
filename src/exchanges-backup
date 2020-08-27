@@ -88,8 +88,8 @@
       "apisecret":"Insert_Api_Secret"
     },
     "poloniex":{  
-      "apikey":"CBU5SD1G-G3K6U3VP-KIK9H73R-0AB52TC4",
-      "apisecret":"fe7885337c05f746c53a020dc7591aafa1ab7b337ee2fc0aeefe9d29d26974a10d28815ef789b170f40949808fd9b04c15fb0585841e9ab010b5a7c664d99bef"
+      "apikey":"Insert_Api_Key",
+      "apisecret":"Insert_Api_Secret
     },
     "quoine":{  
       "apikey":"Insert_Api_Key",
