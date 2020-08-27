@@ -1,4 +1,4 @@
-# Trading-Bot-Assistor
+# Trading-Automator-Bot
 
 Trading bot written in java.
 
