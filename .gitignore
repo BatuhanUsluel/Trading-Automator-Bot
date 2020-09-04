@@ -1,2 +1,5 @@
 /bin/
 /target/
+exchanges.encrypted
+licencekey.encrypted
+password.hashed
