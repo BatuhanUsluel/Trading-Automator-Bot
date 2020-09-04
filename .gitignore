@@ -3,3 +3,5 @@
 exchanges.encrypted
 licencekey.encrypted
 password.hashed
+exchanges.txt
+licencekey.txt
