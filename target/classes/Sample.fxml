@@ -18,11 +18,6 @@
                   <Font size="50.0" />
                </font>
             </Label>
-            <Label fx:id="slogan" layoutX="108.0" layoutY="204.0" text="Insert Slogan Here" textFill="#3f72eb">
-               <font>
-                  <Font size="27.0" />
-               </font>
-            </Label>
          </children>
       </AnchorPane>
       <AnchorPane layoutX="435.0" prefHeight="456.0" prefWidth="518.0" style="-fx-background-color: #3e4047;">
