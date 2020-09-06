@@ -138,8 +138,8 @@ public class BacktestController {
     public void initialize(){
 		System.out.println(ZonedDateTime.now());
 		
-		String css = this.getClass().getResource("/assets/datepicker.css").toExternalForm();
-		Controller.scene.getStylesheets().add(css);;
+		//String css = this.getClass().getResource("/assets/datepicker.css").toExternalForm();
+		//Controller.scene.getStylesheets().add(css);;
 		setUpEntryTable();
 		setUpExitTable();
         List<String> list = new ArrayList<String>(Exchanges.list);

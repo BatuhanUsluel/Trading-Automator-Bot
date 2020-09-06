@@ -33,7 +33,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {	   
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Sample.fxml"));
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
 	        AnchorPane rootLayout = loader.load();
 	        Scene scene = new Scene(rootLayout);
 	        primaryStage.setScene(scene);
