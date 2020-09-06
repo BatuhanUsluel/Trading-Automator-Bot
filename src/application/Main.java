@@ -33,7 +33,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {	   
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Sample.fxml"));
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoggedIn.fxml"));
 	        AnchorPane rootLayout = loader.load();
 	        Scene scene = new Scene(rootLayout);
 	        primaryStage.setScene(scene);
@@ -41,6 +41,8 @@ public class Main extends Application {
 	        primaryStage.show();
 	        primaryStage.setResizable(false);
 	        Main.primaryStage = primaryStage;
+	        
+	        
 	        
 	        Logger logger2 = Logger.getLogger(Main.class.getName());
 	        SimpleDateFormat format = new SimpleDateFormat("M-d_HH.mm.ss");
@@ -59,6 +61,8 @@ public class Main extends Application {
 	            }
 	        });
 	        logger = logger2;
+	        Exchanges ex = new Exchanges();
+            ex.createExchanges();
 		} catch(java.lang.Exception e) {
 			e.printStackTrace();
 		}
