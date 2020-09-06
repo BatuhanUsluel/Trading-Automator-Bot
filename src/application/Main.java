@@ -42,6 +42,8 @@ public class Main extends Application {
 	        primaryStage.setResizable(false);
 	        Main.primaryStage = primaryStage;
 	        
+	        
+	        
 	        Logger logger2 = Logger.getLogger(Main.class.getName());
 	        SimpleDateFormat format = new SimpleDateFormat("M-d_HH.mm.ss");
 	        FileHandler fh = new FileHandler("C:\\Users\\Batuhan\\Desktop\\LogFile_" + format.format(Calendar.getInstance().getTime()) + ".log");
@@ -59,6 +61,8 @@ public class Main extends Application {
 	            }
 	        });
 	        logger = logger2;
+	        Exchanges ex = new Exchanges();
+            ex.createExchanges();
 		} catch(java.lang.Exception e) {
 			e.printStackTrace();
 		}
